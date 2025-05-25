@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Entry Inventory</title>
+  <link href="../public/build/tailwind.css" rel="stylesheet">
+  <style>
+    body {
+      background-image: url('../public/assets/bg-texture.png');
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-position: center;
+    }
+  </style>
+</head>
+
+<body class="min-h-screen font-sans text-white bg-[#5B0B0B]">
+  <div class="flex h-screen">
+    <!-- Sidebar -->
+    <aside class="w-64 bg-[#3D0000] bg-opacity-90 backdrop-blur-md p-6 shadow-2xl">
+      <h2 class="text-3xl font-bold text-white mb-8">Resto App</h2>
+      <nav class="space-y-4">
+        <a href="daftar-inventory.html" class="block py-2 px-4 hover:bg-[#5B0B0B] rounded-md transition">Daftar Inventory</a>
+        <a href="entry-inventory.html" class="block py-2 px-4 bg-[#802B0E] text-white font-semibold rounded-md">Entry Inventory</a>
+        <a href="notif-inventory.html" class="block py-2 px-4 hover:bg-[#5B0B0B] rounded-md transition">Notifikasi Inventory</a>
+        <a href="edit-inventory.html" class="block py-2 px-4 hover:bg-[#5B0B0B] rounded-md transition">Edit Inventory</a>
+        <a href="delete-inventory.html" class="block py-2 px-4 hover:bg-[#5B0B0B] rounded-md transition">Delete Inventory</a>
+        <a href="auto-update-inventory.html" class="block py-2 px-4 hover:bg-[#5B0B0B] rounded-md transition">Auto Update</a>
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 p-10 overflow-y-auto">
+      <div class="max-w-2xl mx-auto">
+        <h1 class="text-4xl font-extrabold mb-6 text-[#FCEEC9]">Entry Inventory</h1>
+        <form class="bg-white bg-opacity-10 backdrop-blur-md p-6 rounded-xl shadow-xl space-y-6">
+          <div>
+            <label for="nama" class="block mb-2 text-sm font-semibold text-white">Nama Barang</label>
+            <input type="text" id="nama" class="w-full px-4 py-2 rounded-md bg-white bg-opacity-20 text-white placeholder-white outline-none" placeholder="Contoh: Tepung Terigu" />
+          </div>
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label for="jumlah" class="block mb-2 text-sm font-semibold text-white">Jumlah</label>
+              <input type="number" id="jumlah" class="w-full px-4 py-2 rounded-md bg-white bg-opacity-20 text-white placeholder-white outline-none" placeholder="Contoh: 30" />
+            </div>
+            <div>
+              <label for="satuan" class="block mb-2 text-sm font-semibold text-white">Satuan</label>
+              <select id="satuan" class="w-full px-4 py-2 rounded-md bg-white bg-opacity-20 text-white outline-none">
+                <option value="pcs">pcs</option>
+                <option value="liter">liter</option>
+                <option value="kg">kg</option>
+              </select>
+            </div>
+          </div>
+          <button type="submit" class="bg-[#F7CA45] hover:bg-[#DDA61A] text-[#3D0000] font-semibold px-6 py-2 rounded-md transition">Tambah</button>
+        </form>
+      </div>
+    </main>
+  </div>
+</body>
+
+</html>

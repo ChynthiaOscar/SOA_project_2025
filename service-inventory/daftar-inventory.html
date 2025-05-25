@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Daftar Inventory</title>
+  <link href="../public/build/tailwind.css" rel="stylesheet">
+  <style>
+    body {
+      background-image: url('../public/assets/bg-texture.png');
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-position: center;
+    }
+  </style>
+</head>
+
+<body class="min-h-screen font-sans text-white bg-[#5B0B0B]">
+  <div class="flex h-screen">
+    <!-- Sidebar -->
+    <aside class="w-64 bg-[#3D0000] bg-opacity-90 backdrop-blur-md p-6 shadow-2xl">
+      <h2 class="text-3xl font-bold text-white mb-8">Resto App</h2>
+      <nav class="space-y-4">
+        <a href="daftar-inventory.html" class="block py-2 px-4 bg-[#802B0E] text-white font-semibold rounded-md">Daftar Inventory</a>
+        <a href="entry-inventory.html" class="block py-2 px-4 hover:bg-[#5B0B0B] rounded-md transition">Entry Inventory</a>
+        <a href="notif-inventory.html" class="block py-2 px-4 hover:bg-[#5B0B0B] rounded-md transition">Notifikasi Inventory</a>
+        <a href="edit-inventory.html" class="block py-2 px-4 hover:bg-[#5B0B0B] rounded-md transition">Edit Inventory</a>
+        <a href="delete-inventory.html" class="block py-2 px-4 hover:bg-[#5B0B0B] rounded-md transition">Delete Inventory</a>
+        <a href="auto-update-inventory.html" class="block py-2 px-4 hover:bg-[#5B0B0B] rounded-md transition">Auto Update</a>
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 p-10 overflow-y-auto">
+      <div class="max-w-5xl mx-auto">
+        <h1 class="text-4xl font-extrabold mb-6 text-[#FCEEC9]">Daftar Inventory</h1>
+        <div class="bg-white bg-opacity-10 backdrop-blur-md p-6 rounded-xl shadow-xl">
+          <table class="min-w-full text-left text-white">
+            <thead class="text-lg font-semibold border-b border-white border-opacity-20">
+              <tr>
+                <th class="py-3 px-4">Nama Barang</th>
+                <th class="py-3 px-4">Jumlah</th>
+                <th class="py-3 px-4">Satuan</th>
+                <th class="py-3 px-4 text-center">Aksi</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-white divide-opacity-20">
+              <tr>
+                <td class="py-3 px-4">Ayam Fillet</td>
+                <td class="py-3 px-4">50</td>
+                <td class="py-3 px-4">pcs</td>
+                <td class="py-3 px-4 text-center">
+                  <a href="#" class="text-[#F7CA45] hover:underline mr-2">Edit</a>
+                  <a href="#" class="text-[#C84141] hover:underline">Hapus</a>
+                </td>
+              </tr>
+              <tr>
+                <td class="py-3 px-4">Minyak Goreng</td>
+                <td class="py-3 px-4">20</td>
+                <td class="py-3 px-4">liter</td>
+                <td class="py-3 px-4 text-center">
+                  <a href="#" class="text-[#F7CA45] hover:underline mr-2">Edit</a>
+                  <a href="#" class="text-[#C84141] hover:underline">Hapus</a>
+                </td>
+              </tr>
+              <!-- Tambahkan baris lainnya sesuai kebutuhan -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+</body>
+
+</html>
