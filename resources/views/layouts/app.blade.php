@@ -11,13 +11,13 @@
     
     @stack('styles') <!-- Optional: untuk stylesheet tambahan -->
 </head>
-<body class="bg-gray-100 text-gray-900">
+<body class="bg-[#131313] text-gray-900">
 
     <!-- Navbar -->
     @include('partials.navbar')
 
     <!-- Konten utama -->
-    <main class="min-h-screen">
+    <main class="min-h-screen py-16">
         @yield('content')
     </main>
 
