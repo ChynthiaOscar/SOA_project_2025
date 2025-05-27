@@ -9,7 +9,7 @@ Route::get('/promo', function () {
     return view('pages.voucher-promo.promoHome');
 });
 
-Route::get('/promo', [PromoVoucherHomeController::class, 'index']);
+Route::get('/promo', [PromoVoucherHomeController::class, 'index'])->name('promoHome');
 
 Route::get('/promo/create', [PromoController::class, 'create']);
 Route::post('/promo/store', [PromoController::class, 'store']);

@@ -1,4 +1,3 @@
-{{-- filepath: resources/views/pages/voucher-promo/promoHome.blade.php --}}
 @extends('layouts.voucher')
 
 @section('title', 'Promo & Voucher')
@@ -12,7 +11,7 @@
     </div>
 
     <!-- ACTION BUTTONS -->
-    <div class="flex flex-wrap gap-4 mt-8 mb-10">
+    <div class="flex flex-wrap gap-4 mt-8 mb-6">
         <a href="{{ url('/promo/create') }}">
             <button class="bg-[#E2BB4D] text-black font-semibold px-6 py-3 border border-[#C9A441] shadow hover:bg-[#c29d34] transition duration-200 uppercase">+ Tambah Promo</button>
         </a>
@@ -21,8 +20,14 @@
         </a>
     </div>
 
+    <!-- SEARCH PROMO -->
+    <form method="GET" class="mb-6">
+        <input type="text" name="search_promo" value="{{ request('search_promo') }}" placeholder="Cari Promo..." class="border px-4 py-2 rounded w-full md:w-1/2 mb-2">
+        <button type="submit" class="ml-2 bg-black text-[#E2BB4D] px-4 py-2 rounded">Cari Promo</button>
+    </form>
+
     <!-- PROMO TABLE -->
-    <div class="mb-12">
+    <div class="mb-12 border-b-4 border-dashed border-gray-400 pb-12">
         <h3 class="text-xl font-bold mb-3 text-black uppercase">Daftar Promo Aktif</h3>
         <div class="overflow-x-auto shadow border border-black">
             <table class="min-w-full text-sm text-left">
@@ -59,17 +64,13 @@
                             <td class="px-4 py-3 border border-black text-center">
                                 <div class="flex justify-center gap-3">
                                     <a href="{{ url('/promos/'.$promo->id.'/edit') }}" title="Edit" class="text-[#E2BB4D] hover:text-black transition duration-150">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536M9 13l6-6m2 2l-6 6m-2 2h6a2 2 0 002-2v-6a2 2 0 00-2-2H7a2 2 0 00-2 2v6a2 2 0 002 2z" />
-                                        </svg>
+                                        ✏️
                                     </a>
                                     <form action="{{ url('/promos/'.$promo->id) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus promo ini?')" class="inline-block">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" title="Delete" class="text-red-600 hover:text-black transition duration-150">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                                            </svg>
+                                            ❌
                                         </button>
                                     </form>
                                 </div>
@@ -77,13 +78,22 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="text-center px-4 py-6 text-[#E2BB4D] font-medium">Tidak ada promo aktif.</td>
+                            <td colspan="7" class="text-center px-4 py-6 text-[#E2BB4D] font-medium">Tidak ada promo aktif.</td>
                         </tr>
                     @endforelse
                 </tbody>
             </table>
         </div>
+        <div class="mt-4">
+            {{ $promos->appends(['search_promo' => request('search_promo')])->links() }}
+        </div>
     </div>
+
+    <!-- SEARCH VOUCHER -->
+    <form method="GET" class="mb-6">
+        <input type="text" name="search_voucher" value="{{ request('search_voucher') }}" placeholder="Cari Voucher..." class="border px-4 py-2 rounded w-full md:w-1/2 mb-2">
+        <button type="submit" class="ml-2 bg-black text-[#E2BB4D] px-4 py-2 rounded">Cari Voucher</button>
+    </form>
 
     <!-- VOUCHER TABLE -->
     <div>
@@ -106,22 +116,18 @@
                             <td class="px-4 py-3 border border-black">{{ $voucher->description }}</td>
                             <td class="px-4 py-3 border border-black">Rp {{ number_format($voucher->promo_value, 0, ',', '.') }}</td>
                             <td class="px-4 py-3 border border-black">
-                                {{ $promo->status == 1 ? 'Aktif' : 'Tidak Aktif' }}
+                                {{ $voucher->status == 1 ? 'Aktif' : 'Tidak Aktif' }}
                             </td>
                             <td class="px-4 py-3 border border-black text-center">
                                 <div class="flex justify-center gap-3">
                                     <a href="{{ url('/vouchers/'.$voucher->id.'/edit') }}" title="Edit" class="text-[#E2BB4D] hover:text-black transition duration-150">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536M9 13l6-6m2 2l-6 6m-2 2h6a2 2 0 002-2v-6a2 2 0 00-2-2H7a2 2 0 00-2 2v6a2 2 0 002 2z" />
-                                        </svg>
+                                        ✏️
                                     </a>
                                     <form action="{{ url('/vouchers/'.$voucher->id) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus voucher ini?')" class="inline-block">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" title="Delete" class="text-red-600 hover:text-black transition duration-150">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                                            </svg>
+                                            ❌
                                         </button>
                                     </form>
                                 </div>
@@ -129,11 +135,14 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="4" class="text-center px-4 py-6 text-[#E2BB4D] font-medium">Tidak ada voucher aktif.</td>
+                            <td colspan="5" class="text-center px-4 py-6 text-[#E2BB4D] font-medium">Tidak ada voucher aktif.</td>
                         </tr>
                     @endforelse
                 </tbody>
             </table>
+        </div>
+        <div class="mt-4">
+            {{ $vouchers->appends(['search_voucher' => request('search_voucher')])->links() }}
         </div>
     </div>
 </div>

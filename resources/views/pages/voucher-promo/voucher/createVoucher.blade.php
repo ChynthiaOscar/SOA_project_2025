@@ -7,6 +7,11 @@
 <div class="min-h-screen bg-[#EEEACB] flex items-center justify-center py-10">
     <div class="w-full max-w-xl bg-white border-2 border-[#E2BB4D] p-8 shadow" style="box-shadow:0 4px 16px #e2bb4d33;">
         <h2 class="text-2xl font-bold mb-6 text-black uppercase tracking-wider border-b-2 border-[#E2BB4D] pb-2">Tambah Voucher</h2>
+        <a href="{{ route('promoHome') }}" class="inline-block mb-6">
+            <button type="button" class="bg-gray-200 hover:bg-[#ff7c7c] text-black font-semibold px-4 py-2 rounded border border-[#E2BB4D] transition">
+                &larr; Back
+            </button>
+        </a>
         @if(session('success'))
             <div class="mb-4 p-3 bg-green-100 text-green-700 border border-green-400 text-center">{{ session('success') }}</div>
         @endif
