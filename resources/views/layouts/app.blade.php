@@ -6,18 +6,17 @@
     
     <title>@yield('title', 'Nama Aplikasi')</title>
 
+      <script src="https://cdn.tailwindcss.com"></script>
     <!-- CSS (misalnya Tailwind atau Bootstrap) -->
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
     
     @stack('styles') <!-- Optional: untuk stylesheet tambahan -->
 </head>
-<body class="bg-gray-100 text-gray-900">
+<body class="bg-[#ECE9CA] text-gray-900">
 
-    <!-- Navbar -->
-    @include('partials.navbar')
 
     <!-- Konten utama -->
-    <main class="min-h-screen">
+    <main class="min-h-screen pt-10">
         @yield('content')
     </main>
 
