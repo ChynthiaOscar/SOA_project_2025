@@ -59,12 +59,12 @@
     <div class="mb-4">
         <label for="password_confirmation" class="block text-sm font-semibold text-white/80">Confirm Password</label>
         <input type="password" name="password_confirmation" id="password_confirmation"
-               class="mt-1 w-full px-4 py-2 rounded-lg bg-white/10 border border-white/30 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-[#E2BB4D]"
+               class="mt-1 w-full px-4 py-2  bg-white/10 border border-white/30 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-[#E2BB4D]"
                required placeholder="Confirm your password">
     </div>
 
     <button type="submit"
-            class="w-full py-2 rounded-lg bg-[#E2BB4D] text-black font-semibold hover:bg-[#f3cd62] transition">
+            class="w-full py-2 bg-[#E2BB4D] text-black font-semibold hover:bg-[#f3cd62] transition">
         Register
     </button>
 </form>
