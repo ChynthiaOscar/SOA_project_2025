@@ -13,6 +13,6 @@ class Employee extends Model
     protected $table = 'employee_data';
 
     protected $fillable = [
-        'nama', 'role', 'email', 'password', 'salary_per_shift',
+        'name', 'role', 'email', 'password', 'salary_per_shift',
     ];
 }

@@ -24,11 +24,28 @@
         <form method="POST" action="{{ route('employee.store') }}" class="border border-[#bfa742] p-8 max-w-xs w-full"
             style="background-color: rgba(0,0,0,0.8);">
             @csrf
+            <!-- ALERT SUCCESS -->
+            @if(session('success'))
+                <div class="mb-4 p-3 text-green-700 bg-green-100 border border-green-300 rounded text-sm">
+                    {{ session('success') }}
+                </div>
+            @endif
+
+            <!-- ALERT ERROR -->
+            @if($errors->any())
+                <div class="mb-4 p-3 text-red-700 bg-red-100 border border-red-300 rounded text-sm">
+                    <ul class="list-disc pl-4">
+                        @foreach($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
             <h1 class="text-[#bfa742] text-3xl font-semibold mb-8 text-center"
                 style="font-family: 'Playfair Display', serif;">
                 REGISTER
             </h1>
-            <input type="text" placeholder="Name" name="nama"
+            <input type="text" placeholder="Name" name="name"
                 class="w-full mb-4 px-3 py-2 border border-[#bfa742] rounded text-white/70 bg-transparent placeholder-white/50 focus:outline-none" />
             <input type="email" placeholder="Email" name="email"
                 class="w-full mb-4 px-3 py-2 border border-[#bfa742] rounded text-white/70 bg-transparent placeholder-white/50 focus:outline-none" />

@@ -5,40 +5,46 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Login Page</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display&display=swap" rel="stylesheet" />
     <style>
-        @import url("https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap");
+        body {
+            font-family: 'Playfair Display', serif;
+        }
     </style>
 </head>
 
-<body class="bg-[#121212] min-h-screen flex flex-col">
-    <header class="p-4">
+<body class="bg-black min-h-screen flex flex-col">
+    <header class="bg-[#000000] p-4">
         <div
-            class="w-32 h-16 bg-gray-300 flex items-center justify-center text-[10px] text-[#6b2a2a] font-sans font-normal">
+            class="w-24 h-12 bg-[#d9d9d9] flex items-center justify-center text-[#6b3f3f] text-xs font-semibold tracking-widest">
             LOGO
         </div>
     </header>
     <main class="flex-grow flex items-center justify-center">
-        <div class="border border-[#111111] p-8">
-            <form class="w-80 border border-[#a88f5a] p-8 flex flex-col gap-6" autocomplete="off">
-                <h1 class="text-[#d6bf6f] font-serif font-extrabold text-3xl text-center">
+        <div style="background-color: rgba(0,0,0,0.8);">
+            <form class="w-80 border border-[#bfa742] p-8 flex flex-col gap-6" autocomplete="off">
+                <h1 class="text-[#bfa742] text-3xl font-semibold text-center">
                     LOGIN
                 </h1>
                 <input type="email" placeholder="Email"
-                    class="bg-transparent border border-[#a88f5a] text-[#a88f5a] text-xs font-mono px-3 py-2 outline-none" />
+                    class="w-full px-3 py-2 border border-[#bfa742] rounded text-white/70 bg-transparent placeholder-white/50 focus:outline-none text-sm" />
                 <input type="password" placeholder="Password"
-                    class="bg-transparent border border-[#a88f5a] text-[#a88f5a] text-xs font-mono px-3 py-2 outline-none" />
+                    class="w-full px-3 py-2 border border-[#bfa742] rounded text-white/70 bg-transparent placeholder-white/50 focus:outline-none text-sm" />
                 <button type="submit"
-                    class="bg-[#6b1a1a] text-[#d6bf6f] font-semibold text-xs py-3 rounded flex items-center justify-center gap-2">
+                    class="w-full bg-[#7f1a12] text-[#bfa742] font-semibold py-3 rounded flex justify-center items-center gap-2 hover:brightness-110 transition">
                     Login to Your Account
-                    <i class="fas fa-arrow-right"></i>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                        stroke="#bfa742" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="5" y1="12" x2="19" y2="12" />
+                        <polyline points="12 5 19 12 12 19" />
+                    </svg>
                 </button>
-                <p class="text-[#a88f5a] italic text-xs text-right -mt-2">
+                <p class="text-white text-xs italic text-right -mt-2">
                     Forgot password?
                 </p>
-                <p class="text-white text-[10px] text-center font-sans">
+                <p class="text-xs text-white text-center">
                     Don’t have an account?
-                    <span class="text-[#6b1a1a] italic">Register Now</span>
+                    <a href="{{ url('/register') }}" class="italic text-[#7f1a12] hover:underline">Register Now</a>
                 </p>
             </form>
         </div>

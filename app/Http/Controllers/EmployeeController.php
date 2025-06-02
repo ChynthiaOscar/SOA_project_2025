@@ -18,14 +18,14 @@ class EmployeeController extends Controller
     {
         // Validasi hanya field yang diisi user
         $validated = $request->validate([
-            'nama' => 'required|string|max:255',
+            'name' => 'required|string|max:255',
             'email' => 'required|email|unique:employee_data,email',
             'password' => 'required|string|min:6',
         ]);
 
         // Simpan ke database dengan nilai default untuk role dan salary
         Employee::create([
-            'nama' => $validated['nama'],
+            'name' => $validated['name'],
             'role' => 'unassign', // default value
             'email' => $validated['email'],
             'password' => Hash::make($validated['password']),
