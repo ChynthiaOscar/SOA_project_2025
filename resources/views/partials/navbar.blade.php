@@ -4,7 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Transparent Navbar</title>
-  <script src="https://cdn.tailwindcss.com"></script>
   <style>
     .transition-bg {
       transition: background-color 0.3s ease;
@@ -37,7 +36,7 @@
 
       <!-- Order Now -->
       <div>
-        <button class="font-serif bg-[#7a0c0c] text-[#d4af37] border border-[#d4af37] rounded-full px-6 py-2 text-[16px] font-semibold shadow-xl transition transform hover:translate-y-0.5 active:translate-y-1 hover:shadow-lg active:shadow-sm">
+        <button class="font-serif bg-[#7a0c0c] text-[#d4af37] border border-[#d4af37] rounded-full px-6 py-2 text-[16px] font-semibold shadow-xl transition transform active:translate-y-0.5 hover:shadow-lg active:shadow-sm">
         BOOK NOW
         </button>
       </div>
@@ -50,10 +49,10 @@
     window.addEventListener('scroll', () => {
       if (window.scrollY > 10) {
         navbar.classList.remove('bg-transparent');
-        navbar.classList.add('bg-black/30');
+        navbar.classList.add('bg-[#131313]/100');
       } else {
         navbar.classList.add('bg-transparent');
-        navbar.classList.remove('bg-black/30');
+        navbar.classList.remove('bg-[#131313]/100');
       }
     });
 
