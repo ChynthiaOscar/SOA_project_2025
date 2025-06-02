@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\EmployeeController;
 
 Route::get('/', function () {
     return view('pages.homepage');
@@ -15,12 +16,9 @@ Route::get('/appEmployee', function () {
     return view('/helper/appEmployee');    
 });
 
-Route::get('/register', function () {
-    return view('/employee/register');
-});
 
 Route::get('/login', function () {
-    return view('/login');
+    return view('/pages/service-employee/login');
 });
 
 Route::get('/dashboard', function () {
@@ -42,4 +40,9 @@ Route::get('/attendance', function () {
 Route::get('/employee_data', function () {
     return view('/manager/employee_data');
 });
-// Batas Routes untuk Empluyee
+
+// Register
+Route::get('/register', [EmployeeController::class, 'showForm']);
+Route::post('/register', [EmployeeController::class, 'store'])->name('employee.store');
+
+// Batas Routes untuk Employee
