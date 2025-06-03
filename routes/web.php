@@ -15,6 +15,6 @@ Route::get('/order_menu', function () {
     return view('pages.service-menu.customer_pages.order-menu');
 });
 
-Route::get('/add_menu', function () {
+Route::get('/add_category', function () {
     return view('pages.service-menu.admin_pages.menu-category');
 });

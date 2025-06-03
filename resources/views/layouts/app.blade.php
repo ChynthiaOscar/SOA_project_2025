@@ -12,10 +12,10 @@
     
     @stack('styles') <!-- Optional: untuk stylesheet tambahan -->
 </head>
-<body class="bg-[#131313]">"
+{{-- <body class="bg-[#131313]">"
 
     <!-- Navbar -->
-    @include('partials.navbar')
+    @include('partials.navbar') --}}
 
     <!-- Konten utama -->
     <main class="min-h-screen">
