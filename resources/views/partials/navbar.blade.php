@@ -27,7 +27,7 @@
         <a href="#" 
             class="nav-link text-[#7d661c]" 
             data-link="About">About</a>
-        <a href="#" 
+        <a href="{{ route('inventory.index') }}" 
             class="nav-link text-[#7d661c]" 
             data-link="Services">Services</a>
         <a href="#" 
