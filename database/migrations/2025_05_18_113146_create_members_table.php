@@ -13,7 +13,8 @@ return new class extends Migration {
             $table->date('tanggal_lahir');
             $table->string('no_hp');
             $table->string('password');
-            $table->boolean('status')->default(0); // 0 = belum aktif, 1 = ulang tahun
+            $table->uuid('token')->nullable();
+            $table->timestamp('token_expires_at')->nullable();
             $table->timestamps();
         });
     }

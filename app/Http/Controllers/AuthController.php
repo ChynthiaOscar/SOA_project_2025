@@ -12,6 +12,8 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Carbon;
 use App\Notifications\MemberResetPasswordNotification;
+use PhpAmqpLib\Connection\AMQPStreamConnection;
+use PhpAmqpLib\Message\AMQPMessage;
 
 class AuthController extends Controller
 {
@@ -49,14 +51,38 @@ class AuthController extends Controller
     if (Auth::guard('member')->attempt($credentials)) {
         $member = Auth::guard('member')->user();
 
-        // Cek ulang tahun
-        $today = now();
-        if (
-            $today->format('m-d') === $member->tanggal_lahir->format('m-d') &&
-            $member->status == 0
-        ) {
-            $member->update(['status' => 1]);
-        }
+        // Generate token & expired
+        $token = (string) \Illuminate\Support\Str::uuid();
+        $expiresAt = now()->addSeconds(60);
+
+        // Simpan ke DB
+        $member->update([
+            'token' => $token,
+            'token_expires_at' => $expiresAt,
+        ]);
+
+        // Kirim ke RabbitMQ
+        $data = [
+            'member_id' => $member->id,
+            'token' => $token,
+            'token_expires_at' => $expiresAt->toDateTimeString(),
+            'email' => $member->email,
+        ];
+
+        $connection = new AMQPStreamConnection(
+            env('RABBITMQ_HOST', '127.0.0.1'),
+            env('RABBITMQ_PORT', 5672),
+            env('RABBITMQ_USER', 'guest'),
+            env('RABBITMQ_PASSWORD', 'guest')
+        );
+        $channel = $connection->channel();
+        $channel->queue_declare(env('RABBITMQ_QUEUE', 'auth_login'), false, true, false, false);
+
+        $msg = new AMQPMessage(json_encode($data));
+        $channel->basic_publish($msg, '', env('RABBITMQ_QUEUE', 'auth_login'));
+
+        $channel->close();
+        $connection->close();
 
         return redirect()->route('profile');
     }
@@ -71,9 +97,14 @@ class AuthController extends Controller
 
 
     public function logout() {
+        $member = Auth::guard('member')->user();
+        if ($member) {
+            $member->update(['token' => null, 'token_expires_at' => null]);
+        }
         Auth::guard('member')->logout();
         return redirect()->route('login');
     }
+        
 
     public function showForgotPassword()
 {

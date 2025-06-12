@@ -12,7 +12,7 @@ class Member extends Authenticatable
     use Notifiable;
 
     protected $fillable = [
-        'email', 'nama', 'tanggal_lahir', 'no_hp', 'password', 'status'
+        'email', 'nama', 'tanggal_lahir', 'no_hp', 'password', 'token', 'token_expires_at'
     ];
 
     protected $hidden = [
@@ -21,7 +21,6 @@ class Member extends Authenticatable
 
     protected $casts = [
         'tanggal_lahir' => 'date',
-        'status' => 'boolean',
     ];
 }
 
