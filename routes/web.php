@@ -9,11 +9,11 @@ Route::get('/', function () {
 
 // Employee Routes
 Route::get('/appManager', function () {
-    return view('/helper/appManager');    
+    return view('/pages/service-employee/helper/appManager');
 });
 
 Route::get('/appEmployee', function () {
-    return view('/helper/appEmployee');    
+    return view('/pages/service-employee/helper/appEmployee');
 });
 
 
@@ -22,23 +22,23 @@ Route::get('/login', function () {
 });
 
 Route::get('/dashboard', function () {
-    return view('/employee/dashboard');
+    return view('/pages/service-employee/employee/dashboard');
 });
 
 Route::get('/profile', function () {
-    return view('/profile');
+    return view('/pages/service-employee/profile');
 });
 
 Route::get('/schedule', function () {
-    return view('/manager/schedule');
+    return view('/pages/service-employee/manager/schedule');
 });
 
 Route::get('/attendance', function () {
-    return view('/manager/attendance');
+    return view('/pages/service-employee/manager/attendance');
 });
 
 Route::get('/employee_data', function () {
-    return view('/manager/employee_data');
+    return view('/pages/service-employee/manager/employee_data');
 });
 
 // Register

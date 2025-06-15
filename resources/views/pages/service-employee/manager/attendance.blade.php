@@ -1,4 +1,4 @@
-@extends('helper.appManager')
+@extends('pages.service-employee.helper.appManager')
 
 @section('title', 'Attendance')
 @section('header-title', 'ATTENDANCE')

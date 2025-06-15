@@ -22,13 +22,14 @@
     </header>
     <main class="flex-grow flex items-center justify-center">
         <div style="background-color: rgba(0,0,0,0.8);">
-            <form class="w-80 border border-[#bfa742] p-8 flex flex-col gap-6" autocomplete="off">
+            <form method="POST" action="/api/employee/login" class="w-80 border border-[#bfa742] p-8 flex flex-col gap-6" autocomplete="off">
+                @csrf
                 <h1 class="text-[#bfa742] text-3xl font-semibold text-center">
                     LOGIN
                 </h1>
-                <input type="email" placeholder="Email"
+                <input name="email" type="email" placeholder="Email"
                     class="w-full px-3 py-2 border border-[#bfa742] rounded text-white/70 bg-transparent placeholder-white/50 focus:outline-none text-sm" />
-                <input type="password" placeholder="Password"
+                <input name="password" type="password" placeholder="Password"
                     class="w-full px-3 py-2 border border-[#bfa742] rounded text-white/70 bg-transparent placeholder-white/50 focus:outline-none text-sm" />
                 <button type="submit"
                     class="w-full bg-[#7f1a12] text-[#bfa742] font-semibold py-3 rounded flex justify-center items-center gap-2 hover:brightness-110 transition">
@@ -46,9 +47,16 @@
                     Don’t have an account?
                     <a href="{{ url('/register') }}" class="italic text-[#7f1a12] hover:underline">Register Now</a>
                 </p>
+                @if ($errors->has('login'))
+                    <p class="text-xs text-center text-red-500 mt-2">
+                        {{ $errors->first('login') }}
+                    </p>
+                @endif
             </form>
         </div>
     </main>
 </body>
+
+
 
 </html>

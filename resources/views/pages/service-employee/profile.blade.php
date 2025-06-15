@@ -1,4 +1,4 @@
-@extends('helper.appEmployee')  
+@extends('pages.service-employee.helper.appEmployee')
 
 @section('title', 'Profile Page')
 
