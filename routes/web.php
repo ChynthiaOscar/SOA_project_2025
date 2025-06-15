@@ -24,6 +24,9 @@ Route::get('/login', function () {
 Route::get('/dashboard', function () {
     return view('/pages/service-employee/employee/dashboard');
 });
+Route::get('/register', function () {
+    return view('/pages/service-employee/employee/register');
+});
 
 Route::get('/profile', function () {
     return view('/pages/service-employee/profile');
@@ -40,9 +43,5 @@ Route::get('/attendance', function () {
 Route::get('/employee_data', function () {
     return view('/pages/service-employee/manager/employee_data');
 });
-
-// Register
-Route::get('/register', [EmployeeController::class, 'showForm']);
-Route::post('/register', [EmployeeController::class, 'store'])->name('employee.store');
 
 // Batas Routes untuk Employee

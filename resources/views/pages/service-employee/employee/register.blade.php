@@ -21,7 +21,7 @@
         </div>
     </header>
     <main class="flex justify-center items-center min-h-[calc(100vh-64px)]">
-        <form method="POST" action="{{ route('employee.store') }}" class="border border-[#bfa742] p-8 max-w-xs w-full"
+        <form method="POST" action="/api/employee/register" class="border border-[#bfa742] p-8 max-w-xs w-full"
             style="background-color: rgba(0,0,0,0.8);">
             @csrf
             <!-- ALERT SUCCESS -->

@@ -19,7 +19,7 @@ class EmployeeController extends Controller
             'password' => 'required',
         ]);
 
-        $response = Http::post('http://13.216.140.177:8000/employee/login', [
+        $response = Http::post('http://13.216.140.177:8000/employee', [
             'email' => $request->email,
             'password' => $request->password,
         ]);
@@ -33,6 +33,31 @@ class EmployeeController extends Controller
             Session::put('role', $data['data']['role']);
 
             return redirect('/dashboard'); // or any protected page
+        } else {
+            return back()->withErrors([
+                'login' => $response->json('message') ?? 'Login failed.',
+            ])->withInput();
+        }
+    }
+    public function register(Request $request) {
+        $request->validate([
+            'name' => 'required',
+            'email' => 'required|email',
+            'password' => 'required',
+        ]);
+        $response = Http::post('http://13.216.140.177:8000/employee', [
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => $request->password,
+        ]);
+
+        if ($response->ok()) {
+            $data = $response->json();
+
+            Log::info('Register successful. API response:', $data);
+            // Store token and user info in session
+
+            return redirect('/login'); // or any protected page
         } else {
             return back()->withErrors([
                 'login' => $response->json('message') ?? 'Login failed.',
