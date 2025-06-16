@@ -59,43 +59,24 @@
 </head>
 
 <body>
-    @php
-    $id = request()->route('id'); // Ambil parameter ID dari URL
-    @endphp
+    <h1>Chef: {{ $chef['name'] }}</h1>
 
-    @if ($id == 1)
-    <!-- CHEF View -->
-    <div class="Chef">
-        <h1>CHEF: Budi Santoso</h1>
-    </div>
     <div class="container">
+        @foreach ($tasks as $task)
         <div class="order">
-            <h3>Order #1</h3>
-            <div style="margin-bottom: 12px;">
+            <h3>Order #{{ $task['order_id'] }}</h3>
+            <form method="POST" action="{{ route('kitchen.updateStatus') }}">
+                @csrf
+                <input type="hidden" name="task_id" value="{{ $task['kitchen_task_id'] }}">
                 <label class="menu-item">
-                    <input type="checkbox" name="menu1-1">
-                    <span><span class="label">2</span>x Spaghetti Carbonara</span>
+                    <input type="checkbox" name="status" onchange="this.form.submit()" {{ $task['status'] == 'done' ? 'checked' : '' }}>
+                    <span><span class="label">{{ $task['quantity'] }}</span>x {{ $task['menu_name'] }}</span>
                 </label>
-                <p style="margin-left: 26px;">Tanpa keju</p>
-            </div>
+                <p style="margin-left: 26px;">{{ $task['notes'] }}</p>
+            </form>
         </div>
-
-        <div class="order">
-            <h3>Order #2</h3>
-            <div style="margin-bottom: 12px;">
-                <label class="menu-item">
-                    <input type="checkbox" name="menu2-1">
-                    <span><span class="label">1</span>x Nasi Goreng Jawa</span>
-                </label>
-                <p style="margin-left: 26px;">Tanpa Sayur</p>
-            </div>
-        </div>
+        @endforeach
     </div>
-    @else
-    <!-- Unknown role -->
-    <p style="color: red;">Akses ditolak: ID tidak dikenali.</p>
-    @endif
-
 </body>
 
 </html>
