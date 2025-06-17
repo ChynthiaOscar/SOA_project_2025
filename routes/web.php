@@ -18,3 +18,23 @@ Route::get('/order_menu', function () {
 Route::get('/add_category', function () {
     return view('pages.service-menu.admin_pages.menu-category');
 });
+
+Route::get('/menu_index', function () {
+    return view('pages.service-menu.admin_pages.menu.index');
+});
+
+Route::get('/add_menu', function () {
+    return view('pages.service-menu.admin_pages.menu.create');
+});
+
+Route::get('/edit_menu', function () {
+    return view('pages.service-menu.admin_pages.menu.edit');
+});
+
+Route::get('/add_recipe', function () {
+    return view('pages.service-menu.admin_pages.menu.add-recipe');
+});
+
+Route::get('/edit_recipe', function () {
+    return view('pages.service-menu.admin_pages.menu.edit-recipe');
+});
