@@ -27,7 +27,7 @@
                     </a>
                 </div>
                 <!-- Search Bar -->
-                <form class="flex items-center mb-6 w-full" method="GET" action="{{ url('event-packages') }}">
+                <form method="GET" action="{{ url('event-packages') }}" class="flex items-center mb-6 w-full">
                     <div class="flex items-center bg-white rounded-full shadow px-4 py-2 w-full max-w-3xl">
                         <svg class="w-6 h-6 text-[#222] mr-2" fill="none" stroke="currentColor" stroke-width="2"
                             viewBox="0 0 24 24">
@@ -36,15 +36,21 @@
                         </svg>
                         <input type="text" name="search" value="{{ $search ?? '' }}" placeholder="Search"
                             class="w-full border-none outline-none bg-transparent text-lg py-2" />
+                        <!-- Tombol submit pencarian -->
+                        <button type="submit" class="text-[#222] ml-2">🔍</button>
                     </div>
                 </form>
+
                 <!-- Table -->
                 <div class="overflow-x-auto rounded-lg shadow">
                     <table class="min-w-full text-left border border-gray-200">
                         <thead>
                             <tr class="bg-black text-white">
                                 <th class="py-3 px-4">Name</th>
+                                <th class="py-3 px-4">Description</th>
+                                <th class="py-3 px-4">Pax</th>
                                 <th class="py-3 px-4">Price</th>
+                                <th class="py-3 px-4">Event Space</th>
                                 <th class="py-3 px-4">Action</th>
                             </tr>
                         </thead>
@@ -53,7 +59,10 @@
                                 <tr
                                     class="{{ $loop->even ? 'bg-[#f7f6fa]' : 'bg-[#f3f1d6]' }} text-[#222] border-b border-gray-200">
                                     <td class="py-3 px-4">{{ $p->name }}</td>
+                                    <td class="py-3 px-4">{{ $p->description }}</td>
+                                    <td class="py-3 px-4">{{ $p->pax }}</td>
                                     <td class="py-3 px-4">Rp {{ number_format($p->price, 0, ',', '.') }}</td>
+                                    <td class="py-3 px-4">{{ $p->event_space->name ?? '-' }}</td>
                                     <td class="py-3 px-4 text-center flex gap-2 justify-center">
                                         <a href="{{ url('event-packages/' . $p->id . '/edit') }}"
                                             class="inline-block text-yellow-600 hover:text-yellow-800" title="Edit">
@@ -81,7 +90,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="4" class="py-6 text-center text-gray-400">No data found.</td>
+                                    <td colspan="6" class="py-6 text-center text-gray-400">No data found.</td>
                                 </tr>
                             @endforelse
                         </tbody>
