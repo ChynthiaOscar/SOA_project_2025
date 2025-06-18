@@ -92,7 +92,7 @@
                                 <ul class="pagination flex gap-2">
                                     @for ($i = 1; $i <= $pagination->last_page; $i++)
                                         <li>
-                                            <a class="{{ $i == $pagination->current_page ? 'font-bold' : '' }}"
+                                            <a class="px-3 py-1 border rounded {{ $i == $pagination->current_page ? 'bg-yellow-400 font-bold' : 'bg-white' }}"
                                                 href="{{ request()->fullUrlWithQuery(['page' => $i]) }}">
                                                 {{ $i }}
                                             </a>
@@ -102,6 +102,7 @@
                             </nav>
                         </div>
                     @endif
+
                 </div>
             </div>
         </div>
