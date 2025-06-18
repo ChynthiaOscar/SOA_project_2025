@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Http;
 
 class EventPackageController extends Controller
 {
-    public function index(Request $request)
+    public function index()
     {
         $response = Http::get(env('API_URL') . '/event_packages/');
         $res = json_decode($response);

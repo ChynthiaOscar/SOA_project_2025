@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\EventPackageController;
+use App\Http\Controllers\EventSpaceController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\InventoryItemController;
 use App\Http\Controllers\InventoryCategoryController;
@@ -48,4 +49,16 @@ Route::prefix('event-packages')->group(function () {
     Route::put('/{id}', [EventPackageController::class, 'update']);
     Route::patch('/{id}', [EventPackageController::class, 'update']);
     Route::delete('/{id}', [EventPackageController::class, 'destroy']);
+});
+
+// Route::resource('event-spaces', [EventSpaceController::class]);
+Route::prefix('event-spaces')->group(function () {
+    Route::get('/', [EventSpaceController::class, 'index']);
+    Route::get('/create', [EventSpaceController::class, 'create']);
+    Route::post('/', [EventSpaceController::class, 'store']);
+    Route::get('/{id}/edit', [EventSpaceController::class, 'edit']);
+    Route::get('/{id}', [EventSpaceController::class, 'show']);
+    Route::put('/{id}', [EventSpaceController::class, 'update']);
+    Route::patch('/{id}', [EventSpaceController::class, 'update']);
+    Route::delete('/{id}', [EventSpaceController::class, 'destroy']);
 });
