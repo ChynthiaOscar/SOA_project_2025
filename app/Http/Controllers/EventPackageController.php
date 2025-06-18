@@ -8,14 +8,28 @@ use Illuminate\Support\Facades\Http;
 
 class EventPackageController extends Controller
 {
-    public function index()
-    {
-        $response = Http::get(env('API_URL') . '/event_packages/');
-        $res = json_decode($response);
-        $data['packages'] = $res->data->data;
-        $data['pagination'] = $res->data;
-        return view('pages.service-event.admin.event_packages.index', $data);
-    }
+    public function index(Request $request)
+{
+    $page = $request->query('page', 1);
+    $search = $request->query('search', '');
+
+    $response = Http::get(env('API_URL') . '/event_packages', [
+        'page' => $page,
+        'search' => $search,
+    ]);
+
+    $res = json_decode($response);
+
+    $data['packages'] = $res->data->data;
+    $data['pagination'] = (object)[
+        'current_page' => $res->data->current_page,
+        'last_page' => $res->data->last_page,
+    ];
+    $data['search'] = $search;
+
+    return view('pages.service-event.admin.event_packages.index', $data);
+}
+
 
     public function create()
     {
