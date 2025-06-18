@@ -63,7 +63,11 @@ class EventSpaceController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $data['title'] = "Edit Event Space";
+        $response = Http::get($this->url . "/event_spaces/" . $id);
+        $res = json_decode($response);
+        $data['event_space'] = $res->data;
+        return view('pages.service-event.admin.event_spaces.edit', $data);
     }
 
     /**
@@ -71,14 +75,18 @@ class EventSpaceController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $response = Http::put($this->url . '/event_spaces/' . $id, $request->all());
+        $res = json_decode($response);
+        return $this->success("Event space updated successfully", $res->data);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy($id)
     {
-        //
+        $response = Http::delete($this->url . '/event_spaces/' . $id);
+        $res = json_decode($response);
+        return $this->success("Event space deleted successfully", $res->data);
     }
 }

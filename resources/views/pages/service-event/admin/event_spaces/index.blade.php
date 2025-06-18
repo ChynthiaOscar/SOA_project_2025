@@ -56,20 +56,15 @@
                                     <td class="py-3 px-4">{{ $space->capacity }}</td>
                                     <td class="py-3 px-4">Rp {{ number_format($space->price, 0, ',', '.') }}</td>
                                     <td class="py-3 px-4 text-center flex gap-2 justify-center">
-                                        <a href="{{ url('event-spaces/' . $space->id . '/edit') }}"
+                                        <a href="{{ route('event-space.edit', $space->id) }}"
                                             class="inline-block text-yellow-600 hover:text-yellow-800" title="Edit">
                                             <i class="fa-solid fa-pencil"></i>
                                         </a>
-                                        <form action="{{ url('event-spaces/' . $space->id) }}" method="POST"
-                                            class="delete-form">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="button"
-                                                class="inline-block text-red-600 hover:text-red-800 btn-delete"
-                                                title="Delete">
-                                                <i class="fa-solid fa-trash"></i>
-                                            </button>
-                                        </form>
+                                        <button type="button"
+                                            class="inline-block text-red-600 hover:text-red-800 btn-delete"
+                                            data-url="{{ route('event-space.destroy', $space->id) }}">
+                                            <i class="fa-solid fa-trash"></i>
+                                        </button>
                                     </td>
                                 </tr>
                             @empty
@@ -103,7 +98,6 @@
         document.querySelectorAll('.btn-delete').forEach(btn => {
             btn.addEventListener('click', function(e) {
                 e.preventDefault();
-                const form = this.closest('form');
                 Swal.fire({
                     title: 'Are you sure?',
                     text: "This action cannot be undone!",
@@ -115,7 +109,41 @@
                     reverseButtons: true
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        form.submit();
+                        fetch(this.dataset.url, {
+                                method: 'DELETE',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                },
+                            })
+                            .then(response => response.json())
+                            .then(async res => {
+                                if (res.success) {
+                                    await Swal.fire({
+                                        title: 'Success',
+                                        text: res.message,
+                                        icon: "success"
+                                    }).then((result) => {
+                                        if (result.isConfirmed) {
+                                            location.reload();
+                                            return;
+                                        }
+                                    });
+                                } else {
+                                    await Swal.fire({
+                                        title: 'Error',
+                                        text: res.message,
+                                        icon: "error"
+                                    });
+                                }
+                            })
+                            .catch(error => {
+                                Swal.fire({
+                                    title: 'Error',
+                                    text: error.message || error,
+                                    icon: 'error'
+                                });
+                            });
                     }
                 });
             });

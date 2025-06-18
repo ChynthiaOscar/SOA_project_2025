@@ -1,24 +1,29 @@
 @extends('layouts.app')
-@section('title', 'Create Event Space')
+@section('title', 'Edit Event Space')
 @section('content')
     <div class="min-h-screen bg-yellow-50 flex items-center justify-center py-10">
         <div class="bg-slate-200 rounded-lg shadow p-8 w-full max-w-md flex flex-col gap-2">
             <h1 class="text-xl font-bold text-yellow-900 mb-6">{{ $title }}</h1>
             <div>
                 <label class="block font-semibold mb-1">Name</label>
-                <input type="text" id="name" class="w-full border border-black rounded px-3 py-2" required>
+                <input type="text" id="name" class="w-full border border-black rounded px-3 py-2"
+                    value="{{ $event_space->name }}">
             </div>
             <div>
                 <label class="block font-semibold mb-1">Location</label>
-                <input type="text" id="location" class="w-full border border-black rounded px-3 py-2" required>
+                <input type="text" id="location" class="w-full border border-black rounded px-3 py-2"
+                    value="{{ $event_space->location }}">
             </div>
             <div>
                 <label class="block font-semibold mb-1">Capacity</label>
-                <input type="number" id="capacity" class="w-full border border-black rounded px-3 py-2" required>
+                <input type="number" id="capacity" class="w-full border border-black rounded px-3 py-2"
+                    value="{{ $event_space->capacity }}">
             </div>
             <div>
                 <label class="block font-semibold mb-1">Price</label>
-                <input type="number" id="price" class="w-full border border-black rounded px-3 py-2" required>
+                <input type="number" id="price" class="w-full border border-black rounded px-3 py-2"
+                    value="{{ $event_space->price }}">
+                <input type="hidden" id="url" value="{{ route('event-space.update', $event_space->id) }}">
             </div>
             <div class="flex justify-end gap-2 mt-4">
                 <a href="{{ route('event-space.index') }}"
@@ -46,8 +51,8 @@
                         capacity: document.getElementById('capacity').value,
                         price: document.getElementById('price').value,
                     };
-                    fetch(`{{ route('event-space.store') }}`, {
-                            method: 'POST',
+                    fetch(document.getElementById('url').value, {
+                            method: 'PUT',
                             headers: {
                                 'Content-Type': 'application/json',
                                 'X-CSRF-TOKEN': '{{ csrf_token() }}'
@@ -63,7 +68,7 @@
                                     icon: "success"
                                 }).then((result) => {
                                     if (result.isConfirmed) {
-                                        location.reload();
+                                        location.href="{{ route('event-space.index') }}";
                                         return;
                                     }
                                 });

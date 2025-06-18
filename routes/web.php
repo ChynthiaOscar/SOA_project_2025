@@ -56,9 +56,8 @@ Route::prefix('event-spaces')->name('event-space.')->group(function () {
     Route::get('/', [EventSpaceController::class, 'index'])->name('index');
     Route::get('/create', [EventSpaceController::class, 'create'])->name('create');
     Route::post('/', [EventSpaceController::class, 'store'])->name('store');
-    Route::get('/{id}/edit', [EventSpaceController::class, 'edit'])->name('edit');
+    Route::get('/edit/{id}', [EventSpaceController::class, 'edit'])->name('edit');
     Route::get('/{id}', [EventSpaceController::class, 'show'])->name('show');
     Route::put('/{id}', [EventSpaceController::class, 'update'])->name('update');
-    Route::patch('/{id}', [EventSpaceController::class, 'update'])->name('update');
     Route::delete('/{id}', [EventSpaceController::class, 'destroy'])->name('destroy');
 });
