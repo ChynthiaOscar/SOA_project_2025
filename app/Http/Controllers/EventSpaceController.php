@@ -2,18 +2,28 @@
 
 namespace App\Http\Controllers;
 
+use App\Utils\HttpResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 
 class EventSpaceController extends Controller
 {
+    use HttpResponse;
+
+    private $url;
+
+    public function __construct()
+    {
+        $this->url = env("API_URL");
+    }
+
     /**
      * Display a listing of the resource.
      */
     public function index(Request $request)
     {
         $page = $request->query('page', 1);
-        $response = Http::get(env('API_URL') . '/event_spaces?page=' . $page);
+        $response = Http::get($this->url . '/event_spaces?page=' . $page);
         $res = json_decode($response);
         $data['spaces'] = $res->data->data;
         $data['pagination'] = $res->data;
@@ -26,7 +36,8 @@ class EventSpaceController extends Controller
      */
     public function create()
     {
-        //
+        $data['title'] = "Create Event Space";
+        return view('pages.service-event.admin.event_spaces.create', $data);
     }
 
     /**
@@ -34,7 +45,9 @@ class EventSpaceController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $response = Http::post($this->url . '/event_spaces', $request->all());
+        $res = json_decode($response);
+        return $this->success("Event space created successfully", $res->data);
     }
 
     /**

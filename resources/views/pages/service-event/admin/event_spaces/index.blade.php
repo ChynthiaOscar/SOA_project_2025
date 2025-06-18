@@ -17,9 +17,9 @@
                         <h2 class="text-2xl font-semibold text-[#222] mb-2">Search Event Space</h2>
                         <p class="text-lg text-[#222]">Find event packages by name or ID</p>
                     </div>
-                    <a href="{{ url('event-packages/create') }}"
+                    <a href="{{ route('event-space.create') }}"
                         class="bg-yellow-400 hover:bg-yellow-500 text-yellow-900 font-semibold px-5 py-2 rounded shadow flex items-center gap-2">
-                        <i class="fa-solid fa-pencil"></i>
+                        <i class="fa-solid fa-square-plus"></i>
                         Create
                     </a>
                 </div>
@@ -58,11 +58,7 @@
                                     <td class="py-3 px-4 text-center flex gap-2 justify-center">
                                         <a href="{{ url('event-spaces/' . $space->id . '/edit') }}"
                                             class="inline-block text-yellow-600 hover:text-yellow-800" title="Edit">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
-                                                viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M15.232 5.232l3.536 3.536M9 13h3l8-8a2.828 2.828 0 10-4-4l-8 8v3zm0 0v3a1 1 0 001 1h3" />
-                                            </svg>
+                                            <i class="fa-solid fa-pencil"></i>
                                         </a>
                                         <form action="{{ url('event-spaces/' . $space->id) }}" method="POST"
                                             class="delete-form">
@@ -71,11 +67,7 @@
                                             <button type="button"
                                                 class="inline-block text-red-600 hover:text-red-800 btn-delete"
                                                 title="Delete">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
-                                                    viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                        d="M6 18L18 6M6 6l12 12" />
-                                                </svg>
+                                                <i class="fa-solid fa-trash"></i>
                                             </button>
                                         </form>
                                     </td>
@@ -107,8 +99,6 @@
             </div>
         </div>
     </div>
-    <!-- SweetAlert2 -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         document.querySelectorAll('.btn-delete').forEach(btn => {
             btn.addEventListener('click', function(e) {
