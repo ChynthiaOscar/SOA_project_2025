@@ -24,12 +24,6 @@ Route::middleware('auth:member')->group(function () {
 
 });
 
-Route::get('/forgot_password', [AuthController::class, 'showForgotPassword'])->name('member.password.request');
-Route::post('/forgot_password', [AuthController::class, 'sendResetLink'])->name('member.password.email');
-
-Route::get('/reset_password/{token}', [AuthController::class, 'showResetPassword'])->name('member.password.reset');
-Route::post('/reset_password', [AuthController::class, 'resetPassword'])->name('member.password.update');
-
 Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
 Route::post('/profile/update', [ProfileController::class, 'update'])->name('profile.update');
 

@@ -27,9 +27,6 @@
                class="mt-1 w-full px-4 py-2 bg-white/10 border border-white/30 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-[#E2BB4D]"
                placeholder="Enter your password">
     </div>
-    <div class="mb-4 text-right">
-        <a href="{{ route('member.password.request') }}" class="text-sm text-[#E2BB4D] hover:underline">Forgot Password?</a>
-    </div>
     <button type="submit"
             class="w-full py-2 bg-[#E2BB4D] text-black font-semibold hover:bg-[#f3cd62] transition">
         Login

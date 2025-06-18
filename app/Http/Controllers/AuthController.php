@@ -30,15 +30,51 @@ class AuthController extends Controller
             'password' => 'required|string|min:6|confirmed',
         ]);
 
-        Member::create([
+        $registerData = [
             'nama' => $request->nama,
             'email' => $request->email,
             'tanggal_lahir' => $request->tanggal_lahir,
             'no_hp' => $request->no_hp,
-            'password' => Hash::make($request->password),
-        ]);
+            'password' => $request->password,
+        ];
 
-        return redirect()->route('login')->with('success', 'Registration successful. Please login.');
+        $client = new \GuzzleHttp\Client();
+        try {
+            $response = $client->post(env('NAMEKO_GATEWAY_URL', 'http://localhost:8001') . '/register', [
+                'json' => $registerData,
+                'http_errors' => false
+            ]);
+
+            $result = json_decode($response->getBody(), true);
+            
+            if (!$result['success']) {
+                return back()->withErrors(['email' => $result['message']])->withInput();
+            }
+
+            // Ambil hash password dari database setelah register sukses
+            $member = \DB::table('members')->where('email', $request->email)->first();
+            if ($member) {
+                $hash = $member->password;
+                // Konversi prefix $2b$ ke $2y$ agar bisa diterima Laravel
+                if (strpos($hash, '$2b$') === 0) {
+                    $hash = '$2y$' . substr($hash, 4);
+                }
+                \App\Models\Member::updateOrCreate(
+                    ['email' => $member->email],
+                    [
+                        'nama' => $member->nama,
+                        'tanggal_lahir' => $member->tanggal_lahir,
+                        'no_hp' => $member->no_hp,
+                        'password' => $hash,
+                    ]
+                );
+            }
+
+            return redirect()->route('login')->with('success', 'Registration successful. Please login.');
+        } catch (\Exception $e) {
+            \Log::error('Failed to register user in Nameko: ' . $e->getMessage());
+            return back()->withErrors(['email' => 'Registration failed, please try again.'])->withInput();
+        }
     }
 
     public function showLogin() {
@@ -48,20 +84,24 @@ class AuthController extends Controller
     public function login(Request $request) {
     $credentials = $request->only('email', 'password');
 
+    // Dua pendekatan login:
+    // 1. Login via Laravel Auth (mempertahankan session web)
+    // 2. Sync token dengan Microservice Nameko
+
     if (Auth::guard('member')->attempt($credentials)) {
         $member = Auth::guard('member')->user();
 
         // Generate token & expired
         $token = (string) \Illuminate\Support\Str::uuid();
-        $expiresAt = now()->addSeconds(60);
+        $expiresAt = now()->addHours(1); // Durasi lebih lama (1 jam)
 
-        // Simpan ke DB
+        // Simpan ke DB lokal
         $member->update([
             'token' => $token,
             'token_expires_at' => $expiresAt,
         ]);
 
-        // Kirim ke RabbitMQ
+        // Kirim token ke Nameko via RabbitMQ untuk sinkronisasi
         $data = [
             'member_id' => $member->id,
             'token' => $token,
@@ -69,20 +109,26 @@ class AuthController extends Controller
             'email' => $member->email,
         ];
 
-        $connection = new AMQPStreamConnection(
-            env('RABBITMQ_HOST', '127.0.0.1'),
-            env('RABBITMQ_PORT', 5672),
-            env('RABBITMQ_USER', 'guest'),
-            env('RABBITMQ_PASSWORD', 'guest')
-        );
-        $channel = $connection->channel();
-        $channel->queue_declare(env('RABBITMQ_QUEUE', 'auth_login'), false, true, false, false);
+        // RabbitMQ logic - bersifat asinkron, tidak menghalangi user
+        try {
+            $connection = new AMQPStreamConnection(
+                env('RABBITMQ_HOST', '127.0.0.1'),
+                env('RABBITMQ_PORT', 5672),
+                env('RABBITMQ_USER', 'guest'),
+                env('RABBITMQ_PASSWORD', 'guest')
+            );
+            $channel = $connection->channel();
+            $channel->queue_declare(env('RABBITMQ_QUEUE', 'auth_login'), false, true, false, false);
 
-        $msg = new AMQPMessage(json_encode($data));
-        $channel->basic_publish($msg, '', env('RABBITMQ_QUEUE', 'auth_login'));
+            $msg = new AMQPMessage(json_encode($data));
+            $channel->basic_publish($msg, '', env('RABBITMQ_QUEUE', 'auth_login'));
 
-        $channel->close();
-        $connection->close();
+            $channel->close();
+            $connection->close();
+        } catch (\Exception $e) {
+            // Log error tetapi jangan blokir user, kita masih punya token lokal
+            \Log::error('Failed to sync token with Nameko: ' . $e->getMessage());
+        }
 
         return redirect()->route('profile');
     }
@@ -98,63 +144,27 @@ class AuthController extends Controller
 
     public function logout() {
         $member = Auth::guard('member')->user();
-        if ($member) {
+        
+        if ($member && $member->token) {
+            // Hapus token di Nameko microservice via gateway
+            try {
+                $client = new \GuzzleHttp\Client();
+                $client->post(env('NAMEKO_GATEWAY_URL', 'http://localhost:8001') . '/logout', [
+                    'json' => ['token' => $member->token],
+                    'http_errors' => false
+                ]);
+            } catch (\Exception $e) {
+                // Log error tapi tetap lanjutkan logout
+                \Log::error('Failed to logout from Nameko: ' . $e->getMessage());
+            }
+            
+            // Hapus token di database lokal
             $member->update(['token' => null, 'token_expires_at' => null]);
         }
+        
+        // Logout dari Laravel Auth
         Auth::guard('member')->logout();
         return redirect()->route('login');
     }
-        
-
-    public function showForgotPassword()
-{
-    return view('pages.member.auth.forgot_password');
-}
-
-public function sendResetLink(Request $request)
-{
-    $request->validate(['email' => 'required|email|exists:members,email']);
-
-    $token = Str::random(60);
-    DB::table('member_password_resets')->updateOrInsert(
-        ['email' => $request->email],
-        ['token' => $token, 'created_at' => Carbon::now()]
-    );
-
-    $member = Member::where('email', $request->email)->first();
-    $member->notify(new MemberResetPasswordNotification($token));
-
-    return back()->with('status', 'Password reset link sent to your email.');
-}
-
-public function showResetPassword($token)
-{
-    return view('pages.member.auth.reset_password', ['token' => $token]);
-}
-
-public function resetPassword(Request $request)
-{
-    $request->validate([
-        'token' => 'required',
-        'email' => 'required|email|exists:members,email',
-        'password' => 'required|min:6|confirmed',
-    ]);
-
-    $reset = DB::table('member_password_resets')
-        ->where('email', $request->email)
-        ->where('token', $request->token)
-        ->first();
-
-    if (!$reset || Carbon::parse($reset->created_at)->addMinutes(60)->isPast()) {
-        return back()->withErrors(['email' => 'This password reset token is invalid or expired.']);
-    }
-
-    $member = Member::where('email', $request->email)->first();
-    $member->update(['password' => Hash::make($request->password)]);
-
-    DB::table('member_password_resets')->where('email', $request->email)->delete();
-
-    return redirect()->route('login')->with('success', 'Password has been reset. You can now login.');
-}
 }
 
