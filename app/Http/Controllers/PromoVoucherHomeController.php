@@ -1,9 +1,9 @@
 <?php
 namespace App\Http\Controllers;
 
-use App\Models\Promo;
-use App\Models\Voucher;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Http;
 
 class PromoVoucherHomeController extends Controller
 {
@@ -12,19 +12,59 @@ class PromoVoucherHomeController extends Controller
         $searchPromo = $request->input('search_promo');
         $searchVoucher = $request->input('search_voucher');
 
-        $promos = Promo::where('status', 1)
-            ->when($searchPromo, function ($query, $searchPromo) {
-                return $query->where('description', 'like', '%' . $searchPromo . '%');
-            })
-            ->paginate(5, ['*'], 'promo_page');
+        // Ambil semua data dari gateway
+        $response = Http::withHeaders([
+            'Accept' => 'application/json',
+            'Content-Type' => 'application/json'
+        ])->get('http://127.0.0.1:8000/api/all');
+        $result = $response->json();
+        $promos = isset($result['promos']) ? $result['promos'] : [];
+        $vouchers = isset($result['vouchers']) ? $result['vouchers'] : [];
 
-        $vouchers = Voucher::where('status', 1)
-            ->when($searchVoucher, function ($query, $searchVoucher) {
-                return $query->where('description', 'like', '%' . $searchVoucher . '%')
-                            ->orWhere('promo_code', 'like', '%' . $searchVoucher . '%');
-            })
-            ->paginate(5, ['*'], 'voucher_page');
+        // Filter pencarian promo
+        if ($searchPromo) {
+            $promos = array_values(array_filter($promos, function($promo) use ($searchPromo) {
+                return stripos($promo['description'], $searchPromo) !== false;
+            }));
+        }
 
-        return view('pages.voucher-promo.promoHome', compact('promos', 'vouchers', 'searchPromo', 'searchVoucher'));
+        // Filter pencarian voucher
+        if ($searchVoucher) {
+            $vouchers = array_values(array_filter($vouchers, function($voucher) use ($searchVoucher) {
+                return stripos($voucher['description'], $searchVoucher) !== false
+                    || stripos($voucher['promo_code'], $searchVoucher) !== false;
+            }));
+        }
+
+        // Manual pagination untuk promo
+        $promoPerPage = 5;
+        $promoCurrentPage = LengthAwarePaginator::resolveCurrentPage('promo_page');
+        $promoCurrentItems = array_slice($promos, ($promoCurrentPage - 1) * $promoPerPage, $promoPerPage);
+        $promosPaginator = new LengthAwarePaginator(
+            $promoCurrentItems,
+            count($promos),
+            $promoPerPage,
+            $promoCurrentPage,
+            ['pageName' => 'promo_page', 'path' => $request->url(), 'query' => $request->query()]
+        );
+
+        // Manual pagination untuk voucher
+        $voucherPerPage = 5;
+        $voucherCurrentPage = LengthAwarePaginator::resolveCurrentPage('voucher_page');
+        $voucherCurrentItems = array_slice($vouchers, ($voucherCurrentPage - 1) * $voucherPerPage, $voucherPerPage);
+        $vouchersPaginator = new LengthAwarePaginator(
+            $voucherCurrentItems,
+            count($vouchers),
+            $voucherPerPage,
+            $voucherCurrentPage,
+            ['pageName' => 'voucher_page', 'path' => $request->url(), 'query' => $request->query()]
+        );
+
+        return view('pages.voucher-promo.promoHome', [
+            'promos' => $promosPaginator,
+            'vouchers' => $vouchersPaginator,
+            'searchPromo' => $searchPromo,
+            'searchVoucher' => $searchVoucher
+        ]);
     }
 }

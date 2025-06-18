@@ -1,11 +1,25 @@
 <?php
 namespace App\Http\Controllers;
 
-use App\Models\Voucher;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
 
 class VoucherController extends Controller
 {
+    private $gateway = 'http://127.0.0.1:8000/api';
+
+    public function index()
+    {
+        $response = Http::withHeaders([
+                'Accept' => 'application/json',
+                'Content-Type' => 'application/json'
+            ])
+            ->get($this->gateway . '/all');
+        $result = $response->json();
+        $vouchers = isset($result['vouchers']) ? $result['vouchers'] : [];
+        return view('pages.voucher-promo.voucher.index', ['vouchers' => $vouchers]);
+    }
+
     public function create()
     {
         return view('pages.voucher-promo.voucher.createVoucher');
@@ -14,41 +28,86 @@ class VoucherController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'promo_code' => 'required|unique:vouchers,promo_code|max:50',
+            'promo_code' => 'required|max:50',
             'description' => 'required|max:100',
             'promo_value' => 'required|integer',
-            'status' => 'required|boolean',
+            'status' => 'required'
         ]);
 
-        Voucher::create($request->all());
+        $data = [
+            'promo_code' => $request->input('promo_code'),
+            'description' => $request->input('description'),
+            'promo_value' => (int)$request->input('promo_value'),
+            'status' => filter_var($request->input('status'), FILTER_VALIDATE_BOOLEAN)
+        ];
+
+        $response = Http::withHeaders([
+                'Accept' => 'application/json',
+                'Content-Type' => 'application/json'
+            ])
+            ->asJson()
+            ->post($this->gateway . '/create_voucher', [
+                'data' => $data
+            ]);
         return redirect('/promo')->with('success', 'Voucher berhasil ditambahkan!');
     }
 
     public function edit($id)
     {
-        $voucher = Voucher::findOrFail($id);
+        $response = Http::withHeaders([
+                'Accept' => 'application/json',
+                'Content-Type' => 'application/json'
+            ])
+            ->get($this->gateway . '/all');
+        $result = $response->json();
+        $vouchers = isset($result['vouchers']) ? $result['vouchers'] : [];
+        $voucher = collect($vouchers)->firstWhere('id', $id);
+
+        if (!$voucher) {
+            return redirect('/promo')->with('error', 'Voucher tidak ditemukan!');
+        }
+
         return view('pages.voucher-promo.voucher.editVoucher', compact('voucher'));
     }
 
     public function update(Request $request, $id)
     {
-        $voucher = Voucher::findOrFail($id);
-
         $request->validate([
-            'promo_code' => 'required|max:50|unique:vouchers,promo_code,' . $voucher->id,
+            'promo_code' => 'required|max:50',
             'description' => 'required|max:100',
             'promo_value' => 'required|integer',
-            'status' => 'required|boolean',
+            'status' => 'required'
         ]);
 
-        $voucher->update($request->all());
+        $data = [
+            'promo_code' => $request->input('promo_code'),
+            'description' => $request->input('description'),
+            'promo_value' => (int)$request->input('promo_value'),
+            'status' => filter_var($request->input('status'), FILTER_VALIDATE_BOOLEAN)
+        ];
+
+        $response = Http::withHeaders([
+                'Accept' => 'application/json',
+                'Content-Type' => 'application/json'
+            ])
+            ->asJson()
+            ->post($this->gateway . '/update_voucher', [
+                'vid' => $id,
+                'data' => $data
+            ]);
         return redirect('/promo')->with('success', 'Voucher berhasil diperbarui!');
     }
 
     public function destroy($id)
     {
-        $voucher = Voucher::findOrFail($id);
-        $voucher->delete();
+        $response = Http::withHeaders([
+                'Accept' => 'application/json',
+                'Content-Type' => 'application/json'
+            ])
+            ->asJson()
+            ->post($this->gateway . '/delete_voucher', [
+                'vid' => $id
+            ]);
         return redirect('/promo')->with('success', 'Voucher berhasil dihapus!');
     }
 }

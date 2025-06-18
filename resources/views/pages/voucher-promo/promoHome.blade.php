@@ -1,3 +1,4 @@
+{{-- filepath: resources/views/pages/voucher-promo/promoHome.blade.php --}}
 @extends('layouts.voucher')
 
 @section('title', 'Promo & Voucher')
@@ -28,7 +29,7 @@
 
     <!-- PROMO TABLE -->
     <div class="mb-12 border-b-4 border-dashed border-gray-400 pb-12">
-        <h3 class="text-xl font-bold mb-3 text-black uppercase">Daftar Promo Aktif</h3>
+        <h3 class="text-xl font-bold mb-3 text-black uppercase">Daftar Promo</h3>
         <div class="overflow-x-auto shadow border border-black">
             <table class="min-w-full text-sm text-left">
                 <thead class="bg-black text-[#E2BB4D] uppercase text-xs">
@@ -45,28 +46,30 @@
                 <tbody class="bg-white text-black">
                     @forelse($promos as $promo)
                         <tr class="border-b border-black hover:bg-[#F9F1DC] transition duration-150">
-                            <td class="px-4 py-3 border border-black">{{ $promo->description }}</td>
+                            <td class="px-4 py-3 border border-black">{{ $promo['description'] }}</td>
                             <td class="px-4 py-3 border border-black">
-                                @if($promo->value_type == 'percentage')
-                                    {{ $promo->promo_value }}%
+                                @if($promo['value_type'] == 'percentage')
+                                    {{ $promo['promo_value'] }}%
                                 @else
-                                    Rp {{ number_format($promo->promo_value, 0, ',', '.') }}
+                                    Rp {{ number_format($promo['promo_value'], 0, ',', '.') }}
                                 @endif
                             </td>
                             <td class="px-4 py-3 border border-black capitalize">
-                                {{ $promo->value_type == 'percentage' ? 'Presentase' : 'Potongan' }}
+                                {{ $promo['value_type'] == 'percentage' ? 'Presentase' : 'Potongan' }}
                             </td>
-                            <td class="px-4 py-3 border border-black">Rp {{ number_format($promo->minimum_order, 0, ',', '.') }}</td>
-                            <td class="px-4 py-3 border border-black">{{ $promo->usage_limit }}</td>
+                            <td class="px-4 py-3 border border-black">Rp {{ number_format($promo['minimum_order'], 0, ',', '.') }}</td>
+                            <td class="px-4 py-3 border border-black">{{ $promo['usage_limit'] }}</td>
                             <td class="px-4 py-3 border border-black">
-                                {{ $promo->status == 1 ? 'Aktif' : 'Tidak Aktif' }}
+                                <span class="font-semibold {{ $promo['status'] == 1 ? 'text-green-600' : 'text-red-600' }}">
+                                    {{ $promo['status'] == 1 ? 'Aktif' : 'Tidak Aktif' }}
+                                </span>
                             </td>
                             <td class="px-4 py-3 border border-black text-center">
                                 <div class="flex justify-center gap-3">
-                                    <a href="{{ url('/promos/'.$promo->id.'/edit') }}" title="Edit" class="text-[#E2BB4D] hover:text-black transition duration-150">
+                                    <a href="{{ url('/promos/'.$promo['id'].'/edit') }}" title="Edit" class="text-[#E2BB4D] hover:text-black transition duration-150">
                                         ✏️
                                     </a>
-                                    <form action="{{ url('/promos/'.$promo->id) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus promo ini?')" class="inline-block">
+                                    <form action="{{ url('/promos/'.$promo['id']) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus promo ini?')" class="inline-block">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" title="Delete" class="text-red-600 hover:text-black transition duration-150">
@@ -78,7 +81,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" class="text-center px-4 py-6 text-[#E2BB4D] font-medium">Tidak ada promo aktif.</td>
+                            <td colspan="7" class="text-center px-4 py-6 text-[#E2BB4D] font-medium">Tidak ada promo.</td>
                         </tr>
                     @endforelse
                 </tbody>
@@ -97,7 +100,7 @@
 
     <!-- VOUCHER TABLE -->
     <div>
-        <h3 class="text-xl font-bold mb-3 text-black uppercase">Daftar Voucher Aktif</h3>
+        <h3 class="text-xl font-bold mb-3 text-black uppercase">Daftar Voucher</h3>
         <div class="overflow-x-auto shadow border border-black">
             <table class="min-w-full text-sm text-left">
                 <thead class="bg-black text-[#E2BB4D] uppercase text-xs">
@@ -112,18 +115,20 @@
                 <tbody class="bg-white text-black">
                     @forelse($vouchers as $voucher)
                         <tr class="border-b border-black hover:bg-[#F9F1DC] transition duration-150">
-                            <td class="px-4 py-3 border border-black">{{ $voucher->promo_code }}</td>
-                            <td class="px-4 py-3 border border-black">{{ $voucher->description }}</td>
-                            <td class="px-4 py-3 border border-black">Rp {{ number_format($voucher->promo_value, 0, ',', '.') }}</td>
+                            <td class="px-4 py-3 border border-black">{{ $voucher['promo_code'] }}</td>
+                            <td class="px-4 py-3 border border-black">{{ $voucher['description'] }}</td>
+                            <td class="px-4 py-3 border border-black">Rp {{ number_format($voucher['promo_value'], 0, ',', '.') }}</td>
                             <td class="px-4 py-3 border border-black">
-                                {{ $voucher->status == 1 ? 'Aktif' : 'Tidak Aktif' }}
+                                <span class="font-semibold {{ $voucher['status'] == 1 ? 'text-green-600' : 'text-red-600' }}">
+                                    {{ $voucher['status'] == 1 ? 'Aktif' : 'Tidak Aktif' }}
+                                </span>
                             </td>
                             <td class="px-4 py-3 border border-black text-center">
                                 <div class="flex justify-center gap-3">
-                                    <a href="{{ url('/vouchers/'.$voucher->id.'/edit') }}" title="Edit" class="text-[#E2BB4D] hover:text-black transition duration-150">
+                                    <a href="{{ url('/vouchers/'.$voucher['id'].'/edit') }}" title="Edit" class="text-[#E2BB4D] hover:text-black transition duration-150">
                                         ✏️
                                     </a>
-                                    <form action="{{ url('/vouchers/'.$voucher->id) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus voucher ini?')" class="inline-block">
+                                    <form action="{{ url('/vouchers/'.$voucher['id']) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus voucher ini?')" class="inline-block">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" title="Delete" class="text-red-600 hover:text-black transition duration-150">
@@ -135,7 +140,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="text-center px-4 py-6 text-[#E2BB4D] font-medium">Tidak ada voucher aktif.</td>
+                            <td colspan="5" class="text-center px-4 py-6 text-[#E2BB4D] font-medium">Tidak ada voucher.</td>
                         </tr>
                     @endforelse
                 </tbody>
