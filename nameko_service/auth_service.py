@@ -130,7 +130,7 @@ class AuthService:
                 return {"success": False, "message": "Invalid credentials"}
             # Generate token
             token = str(uuid.uuid4())
-            expires_at = datetime.datetime.now() + datetime.timedelta(seconds=3600)
+            expires_at = datetime.datetime.now() + datetime.timedelta(seconds=300)
             expires_at_str = expires_at.strftime('%Y-%m-%d %H:%M:%S')
             TOKENS[token] = {
                 "member_id": member['id'],

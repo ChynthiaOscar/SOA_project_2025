@@ -93,7 +93,7 @@ class AuthController extends Controller
 
         // Generate token & expired
         $token = (string) \Illuminate\Support\Str::uuid();
-        $expiresAt = now()->addHours(1); // Durasi lebih lama (1 jam)
+        $expiresAt = now()->addMinutes(5); // Durasi lebih singkat (1 menit)
 
         // Simpan ke DB lokal
         $member->update([
@@ -137,8 +137,17 @@ class AuthController extends Controller
     }
 
     public function profile() {
-    $member = Auth::guard('member')->user();
-    return view('pages.member.profile', compact('member'));
+        $member = Auth::guard('member')->user();
+        // Cek token expired
+        if ($member && $member->token_expires_at && now()->greaterThan($member->token_expires_at)) {
+            // Hapus token di database
+            $member->update(['token' => null, 'token_expires_at' => null]);
+            // Logout dari Laravel Auth
+            Auth::guard('member')->logout();
+            // Redirect ke login dengan pesan
+            return redirect()->route('login')->withErrors(['email' => 'Sesi Anda telah berakhir, silakan login kembali.']);
+        }
+        return view('pages.member.profile', compact('member'));
     }
 
 
