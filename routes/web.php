@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\EventController;
+use App\Http\Controllers\EventPackageController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\InventoryItemController;
 use App\Http\Controllers\InventoryCategoryController;
@@ -39,12 +40,12 @@ Route::get('/employee-data', function () {
 
 // Event Package Routes
 Route::prefix('event-packages')->group(function () {
-    Route::get('/', [App\Http\Controllers\EventPackageController::class, 'index']);
-    Route::get('/create', [App\Http\Controllers\EventPackageController::class, 'create']);
-    Route::post('/', [App\Http\Controllers\EventPackageController::class, 'store']);
-    Route::get('/{id}/edit', [App\Http\Controllers\EventPackageController::class, 'edit']);
-    Route::get('/{id}', [App\Http\Controllers\EventPackageController::class, 'show']);
-    Route::put('/{id}', [App\Http\Controllers\EventPackageController::class, 'update']);
-    Route::patch('/{id}', [App\Http\Controllers\EventPackageController::class, 'update']);
-    Route::delete('/{id}', [App\Http\Controllers\EventPackageController::class, 'destroy']);
+    Route::get('/', [EventPackageController::class, 'index']);
+    Route::get('/create', [EventPackageController::class, 'create']);
+    Route::post('/', [EventPackageController::class, 'store']);
+    Route::get('/{id}/edit', [EventPackageController::class, 'edit']);
+    Route::get('/{id}', [EventPackageController::class, 'show']);
+    Route::put('/{id}', [EventPackageController::class, 'update']);
+    Route::patch('/{id}', [EventPackageController::class, 'update']);
+    Route::delete('/{id}', [EventPackageController::class, 'destroy']);
 });

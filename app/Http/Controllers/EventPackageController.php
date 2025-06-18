@@ -4,21 +4,17 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\EventPackage;
+use Illuminate\Support\Facades\Http;
 
 class EventPackageController extends Controller
 {
     public function index(Request $request)
     {
-        $query = EventPackage::query();
-        if ($request->search) {
-            $query->where('name', 'like', '%'.$request->search.'%')
-                  ->orWhere('id', $request->search);
-        }
-        $packages = $query->orderBy('id')->get();
-        return view('pages.service-event.admin.event_packages.index', [
-            'packages' => $packages,
-            'search' => $request->search,
-        ]);
+        $response = Http::get(env('API_URL') . '/event_packages/');
+        $res = json_decode($response);
+        $data['packages'] = $res->data->data;
+        $data['pagination'] = $res->data;
+        return view('pages.service-event.admin.event_packages.index', $data);
     }
 
     public function create()
@@ -55,8 +51,8 @@ class EventPackageController extends Controller
 
     public function destroy($id)
     {
-        $package = EventPackage::findOrFail($id);
-        $package->delete();
+        $response = Http::delete(env('API_URL') . '/event_packages/' . $id);
+        $res = json_decode($response);
         return redirect('event-packages')->with('success', 'Event package deleted!');
     }
-} 
+}
