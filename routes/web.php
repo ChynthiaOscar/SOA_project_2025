@@ -28,9 +28,17 @@ Route::get('/register', function () {
     return view('/pages/service-employee/employee/register');
 });
 
+// Employee & Manager PROFILE
+
 Route::get('/profile', function () {
-    return view('/pages/service-employee/profile');
+    return view('/pages/service-employee/both/profile');
 });
+
+Route::get('/editprofile', function () {
+    return view('pages/service-employee/both/editprofile');
+});
+
+// Manager
 
 Route::get('/schedule', function () {
     return view('/pages/service-employee/manager/schedule');
