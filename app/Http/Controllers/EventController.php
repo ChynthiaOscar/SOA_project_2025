@@ -10,7 +10,7 @@ class EventController extends Controller
     {
         return view('pages.service-event.reservations.create');
     }
-    public function validate()
+    public function validateReservation()
     {
         return view('pages.service-event.reservations.validate');
     }
