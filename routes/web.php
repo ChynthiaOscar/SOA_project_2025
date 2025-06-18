@@ -1,10 +1,11 @@
 <?php
 
+use App\Http\Controllers\EventController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\InventoryItemController;
 use App\Http\Controllers\InventoryCategoryController;
 
-Route::get('/', [InventoryItemController::class, 'index'])-> name('inventory.index');
+Route::get('/', [InventoryItemController::class, 'index'])->name('inventory.index');
 
 
 Route::resource('inventory', InventoryItemController::class);
@@ -20,4 +21,13 @@ Route::get('/service-kitchen', function () {
 });
 Route::get('/service-kitchen/{id}', function () {
     return view('pages.service-kitchen.show');
+});
+
+/**
+ * Event Routes 
+ */
+
+Route::prefix('events')->name('events.')->group(function () {
+    Route::get('/', [EventController::class, 'create'])->name('create');
+    Route::get('/validate', [EventController::class, 'validate'])->name('validate');
 });

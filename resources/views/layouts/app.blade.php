@@ -16,7 +16,7 @@
 
 
     <!-- Konten utama -->
-    <main class="min-h-screen pt-10">
+    <main class="min-h-screen w-screen pt-10">
         @yield('content')
     </main>
 
