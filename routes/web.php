@@ -26,7 +26,7 @@ Route::get('/service-kitchen/{id}', function () {
 });
 
 /**
- * Event Routes 
+ * Event Routes
  */
 
 Route::prefix('events')->name('events.')->group(function () {
@@ -40,15 +40,14 @@ Route::get('/employee-data', function () {
 })->name('employee.data');
 
 // Event Package Routes
-Route::prefix('event-packages')->group(function () {
-    Route::get('/', [EventPackageController::class, 'index']);
-    Route::get('/create', [EventPackageController::class, 'create']);
-    Route::post('/', [EventPackageController::class, 'store']);
-    Route::get('/{id}/edit', [EventPackageController::class, 'edit']);
-    Route::get('/{id}', [EventPackageController::class, 'show']);
-    Route::put('/{id}', [EventPackageController::class, 'update']);
-    Route::patch('/{id}', [EventPackageController::class, 'update']);
-    Route::delete('/{id}', [EventPackageController::class, 'destroy']);
+Route::prefix('event-packages')->name('event-packages.')->group(function () {
+    Route::get('/', [EventPackageController::class, 'index'])->name('index');
+    Route::get('/create', [EventPackageController::class, 'create'])->name('create');
+    Route::post('/', [EventPackageController::class, 'store'])->name('store');
+    Route::get('/{id}/edit', [EventPackageController::class, 'edit'])->name('edit');
+    Route::get('/{id}', [EventPackageController::class, 'show'])->name('show');
+    Route::put('/{id}', [EventPackageController::class, 'update'])->name('update');
+    Route::delete('/{id}', [EventPackageController::class, 'destroy'])->name('destroy');
 });
 
 // Route::resource('event-spaces', [EventSpaceController::class]);

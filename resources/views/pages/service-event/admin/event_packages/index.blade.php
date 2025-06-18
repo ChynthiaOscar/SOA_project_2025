@@ -72,20 +72,16 @@
                                                     d="M15.232 5.232l3.536 3.536M9 13h3l8-8a2.828 2.828 0 10-4-4l-8 8v3zm0 0v3a1 1 0 001 1h3" />
                                             </svg>
                                         </a>
-                                        <form action="{{ url('event-packages/' . $p->id) }}" method="POST"
-                                            class="delete-form">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="button"
-                                                class="inline-block text-red-600 hover:text-red-800 btn-delete"
-                                                title="Delete">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
-                                                    viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                        d="M6 18L18 6M6 6l12 12" />
-                                                </svg>
-                                            </button>
-                                        </form>
+                                        <button type="button"
+                                            class="inline-block text-red-600 hover:text-red-800 btn-delete"
+                                            data-url="{{ url('event-packages/' . $p->id) }}"
+                                            title="Delete">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
+                                                viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M6 18L18 6M6 6l12 12" />
+                                            </svg>
+                                        </button>
                                     </td>
                                 </tr>
                             @empty
@@ -116,13 +112,10 @@
             </div>
         </div>
     </div>
-    <!-- SweetAlert2 -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         document.querySelectorAll('.btn-delete').forEach(btn => {
             btn.addEventListener('click', function(e) {
                 e.preventDefault();
-                const form = this.closest('form');
                 Swal.fire({
                     title: 'Are you sure?',
                     text: "This action cannot be undone!",
@@ -134,7 +127,41 @@
                     reverseButtons: true
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        form.submit();
+                        fetch(this.dataset.url, {
+                                method: 'DELETE',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                },
+                            })
+                            .then(response => response.json())
+                            .then(async res => {
+                                if (res.success) {
+                                    await Swal.fire({
+                                        title: 'Success',
+                                        text: res.message,
+                                        icon: "success"
+                                    }).then((result) => {
+                                        if (result.isConfirmed) {
+                                            location.reload();
+                                            return;
+                                        }
+                                    });
+                                } else {
+                                    await Swal.fire({
+                                        title: 'Error',
+                                        text: res.message,
+                                        icon: "error"
+                                    });
+                                }
+                            })
+                            .catch(error => {
+                                Swal.fire({
+                                    title: 'Error',
+                                    text: error.message || error,
+                                    icon: 'error'
+                                });
+                            });
                     }
                 });
             });
