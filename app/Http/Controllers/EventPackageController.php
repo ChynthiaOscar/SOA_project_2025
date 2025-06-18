@@ -9,27 +9,26 @@ use Illuminate\Support\Facades\Http;
 class EventPackageController extends Controller
 {
     public function index(Request $request)
-{
-    $page = $request->query('page', 1);
-    $search = $request->query('search', '');
+    {
+        $page = $request->query('page', 1);
+        $search = $request->query('search', '');
 
-    $response = Http::get(env('API_URL') . '/event_packages', [
-        'page' => $page,
-        'search' => $search,
-    ]);
+        $response = Http::get(env('API_URL') . '/event_packages', [
+            'page' => $page,
+            'search' => $search,
+        ]);
 
-    $res = json_decode($response);
+        $res = json_decode($response);
 
-    $data['packages'] = $res->data->data;
-    $data['pagination'] = (object)[
-        'current_page' => $res->data->current_page,
-        'last_page' => $res->data->last_page,
-    ];
-    $data['search'] = $search;
+        $data['packages'] = $res->data->data;
+        $data['pagination'] = (object)[
+            'current_page' => $res->data->current_page,
+            'last_page' => $res->data->last_page,
+        ];
+        $data['search'] = $search;
 
-    return view('pages.service-event.admin.event_packages.index', $data);
-}
-
+        return view('pages.service-event.admin.event_packages.index', $data);
+    }
 
     public function create()
     {
@@ -42,13 +41,20 @@ class EventPackageController extends Controller
             'name' => 'required',
             'price' => 'required|integer',
         ]);
-        EventPackage::create($request->only('name', 'price'));
+
+        $response = Http::post(env('API_URL') . '/event_packages', [
+            'name' => $request->name,
+            'price' => $request->price,
+        ]);
+
         return redirect('event-packages')->with('success', 'Event package created!');
     }
 
     public function edit($id)
     {
-        $package = EventPackage::findOrFail($id);
+        $response = Http::get(env('API_URL') . '/event_packages/' . $id);
+        $res = json_decode($response);
+        $package = $res->data;
         return view('pages.service-event.admin.event_packages.edit', compact('package'));
     }
 
@@ -58,8 +64,12 @@ class EventPackageController extends Controller
             'name' => 'required',
             'price' => 'required|integer',
         ]);
-        $package = EventPackage::findOrFail($id);
-        $package->update($request->only('name', 'price'));
+
+        $response = Http::put(env('API_URL') . '/event_packages/' . $id, [
+            'name' => $request->name,
+            'price' => $request->price,
+        ]);
+
         return redirect('event-packages')->with('success', 'Event package updated!');
     }
 
