@@ -1,0 +1,91 @@
+version: '3'
+
+services:  # MySQL Database
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+      MYSQL_DATABASE: soa_project_2025
+    volumes:
+      - mysql_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    networks:
+      - soa_network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # RabbitMQ for Nameko
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - soa_network
+    healthcheck:
+      test: ["CMD", "rabbitmqctl", "status"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # Laravel Frontend
+  laravel:
+    build:
+      context: .
+      dockerfile: Dockerfile.laravel
+    volumes:
+      - .:/var/www/html
+    ports:
+      - "8080:8000"
+    depends_on:
+      - mysql
+      - gateway
+    networks:
+      - soa_network    environment:
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_DATABASE=soa_project_2025
+      - DB_USERNAME=root
+      - DB_PASSWORD=
+      - GATEWAY_URL=http://gateway:8000
+
+  # Nameko Gateway Service
+  gateway:
+    build:
+      context: ./gateway
+      dockerfile: Dockerfile.gateway
+    volumes:
+      - ./gateway:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - rabbitmq
+      - inventory_service
+    networks:
+      - soa_network
+    command: nameko run --config config.yaml gateway
+
+  # Nameko Inventory Service
+  inventory_service:
+    build:
+      context: ./service
+      dockerfile: Dockerfile.service
+    volumes:
+      - ./service:/app
+    depends_on:
+      - rabbitmq
+      - mysql
+    networks:
+      - soa_network
+    command: nameko run --config config.yaml inventory_service
+
+networks:
+  soa_network:
+    driver: bridge
+
+volumes:
+  mysql_data:

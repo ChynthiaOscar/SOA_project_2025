@@ -1,78 +1,79 @@
 <?php
-
 namespace App\Http\Controllers;
 
-use App\Models\InventoryItem;
-use App\Models\InventoryCategory;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
 
 class InventoryItemController extends Controller
 {
+    protected $gatewayUrl;
+
+    public function __construct()
+    {
+        $this->gatewayUrl = env('GATEWAY_URL', 'http://localhost:8000');
+    }
+
     public function index()
     {
-        $inventoryItems = InventoryItem::with('category')->get();
+        $response = Http::get($this->gatewayUrl . '/items');
+        $inventoryItems = $response->json();
         return view('pages.service-inventory.index', compact('inventoryItems'));
     }
 
     public function create()
     {
-        $categories = InventoryCategory::all();
+        $categories = Http::get($this->gatewayUrl . '/categories')->json();
         return view('pages.service-inventory.inventory.create', compact('categories'));
     }
 
-    public function categories()
-{
-    $categories = InventoryCategory::with('items')->get(); // Pastikan relasi 'items' ada di model InventoryCategory
-    return view('pages.service-inventory.category', compact('categories'));
-}
-
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'inventoryItem_name' => 'required',
-            'inventoryItem_description' => 'required',
-            'inventoryItem_currentQuantity' => 'required|numeric',
-            'inventoryItem_unitOfMeasure' => 'required',
-            'inventoryItem_reorderPoint' => 'required|numeric',
-            'inventoryItem_initialStockLevel' => 'required|numeric',
-            'inventoryItem_lastUpdated' => 'required|date',
-            'inventoryCategory_inventoryCategory_id' => 'required|exists:inventory_categories,inventoryCategory_id',
-        ]);
-        $lastId = InventoryItem::max('inventoryItem_id') ?? 0;
-        $validated['inventoryItem_id'] = $lastId + 1;
-        InventoryItem::create($validated);
+        $data = [
+            'name' => $request->input('inventoryItem_name'),
+            'description' => $request->input('inventoryItem_description'),
+            'category_id' => $request->input('inventoryCategory_inventoryCategory_id'),
+            'quantity' => $request->input('inventoryItem_currentQuantity'),
+            'unit' => $request->input('inventoryItem_unitOfMeasure'),
+            'reorder_point' => $request->input('inventoryItem_reorderPoint'),
+            'initial_stock' => $request->input('inventoryItem_initialStockLevel'),
+            'last_updated' => $request->input('inventoryItem_lastUpdated'),
+        ];
+        Http::post($this->gatewayUrl . '/items', $data);
         return redirect()->route('inventory.index')->with('success', 'Item added successfully!');
     }
 
     public function edit($id)
     {
-        $item = InventoryItem::findOrFail($id);
-        $categories = InventoryCategory::all();
+        $item = Http::get("{$this->gatewayUrl}/items/{$id}")->json();
+        $categories = Http::get($this->gatewayUrl . '/categories')->json();
         return view('pages.service-inventory.inventory.edit', compact('item', 'categories'));
     }
 
     public function update(Request $request, $id)
     {
-        $validated = $request->validate([
-            'inventoryItem_name' => 'required',
-            'inventoryItem_description' => 'required',
-            'inventoryItem_currentQuantity' => 'required|numeric',
-            'inventoryItem_unitOfMeasure' => 'required',
-            'inventoryItem_reorderPoint' => 'required|numeric',
-            'inventoryItem_initialStockLevel' => 'required|numeric',
-            'inventoryItem_lastUpdated' => 'required|date',
-            'inventoryCategory_inventoryCategory_id' => 'required|exists:inventory_categories,inventoryCategory_id',
-        ]);
-        $item = InventoryItem::findOrFail($id);
-        $item->update($validated);
-        // Redirect ke index agar langsung lihat data
+        $data = [
+            'name' => $request->input('inventoryItem_name'),
+            'description' => $request->input('inventoryItem_description'),
+            'category_id' => $request->input('inventoryCategory_inventoryCategory_id'),
+            'quantity' => $request->input('inventoryItem_currentQuantity'),
+            'unit' => $request->input('inventoryItem_unitOfMeasure'),
+            'reorder_point' => $request->input('inventoryItem_reorderPoint'),
+            'initial_stock' => $request->input('inventoryItem_initialStockLevel'),
+            'last_updated' => $request->input('inventoryItem_lastUpdated'),
+        ];
+        Http::put("{$this->gatewayUrl}/items/{$id}", $data);
         return redirect()->route('inventory.index')->with('success', 'Item updated successfully!');
     }
 
     public function destroy($id)
     {
-        $item = InventoryItem::findOrFail($id);
-        $item->delete();
+        Http::delete("{$this->gatewayUrl}/items/{$id}");
         return redirect()->route('inventory.index')->with('success', 'Item deleted successfully!');
+    }
+
+    public function apiIndex()
+    {
+        $response = Http::get($this->gatewayUrl . '/items');
+        return $response->json();
     }
 }

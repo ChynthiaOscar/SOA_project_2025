@@ -1,0 +1,5 @@
+AMQP_URI: 'pyamqp://guest:guest@rabbitmq'
+WEB_SERVER_ADDRESS: '0.0.0.0:8000'
+
+DB_URIS:
+  'inventory_service:Base': "mysql+pymysql://root@mysql:3306/soa_project_2025"

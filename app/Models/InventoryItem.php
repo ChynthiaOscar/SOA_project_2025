@@ -26,8 +26,8 @@ class InventoryItem extends Model
     {
         return $this->belongsTo(
             InventoryCategory::class,
-            'inventoryCategory_inventoryCategory_id', // foreign key in inventory_items
-            'inventoryCategory_id' // primary key in inventory_categories
+            'inventoryCategory_inventoryCategory_id', 
+            'inventoryCategory_id' 
         );
     }
 }

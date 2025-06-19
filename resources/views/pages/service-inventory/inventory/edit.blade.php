@@ -6,47 +6,47 @@
 <div class="container mx-auto p-4 md:p-8">
     <div class="bg-[#FDF2D0] shadow-xl rounded-lg p-6 md:p-8 max-w-2xl mx-auto">
         <h2 class="text-2xl font-bold text-black mb-6 text-center">Edit Inventory Item</h2>
-        <form action="{{ route('inventory.update', $item->inventoryItem_id) }}" method="POST" class="space-y-6">
+        <form action="{{ route('inventory.update', $item['id']) }}" method="POST" class="space-y-6">
             @csrf
             @method('PUT')
             <div>
                 <label for="inventoryItem_name" class="block text-sm font-medium text-black">Name</label>
-                <input type="text" name="inventoryItem_name" id="inventoryItem_name" value="{{ $item->inventoryItem_name }}" class="mt-1 block w-full bg-white border border-[#A88A29] rounded-md shadow-sm py-2 px-3 text-black focus:outline-none focus:ring-2 focus:ring-[#A88A29] focus:border-transparent" required>
+                <input type="text" name="inventoryItem_name" id="inventoryItem_name" value="{{ $item['name'] }}" class="mt-1 block w-full bg-white border border-[#A88A29] rounded-md shadow-sm py-2 px-3 text-black focus:outline-none focus:ring-2 focus:ring-[#A88A29] focus:border-transparent" required>
             </div>
             <div>
                 <label for="inventoryItem_description" class="block text-sm font-medium text-black">Description</label>
-                <textarea name="inventoryItem_description" id="inventoryItem_description" rows="3" class="mt-1 block w-full bg-white border border-[#A88A29] rounded-md shadow-sm py-2 px-3 text-black focus:outline-none focus:ring-2 focus:ring-[#A88A29] focus:border-transparent" required>{{ $item->inventoryItem_description }}</textarea>
+                <textarea name="inventoryItem_description" id="inventoryItem_description" rows="3" class="mt-1 block w-full bg-white border border-[#A88A29] rounded-md shadow-sm py-2 px-3 text-black focus:outline-none focus:ring-2 focus:ring-[#A88A29] focus:border-transparent" required>{{ $item['description'] }}</textarea>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                     <label for="inventoryItem_currentQuantity" class="block text-sm font-medium text-black">Current Quantity</label>
-                    <input type="number" step="0.01" name="inventoryItem_currentQuantity" id="inventoryItem_currentQuantity" value="{{ $item->inventoryItem_currentQuantity }}" class="mt-1 block w-full bg-white border border-[#A88A29] rounded-md shadow-sm py-2 px-3 text-black focus:outline-none focus:ring-2 focus:ring-[#A88A29] focus:border-transparent" required>
+                    <input type="number" step="0.01" name="inventoryItem_currentQuantity" id="inventoryItem_currentQuantity" value="{{ $item['quantity'] }}" class="mt-1 block w-full bg-white border border-[#A88A29] rounded-md shadow-sm py-2 px-3 text-black focus:outline-none focus:ring-2 focus:ring-[#A88A29] focus:border-transparent" required>
                 </div>
                 <div>
                     <label for="inventoryItem_unitOfMeasure" class="block text-sm font-medium text-black">Unit of Measure</label>
-                    <input type="text" name="inventoryItem_unitOfMeasure" id="inventoryItem_unitOfMeasure" value="{{ $item->inventoryItem_unitOfMeasure }}" class="mt-1 block w-full bg-white border border-[#A88A29] rounded-md shadow-sm py-2 px-3 text-black focus:outline-none focus:ring-2 focus:ring-[#A88A29] focus:border-transparent" required>
+                    <input type="text" name="inventoryItem_unitOfMeasure" id="inventoryItem_unitOfMeasure" value="{{ $item['unit'] }}" class="mt-1 block w-full bg-white border border-[#A88A29] rounded-md shadow-sm py-2 px-3 text-black focus:outline-none focus:ring-2 focus:ring-[#A88A29] focus:border-transparent" required>
                 </div>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                     <label for="inventoryItem_reorderPoint" class="block text-sm font-medium text-black">Reorder Point</label>
-                    <input type="number" step="0.01" name="inventoryItem_reorderPoint" id="inventoryItem_reorderPoint" value="{{ $item->inventoryItem_reorderPoint }}" class="mt-1 block w-full bg-white border border-[#A88A29] rounded-md shadow-sm py-2 px-3 text-black focus:outline-none focus:ring-2 focus:ring-[#A88A29] focus:border-transparent" required>
+                    <input type="number" step="0.01" name="inventoryItem_reorderPoint" id="inventoryItem_reorderPoint" value="{{ $item['reorder_point'] }}" class="mt-1 block w-full bg-white border border-[#A88A29] rounded-md shadow-sm py-2 px-3 text-black focus:outline-none focus:ring-2 focus:ring-[#A88A29] focus:border-transparent" required>
                 </div>
                 <div>
                     <label for="inventoryItem_initialStockLevel" class="block text-sm font-medium text-black">Initial Stock Level</label>
-                    <input type="number" step="0.01" name="inventoryItem_initialStockLevel" id="inventoryItem_initialStockLevel" value="{{ $item->inventoryItem_initialStockLevel }}" class="mt-1 block w-full bg-white border border-[#A88A29] rounded-md shadow-sm py-2 px-3 text-black focus:outline-none focus:ring-2 focus:ring-[#A88A29] focus:border-transparent" required>
+                    <input type="number" step="0.01" name="inventoryItem_initialStockLevel" id="inventoryItem_initialStockLevel" value="{{ $item['initial_stock'] }}" class="mt-1 block w-full bg-white border border-[#A88A29] rounded-md shadow-sm py-2 px-3 text-black focus:outline-none focus:ring-2 focus:ring-[#A88A29] focus:border-transparent" required>
                 </div>
             </div>
             <div>
                 <label for="inventoryItem_lastUpdated" class="block text-sm font-medium text-black">Last Updated</label>
-                <input type="date" name="inventoryItem_lastUpdated" id="inventoryItem_lastUpdated" value="{{ \Carbon\Carbon::parse($item->inventoryItem_lastUpdated)->format('Y-m-d') }}" class="mt-1 block w-full bg-white border border-[#A88A29] rounded-md shadow-sm py-2 px-3 text-black focus:outline-none focus:ring-2 focus:ring-[#A88A29] focus:border-transparent" required>
+                <input type="date" name="inventoryItem_lastUpdated" id="inventoryItem_lastUpdated" value="{{ \Carbon\Carbon::parse($item['last_updated'])->format('Y-m-d') }}" class="mt-1 block w-full bg-white border border-[#A88A29] rounded-md shadow-sm py-2 px-3 text-black focus:outline-none focus:ring-2 focus:ring-[#A88A29] focus:border-transparent" required>
             </div>
             <div>
                 <label for="inventoryCategory_inventoryCategory_id" class="block text-sm font-medium text-black">Category</label>
                 <select name="inventoryCategory_inventoryCategory_id" id="inventoryCategory_inventoryCategory_id" class="mt-1 block w-full bg-white border border-[#A88A29] rounded-md shadow-sm py-2 px-3 text-black focus:outline-none focus:ring-2 focus:ring-[#A88A29] focus:border-transparent" required>
                     <option value="">Select Category</option>
                     @foreach($categories as $category)
-                        <option value="{{ $category->inventoryCategory_id }}" @if($item->inventoryCategory_inventoryCategory_id == $category->inventoryCategory_id) selected @endif>{{ $category->inventoryCategory_name }}</option>
+                        <option value="{{ $category['id'] }}" @if(isset($item['category_id']) && $item['category_id'] == $category['id']) selected @endif>{{ $category['name'] }}</option>
                     @endforeach
                 </select>
             </div>

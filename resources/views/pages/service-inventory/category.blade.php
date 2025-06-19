@@ -3,10 +3,12 @@
 @section('title', 'Items by Category')
 
 @section('content')
+@php
+    use Illuminate\Support\Facades\Http;
+@endphp
 
 <div class="container mx-auto p-4 md:p-8">
     <div class="bg-[#FDF2D0] shadow-xl rounded-lg overflow-hidden">
-        
         <!-- Header Section -->
         <header class="px-6 py-5 border-b border-[#E0C98F]">
             <div class="flex justify-between items-center">
@@ -28,23 +30,30 @@
 
         <!-- Main Content: Categories and Items List -->
         <div class="p-6 md:p-8">
-            @if($categories->count() > 0)
+            @if(count($categories) > 0)
                 @foreach ($categories as $category)
                     <div class="mb-8 p-6 bg-white shadow-md rounded-lg border border-[#E0C98F]">
                         <div class="flex justify-between items-center mb-4">
                             <h2 class="text-xl font-bold text-[#BA1E1E] pb-2 border-b border-[#E0C98F]">
-                                {{ $category->inventoryCategory_name }}
-                                @if($category->items->count() > 0)
+                                {{ $category['name'] }}
+                                @php
+                                    // Get items for this category from the gateway
+                                    $categoryItems = Http::get('http://localhost:8000/items')->json();
+                                    $categoryItems = array_filter($categoryItems, function($item) use ($category) {
+                                        return isset($item['category_name']) && $item['category_name'] == $category['name'];
+                                    });
+                                @endphp
+                                @if(count($categoryItems) > 0)
                                 <span class="ml-2 text-xs font-semibold text-black bg-[#D4AF37] px-2 py-1 rounded-full align-middle">
-                                    {{ $category->items->count() }} item(s)
+                                    {{ count($categoryItems) }} item(s)
                                 </span>
                                 @endif
                             </h2>
                             <div class="flex gap-2">
-                                <a href="{{ route('categories.edit', $category->inventoryCategory_id) }}" class="text-xs bg-blue-100 hover:bg-blue-200 text-blue-800 font-semibold py-1 px-3 rounded-full flex items-center">
+                                <a href="{{ route('categories.edit', $category['id']) }}" class="text-xs bg-blue-100 hover:bg-blue-200 text-blue-800 font-semibold py-1 px-3 rounded-full flex items-center">
                                     <i class="fas fa-edit mr-1"></i> Edit
                                 </a>
-                                <form action="{{ route('categories.destroy', $category->inventoryCategory_id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this category?');">
+                                <form action="{{ route('categories.destroy', $category['id']) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this category?');">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="text-xs bg-red-100 hover:bg-red-200 text-red-800 font-semibold py-1 px-3 rounded-full flex items-center">
@@ -53,20 +62,20 @@
                                 </form>
                             </div>
                         </div>
-                        @if($category->items->count() > 0)
+                        @if(count($categoryItems) > 0)
                             <ul class="space-y-3">
-                                @foreach ($category->items as $item)
+                                @foreach ($categoryItems as $item)
                                     <li class="p-3 bg-yellow-50 rounded-md border border-yellow-200 hover:shadow-lg transition-shadow duration-200">
                                         <div class="flex justify-between items-center">
                                             <div>
-                                                <span class="font-semibold text-black text-md">{{ $item->inventoryItem_name }}</span>
-                                                @if($item->inventoryItem_description)
-                                                <p class="text-sm text-gray-600 truncate max-w-md" title="{{ $item->inventoryItem_description }}">{{ Str::limit($item->inventoryItem_description, 70) }}</p>
+                                                <span class="font-semibold text-black text-md">{{ $item['name'] }}</span>
+                                                @if(isset($item['description']))
+                                                <p class="text-sm text-gray-600 truncate max-w-md" title="{{ $item['description'] }}">{{ \Illuminate\Support\Str::limit($item['description'], 70) }}</p>
                                                 @endif
                                             </div>
                                             <div class="text-right flex-shrink-0 ml-4">
-                                                <span class="text-sm text-gray-700 block">Qty: <span class="font-bold text-black">{{ $item->inventoryItem_currentQuantity }}</span> {{ $item->inventoryItem_unitOfMeasure }}</span>
-                                                <a href="{{ route('inventory.edit', $item->inventoryItem_id) }}" class="text-xs text-[#7D1111] hover:text-[#450505] hover:underline font-semibold">
+                                                <span class="text-sm text-gray-700 block">Qty: <span class="font-bold text-black">{{ $item['quantity'] }}</span> {{ $item['unit'] }}</span>
+                                                <a href="{{ route('inventory.edit', $item['id']) }}" class="text-xs text-[#7D1111] hover:text-[#450505] hover:underline font-semibold">
                                                     View/Edit
                                                 </a>
                                             </div>

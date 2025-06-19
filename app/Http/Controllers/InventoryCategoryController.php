@@ -1,63 +1,54 @@
 <?php
-
 namespace App\Http\Controllers;
 
-use App\Models\InventoryCategory;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
 
 class InventoryCategoryController extends Controller
 {
+    protected $gatewayUrl;
+
+    public function __construct()
+    {
+        $this->gatewayUrl = env('GATEWAY_URL', 'http://localhost:8000');
+    }
+    
     public function index()
     {
-        $categories = InventoryCategory::all();
-        $inventoryItems = collect(); // Use a collection to avoid filter() error
-        return view('pages.service-inventory.index', compact('categories', 'inventoryItems'));
+        $categories = Http::get($this->gatewayUrl . '/categories')->json();
+        return view('pages.service-inventory.category', compact('categories'));
     }
 
     public function create()
     {
-        return view('pages.service-inventory.categories.create');
+        return view('pages.service-inventory.category.create');
     }
 
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'inventoryCategory_name' => 'required',
-            'inventoryCategory_description' => 'required',
-        ]);
-        $lastId = InventoryCategory::max('inventoryCategory_id') ?? 0;
-        $validated['inventoryCategory_id'] = $lastId + 1;
-        InventoryCategory::create($validated);
+        $data = [
+            'name' => $request->input('inventoryCategory_name'),
+            'description' => $request->input('inventoryCategory_description'),        ];
+        Http::post($this->gatewayUrl . '/categories', $data);
         return redirect()->route('service-inventory.category')->with('success', 'Category added successfully!');
     }
 
     public function edit($id)
     {
-        $category = \App\Models\InventoryCategory::where('inventoryCategory_id', $id)->firstOrFail();
-        return view('pages.service-inventory.categories.edit', compact('category'));
+        $category = Http::get("{$this->gatewayUrl}/categories/{$id}")->json();
+        return view('pages.service-inventory.category.edit', compact('category'));
     }
 
     public function update(Request $request, $id)
     {
-        $validated = $request->validate([
-            'inventoryCategory_name' => 'required',
-            'inventoryCategory_description' => 'required',
-        ]);
-        $category = InventoryCategory::findOrFail($id);
-        $category->update($validated);
+        $data = [
+            'name' => $request->input('inventoryCategory_name'),            'description' => $request->input('inventoryCategory_description'),
+        ];
+        Http::put("{$this->gatewayUrl}/categories/{$id}", $data);
         return redirect()->route('service-inventory.category')->with('success', 'Category updated successfully!');
-    }
-
-    public function destroy($id)
+    }    public function destroy($id)
     {
-        $category = InventoryCategory::findOrFail($id);
-        $category->delete();
+        Http::delete("{$this->gatewayUrl}/categories/{$id}");
         return redirect()->route('service-inventory.category')->with('success', 'Category deleted successfully!');
-    }
-
-    public function show($id)
-    {
-        $category = InventoryCategory::with('items')->findOrFail($id);
-        return view('pages.service-inventory.category.show', compact('category'));
     }
 }

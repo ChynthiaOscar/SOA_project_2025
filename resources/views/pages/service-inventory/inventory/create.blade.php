@@ -45,7 +45,7 @@
                 <select name="inventoryCategory_inventoryCategory_id" id="inventoryCategory_inventoryCategory_id" class="mt-1 block w-full bg-white border border-[#A88A29] rounded-md shadow-sm py-2 px-3 text-black focus:outline-none focus:ring-2 focus:ring-[#A88A29] focus:border-transparent" required>
                     <option value="">Select Category</option>
                     @foreach($categories as $category)
-                        <option value="{{ $category->inventoryCategory_id }}">{{ $category->inventoryCategory_name }}</option>
+                        <option value="{{ $category['id'] }}">{{ $category['name'] }}</option>
                     @endforeach
                 </select>
             </div>

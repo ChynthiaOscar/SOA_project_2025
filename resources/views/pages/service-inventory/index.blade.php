@@ -3,18 +3,19 @@
 @section('title', 'Inventory Items')
 
 @section('content')
-
- <body> 
-
+@php
+    use Illuminate\Support\Facades\Http;
+@endphp
+<body>
 <div class="container mx-auto p-4 md:p-8">
     <div class="bg-[#FDF2D0] shadow-xl rounded-lg overflow-hidden">
         <!-- Warning Section -->
         @php
-            $lowStockItems = $inventoryItems->filter(function($item) {
-                return $item->inventoryItem_currentQuantity < $item->inventoryItem_reorderPoint;
+            $lowStockItems = array_filter($inventoryItems, function($item) {
+                return $item['quantity'] < $item['reorder_point'];
             });
         @endphp
-        @if($lowStockItems->count())
+        @if(count($lowStockItems))
         <div class="bg-[#FCD772] border-l-4 border-[#F53939] text-black p-4 mb-6 rounded flex items-center">
             <i class="fas fa-exclamation-triangle mr-3 text-[#BA1E1E] text-2xl"></i>
             <div>
@@ -22,9 +23,9 @@
                 <ul class="list-disc pl-5">
                     @foreach($lowStockItems as $item)
                         <li>
-                            <span class="font-semibold">{{ $item->inventoryItem_name }}</span>
-                            (Current: <span class="text-[#BA1E1E] font-bold">{{ $item->inventoryItem_currentQuantity }}</span>,
-                            Reorder Point: {{ $item->inventoryItem_reorderPoint }})
+                            <span class="font-semibold">{{ $item['name'] }}</span>
+                            (Current: <span class="text-[#BA1E1E] font-bold">{{ $item['quantity'] }}</span>,
+                            Reorder Point: {{ $item['reorder_point'] }})
                         </li>
                     @endforeach
                 </ul>
@@ -83,15 +84,19 @@
                     <tbody id="inventoryTableBody">
                         @forelse ($inventoryItems as $item)
                         <tr class="hover:bg-yellow-50">
-                            <td class="px-5 py-4 border-b border-[#E0C98F] text-sm text-gray-700">{{ $item->inventoryItem_id }}</td>
-                            <td class="px-5 py-4 border-b border-[#E0C98F] text-sm text-black font-medium item-name">{{ $item->inventoryItem_name }}</td>
-                            <td class="px-5 py-4 border-b border-[#E0C98F] text-sm text-gray-600 truncate max-w-xs">{{ $item->inventoryItem_description }}</td>
-                            <td class="px-5 py-4 border-b border-[#E0C98F] text-sm text-gray-700">{{ $item->category->inventoryCategory_name ?? 'N/A' }}</td>
-                            <td class="px-5 py-4 border-b border-[#E0C98F] text-sm text-gray-700 text-right">{{ $item->inventoryItem_currentQuantity }}</td>
-                            <td class="px-5 py-4 border-b border-[#E0C98F] text-sm text-gray-700">{{ $item->inventoryItem_unitOfMeasure }}</td>
-                            <td class="px-5 py-4 border-b border-[#E0C98F] text-sm text-gray-700 text-right">{{ $item->inventoryItem_reorderPoint }}</td>
-                            <td class="px-5 py-4 border-b border-[#E0C98F] text-sm text-gray-700 text-right">{{ $item->inventoryItem_initialStockLevel }}</td>
-                            <td class="px-5 py-4 border-b border-[#E0C98F] text-sm text-gray-700">{{ \Carbon\Carbon::parse($item->inventoryItem_lastUpdated)->format('M d, Y') }}</td>
+                            <td class="px-5 py-4 border-b border-[#E0C98F] text-sm text-gray-700">{{ $item['id'] }}</td>
+                            <td class="px-5 py-4 border-b border-[#E0C98F] text-sm text-black font-medium item-name">{{ $item['name'] }}</td>
+                            <td class="px-5 py-4 border-b border-[#E0C98F] text-sm text-gray-600 truncate max-w-xs">{{ $item['description'] }}</td>
+                            <td class="px-5 py-4 border-b border-[#E0C98F] text-sm text-gray-700">
+                                {{ $item['category_name'] ?? 'N/A' }}
+                            </td>
+                            <td class="px-5 py-4 border-b border-[#E0C98F] text-sm text-gray-700 text-right">{{ $item['quantity'] }}</td>
+                            <td class="px-5 py-4 border-b border-[#E0C98F] text-sm text-gray-700">{{ $item['unit'] }}</td>
+                            <td class="px-5 py-4 border-b border-[#E0C98F] text-sm text-gray-700 text-right">{{ $item['reorder_point'] }}</td>
+                            <td class="px-5 py-4 border-b border-[#E0C98F] text-sm text-gray-700 text-right">{{ $item['initial_stock'] }}</td>
+                            <td class="px-5 py-4 border-b border-[#E0C98F] text-sm text-gray-700">
+                                {{ \Carbon\Carbon::parse($item['last_updated'])->format('M d, Y') }}
+                            </td>
                             <td class="px-5 py-4 border-b border-[#E0C98F] text-sm text-center">
                                 <div class="relative inline-block text-left">
                                     <button type="button" class="inline-flex justify-center w-full rounded-md px-2 py-1 text-sm font-medium text-gray-600 hover:text-black focus:outline-none" onclick="toggleDropdown(this)">
@@ -99,10 +104,10 @@
                                     </button>
                                     <div class="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none hidden z-10 action-dropdown">
                                         <div class="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
-                                            <a href="{{ route('inventory.edit', $item->inventoryItem_id) }}" class="block px-4 py-2 text-sm text-black hover:bg-yellow-100 hover:text-black flex items-center" role="menuitem">
+                                            <a href="{{ route('inventory.edit', $item['id']) }}" class="block px-4 py-2 text-sm text-black hover:bg-yellow-100 hover:text-black flex items-center" role="menuitem">
                                                 <i class="fas fa-edit w-5 mr-2 text-gray-500"></i> Edit
                                             </a>
-                                            <form action="{{ route('inventory.destroy', $item->inventoryItem_id) }}" method="POST" onsubmit="return confirm('Are you sure?');">
+                                            <form action="{{ route('inventory.destroy', $item['id']) }}" method="POST" onsubmit="return confirm('Are you sure?');">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" class="block w-full text-left px-4 py-2 text-sm text-[#BA1E1E] hover:bg-red-50 hover:text-[#7D1111] flex items-center" role="menuitem">
@@ -128,51 +133,40 @@
             <!-- Sidebar Section -->
             <aside class="w-full md:w-80 lg:w-96 mt-6 md:mt-0 md:flex-shrink-0 bg-[#7D1111] p-6 rounded-lg border border-[#450505]">
                 <h2 class="text-lg font-semibold text-[#FDEDED] mb-5">Products category</h2>
-
                 @php
-                    $categories = App\Models\InventoryCategory::all();
-                    $categoryColors = ['#F53939', '#D4AF37', '#434343', '#BA1E1E', '#FCD772', '#A88A29', '#450505', '#FAC2C2'];
+                    // Fetch categories from controller
+                    $categories = Http::get('http://localhost:8000/categories')->json();
+                    
+                    // Calculate category counts
                     $categoryCounts = [];
-                    $totalItems = 0;
-                    foreach ($categories as $i => $category) {
-                        $count = \App\Models\InventoryItem::where('inventoryCategory_inventoryCategory_id', $category->inventoryCategory_id)->count();
-                        $categoryCounts[] = [
-                            'name' => $category->inventoryCategory_name,
-                            'count' => $count,
-                            'color' => $categoryColors[$i % count($categoryColors)]
-                        ];
-                        $totalItems += $count;
+                    $totalItems = count($inventoryItems);
+                    
+                    // Array of colors for the chart
+                    $colors = ['#F53939', '#FCD772', '#D4AF37', '#A88A29', '#7D661C', '#BA1E1E'];
+                    
+                    // Generate category counts with colors
+                    if (!empty($categories)) {
+                        foreach ($categories as $index => $category) {
+                            $categoryItems = array_filter($inventoryItems, function($item) use ($category) {
+                                return $item['category_name'] == $category['name'];
+                            });
+                            
+                            $categoryCounts[] = [
+                                'name' => $category['name'],
+                                'count' => count($categoryItems),
+                                'color' => $colors[$index % count($colors)]
+                            ];
+                        }
                     }
                 @endphp
                 <div class="mb-8 flex justify-center">
                     <div class="donut-chart relative">
-                        <svg width="150" height="150" viewBox="0 0 42 42">
-                            @php
-                                $circumference = 2 * pi() * 16;
-                                $offset = 0;
-                            @endphp
-                            @foreach($categoryCounts as $i => $cat)
-                                @php
-                                    $percent = $totalItems > 0 ? ($cat['count'] / $totalItems) : 0;
-                                    $length = $percent * $circumference;
-                                @endphp
-                                <circle
-                                    r="16" cx="21" cy="21"
-                                    fill="transparent"
-                                    stroke="{{ $cat['color'] }}"
-                                    stroke-width="6"
-                                    stroke-dasharray="{{ $length }} {{ $circumference - $length }}"
-                                    stroke-dashoffset="{{ -$offset }}"
-                                />
-                                @php $offset += $length; @endphp
-                            @endforeach
-                        </svg>
+                        <svg width="150" height="150" viewBox="0 0 42 42"></svg>
                         <div class="donut-chart-hole absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-[#7D1111] text-[#FDEDED]">
                             {{ $totalItems }}
                         </div>
                     </div>
                 </div>
-
                 <ul class="space-y-3">
                     @foreach ($categoryCounts as $cat)
                     <li class="flex justify-between items-center text-sm">
