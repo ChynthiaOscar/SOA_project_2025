@@ -1,7 +1,16 @@
-<div class="p-3 bg-[#65090D] border-4 border-[#65090D] w-80 h-[340px] flex flex-col justify-between">
-    <div class="px-3 py-2 border-4 border-[#A67D44] flex flex-col h-full">
-        <img src="{{ $image }}" alt="{{ $title }}" class="w-40 h-40 mx-auto rounded-full object-cover -mt-16">
-        
+<div class="relative p-3 bg-[#65090D] border-4 border-[#65090D] w-80 h-[340px] flex flex-col justify-between">
+    <div class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center z-10 rounded-md">
+        <div class="absolute top-0 right-0 bg-[#65090D] border border-[#A67D44] text-[#EEEACB] text-xs font-bold px-3 py-1 rounded-bl-lg z-20">
+            Sold Out
+        </div>
+    </div>
+
+    <div class="px-3 py-2 border-4 border-[#A67D44] relative flex flex-col h-full z-5">
+        <div class="relative flex justify-center">
+            <img src="{{ $image }}" alt="{{ $title }}" class="w-40 h-40 rounded-full object-cover -mt-16 z-10">
+            <div class="absolute top-0 w-40 h-40 rounded-full bg-black bg-opacity-50 -mt-16 z-20"></div>
+        </div>
+
         <div class="flex justify-center gap-1 text-[#E09121] mt-2">
             @for ($i = 0; $i < 5; $i++)
                 <svg class="w-5 h-5 fill-current" viewBox="0 0 20 20">
@@ -15,7 +24,7 @@
 
         <div class="mt-auto grid grid-cols-2 items-center">
             <p class="text-lg font-bold text-[#EEEACB] ml-3">IDR {{ $price }}</p>
-            <a class="bg-[#E4C788] px-2 py-2 rounded-full hover:bg-[#A67D44] transition duration-300 justify-self-end w-fit cursor-pointer">
+            <a class="bg-[#A67D44] px-2 py-2 rounded-full transition duration-300 justify-self-end w-fit cursor-pointer">
                 <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#65090D">
                     <path d="M440-440H200v-80h240v-240h80v240h240v80H520v240h-80v-240Z"/>
                 </svg>
