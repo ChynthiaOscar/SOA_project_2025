@@ -23,12 +23,25 @@ class EventMenuController extends Controller
     public function index(Request $request)
     {
         $page = $request->query('page', 1);
-        $response = Http::get($this->url . '/event_menus?page=' . $page);
+        $response = Http::get($this->url . "/event_menus?page={$page}");
         $res = json_decode($response);
-        $data['menus'] = $res->data->data ?? [];
-        $data['pagination'] = $res->data ?? null;
-        $data['title'] = "Manage Event Menus";
-        return view('pages.service-event.admin.event_menus.index', $data);
+
+        $menus = $res->data->data ?? [];
+        $pagination = $res->data ?? null;
+
+        // ✅ Optional: Group menu berdasarkan kategori (kalau untuk keperluan tampilan)
+        $groupedMenus = [];
+        foreach ($menus as $menu) {
+            $category = $menu->dish_category->name ?? 'Uncategorized';
+            $groupedMenus[$category][] = $menu;
+        }
+
+        return view('pages.service-event.admin.event_menus.index', [
+            'title' => "Manage Event Menus",
+            'menus' => $menus,
+            'pagination' => $pagination,
+            'groupedMenus' => $groupedMenus, // opsional, tergantung view
+        ]);
     }
 
     /**
@@ -36,16 +49,17 @@ class EventMenuController extends Controller
      */
     public function create()
     {
-        $data['title'] = "Create Event Menu";
-        
         $response = Http::get($this->url . '/dish_categories?per_page=100');
         $res = json_decode($response);
-        $categories = [];
-        if ($response->successful() && isset($res->data)) {
-            $categories = is_array($res->data) ? $res->data : ($res->data->data ?? []);
-        }
-        $data['categories'] = $categories;
-        return view('pages.service-event.admin.event_menus.create', $data);
+
+        $categories = is_array($res->data ?? null)
+            ? $res->data
+            : ($res->data->data ?? []);
+
+        return view('pages.service-event.admin.event_menus.create', [
+            'title' => "Create Event Menu",
+            'categories' => $categories,
+        ]);
     }
 
     /**
@@ -54,12 +68,15 @@ class EventMenuController extends Controller
     public function store(Request $request)
     {
         $data = $request->all();
+
         if ($request->hasFile('image')) {
             $path = $request->file('image')->store('images', 'public');
             $data['image'] = $path;
         }
+
         $response = Http::post($this->url . '/event_menus', $data);
         $res = json_decode($response);
+
         return $this->success("Event menu created successfully", $res->data ?? null);
     }
 
@@ -68,19 +85,21 @@ class EventMenuController extends Controller
      */
     public function edit(string $id)
     {
-        $data['title'] = "Edit Event Menu";
-        $response = Http::get($this->url . "/event_menus/" . $id);
-        $res = json_decode($response);
-        $data['event_menu'] = $res->data ?? null;
-        // Fetch dish categories for the dropdown
+        $menuResponse = Http::get("{$this->url}/event_menus/{$id}");
+        $menuRes = json_decode($menuResponse);
+
         $categoriesResponse = Http::get($this->url . '/dish_categories?per_page=100');
         $categoriesRes = json_decode($categoriesResponse);
-        $categories = [];
-        if ($categoriesResponse->successful() && isset($categoriesRes->data)) {
-            $categories = is_array($categoriesRes->data) ? $categoriesRes->data : ($categoriesRes->data->data ?? []);
-        }
-        $data['categories'] = $categories;
-        return view('pages.service-event.admin.event_menus.edit', $data);
+
+        $categories = is_array($categoriesRes->data ?? null)
+            ? $categoriesRes->data
+            : ($categoriesRes->data->data ?? []);
+
+        return view('pages.service-event.admin.event_menus.edit', [
+            'title' => "Edit Event Menu",
+            'event_menu' => $menuRes->data ?? null,
+            'categories' => $categories,
+        ]);
     }
 
     /**
@@ -89,22 +108,26 @@ class EventMenuController extends Controller
     public function update(Request $request, string $id)
     {
         $data = $request->all();
+
         if ($request->hasFile('image')) {
             $path = $request->file('image')->store('images', 'public');
             $data['image'] = $path;
         }
-        $response = Http::put($this->url . '/event_menus/' . $id, $data);
+
+        $response = Http::put("{$this->url}/event_menus/{$id}", $data);
         $res = json_decode($response);
+
         return $this->success("Event menu updated successfully", $res->data ?? null);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy($id)
+    public function destroy(string $id)
     {
-        $response = Http::delete($this->url . '/event_menus/' . $id);
+        $response = Http::delete("{$this->url}/event_menus/{$id}");
         $res = json_decode($response);
+
         return $this->success("Event menu deleted successfully", $res->data ?? null);
     }
 }

@@ -1,210 +1,110 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Event Menus</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-gray-100 p-8">
-  <div class="max-w-6xl mx-auto border rounded-3xl p-6 bg-white">
-    <h1 class="text-3xl font-bold text-center mb-10">EVENT MENUS</h1>
-
-    <div class="space-y-12">
-
-      <!-- Appetizer Section -->
-      <div>
-        <h2 class="text-2xl font-semibold mb-4">Appetizer</h2>
-        <div class="flex space-x-6 overflow-x-auto pb-2">
-          <!-- 7 Appetizers -->
-          <div class="min-w-[220px] bg-white shadow-md rounded-xl overflow-hidden border">
-            <img src="{{ asset('images/dumplings.png') }}" alt="Dumplings" class="h-48 w-full object-cover">
-            <div class="p-4">
-              <h3 class="text-lg font-bold">Dumplings</h3>
-              <p class="text-sm text-gray-600">Steamed meat dumplings</p>
-              <p class="text-sm font-semibold text-red-600 mt-1">IDR 17K</p>
-            </div>
-          </div>
-          <div class="min-w-[220px] bg-white shadow-md rounded-xl overflow-hidden border">
-            <img src="{{ asset('images/steamed_buns.png') }}" alt="Steamed Buns" class="h-48 w-full object-cover">
-            <div class="p-4">
-              <h3 class="text-lg font-bold">Mini Steamed Buns</h3>
-              <p class="text-sm text-gray-600">Soft buns with chicken filling</p>
-              <p class="text-sm font-semibold text-red-600 mt-1">IDR 16K</p>
-            </div>
-          </div>
-          <div class="min-w-[220px] bg-white shadow-md rounded-xl overflow-hidden border">
-            <img src="{{ asset('images/dumplings.png') }}" alt="Spring Rolls" class="h-48 w-full object-cover">
-            <div class="p-4">
-              <h3 class="text-lg font-bold">Spring Rolls</h3>
-              <p class="text-sm text-gray-600">Crispy veggie rolls</p>
-              <p class="text-sm font-semibold text-red-600 mt-1">IDR 14K</p>
-            </div>
-          </div>
-          <div class="min-w-[220px] bg-white shadow-md rounded-xl overflow-hidden border">
-            <img src="{{ asset('images/steamed_buns.png') }}" alt="Tofu Bites" class="h-48 w-full object-cover">
-            <div class="p-4">
-              <h3 class="text-lg font-bold">Tofu Bites</h3>
-              <p class="text-sm text-gray-600">Fried tofu with dip</p>
-              <p class="text-sm font-semibold text-red-600 mt-1">IDR 13K</p>
-            </div>
-          </div>
-          <div class="min-w-[220px] bg-white shadow-md rounded-xl overflow-hidden border">
-            <img src="{{ asset('images/dumplings.png') }}" alt="Seaweed Salad" class="h-48 w-full object-cover">
-            <div class="p-4">
-              <h3 class="text-lg font-bold">Seaweed Salad</h3>
-              <p class="text-sm text-gray-600">Chilled seasoned seaweed</p>
-              <p class="text-sm font-semibold text-red-600 mt-1">IDR 15K</p>
-            </div>
-          </div>
-          <div class="min-w-[220px] bg-white shadow-md rounded-xl overflow-hidden border">
-            <img src="{{ asset('images/steamed_buns.png') }}" alt="Chicken Satay" class="h-48 w-full object-cover">
-            <div class="p-4">
-              <h3 class="text-lg font-bold">Chicken Satay</h3>
-              <p class="text-sm text-gray-600">Grilled skewers with sauce</p>
-              <p class="text-sm font-semibold text-red-600 mt-1">IDR 18K</p>
-            </div>
-          </div>
-          <div class="min-w-[220px] bg-white shadow-md rounded-xl overflow-hidden border">
-            <img src="{{ asset('images/dumplings.png') }}" alt="Mini Wontons" class="h-48 w-full object-cover">
-            <div class="p-4">
-              <h3 class="text-lg font-bold">Mini Wontons</h3>
-              <p class="text-sm text-gray-600">Soup wontons</p>
-              <p class="text-sm font-semibold text-red-600 mt-1">IDR 15K</p>
-            </div>
-          </div>
+@extends('layouts.app')
+@section('title', 'Event Menus')
+@section('content')
+    <div class="min-h-screen bg-[#f3f1d6] flex flex-col">
+        <!-- Header -->
+        <div class="bg-[#e2c15a] py-8 px-10">
+            <h1 class="text-4xl font-bold text-[#222]">EVENT MENUS</h1>
         </div>
-      </div>
 
-      <!-- Main Course Section -->
-      <div>
-        <h2 class="text-2xl font-semibold mb-4">Main Course</h2>
-        <div class="flex space-x-6 overflow-x-auto pb-2">
-          <!-- 7 Main Course -->
-          <div class="min-w-[220px] bg-white shadow-md rounded-xl overflow-hidden border">
-            <img src="{{ asset('images/charsiu.png') }}" alt="Char Siu" class="h-48 w-full object-cover">
-            <div class="p-4">
-              <h3 class="text-lg font-bold">Char Siu</h3>
-              <p class="text-sm text-gray-600">BBQ pork with rice</p>
-              <p class="text-sm font-semibold text-red-600 mt-1">IDR 30K</p>
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col items-center py-10">
+            <div class="w-full max-w-6xl">
+                @if (session('success'))
+                    <div class="mb-6 p-4 bg-green-100 text-green-800 rounded shadow">{{ session('success') }}</div>
+                @endif
+
+                <!-- Create Button -->
+                <div class="flex justify-end mb-6">
+                    <a href="{{ route('event-menus.create') }}"
+                        class="bg-yellow-400 hover:bg-yellow-500 text-yellow-900 font-semibold px-5 py-2 rounded shadow flex items-center gap-2">
+                        <i class="fa-solid fa-square-plus"></i> Create
+                    </a>
+                </div>
+
+                <!-- Loop by Category -->
+                @foreach ($groupedMenus as $category => $menus)
+                    <div class="mb-10">
+                        <h2 class="text-2xl font-bold text-[#222] mb-4">{{ $category }}</h2>
+                        <div class="flex space-x-4 overflow-x-auto pb-2">
+                            @foreach ($menus as $menu)
+                                <div class="bg-white rounded-lg shadow-md w-60 shrink-0">
+                                    <img src="{{ asset('storage/' . $menu->image) }}" alt="{{ $menu->name }}"
+                                        class="w-full h-40 object-cover rounded-t-lg">
+                                    <div class="p-4">
+                                        <h3 class="text-lg font-semibold text-[#222]">{{ $menu->name }}</h3>
+                                        <p class="text-sm text-gray-600">{{ $menu->description }}</p>
+                                        <p class="text-red-600 font-semibold">IDR {{ $menu->price }}K</p>
+                                        <div class="mt-4 flex justify-between text-sm text-[#333]">
+                                            <a href="{{ route('event-menus.edit', $menu->id) }}"
+                                                class="text-yellow-600 hover:text-yellow-800">
+                                                <i class="fa-solid fa-pencil"></i> Edit
+                                            </a>
+                                            <button class="text-red-600 hover:text-red-800 btn-delete"
+                                                data-url="{{ route('event-menus.destroy', $menu->id) }}">
+                                                <i class="fa-solid fa-trash"></i> Delete
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                @endforeach
             </div>
-          </div>
-          <div class="min-w-[220px] bg-white shadow-md rounded-xl overflow-hidden border">
-            <img src="{{ asset('images/egg fried rice.png') }}" alt="Egg Fried Rice" class="h-48 w-full object-cover">
-            <div class="p-4">
-              <h3 class="text-lg font-bold">Egg Fried Rice</h3>
-              <p class="text-sm text-gray-600">Fried rice with egg</p>
-              <p class="text-sm font-semibold text-red-600 mt-1">IDR 25K</p>
-            </div>
-          </div>
-          <div class="min-w-[220px] bg-white shadow-md rounded-xl overflow-hidden border">
-            <img src="{{ asset('images/braised pork belly.png') }}" alt="Braised Pork Belly" class="h-48 w-full object-cover">
-            <div class="p-4">
-              <h3 class="text-lg font-bold">Braised Pork Belly</h3>
-              <p class="text-sm text-gray-600">Slow-cooked pork with sauce</p>
-              <p class="text-sm font-semibold text-red-600 mt-1">IDR 35K</p>
-            </div>
-          </div>
-          <div class="min-w-[220px] bg-white shadow-md rounded-xl overflow-hidden border">
-            <img src="{{ asset('images/charsiu.png') }}" alt="Sweet & Sour Pork" class="h-48 w-full object-cover">
-            <div class="p-4">
-              <h3 class="text-lg font-bold">Sweet & Sour Pork</h3>
-              <p class="text-sm text-gray-600">Pork with tangy sauce</p>
-              <p class="text-sm font-semibold text-red-600 mt-1">IDR 32K</p>
-            </div>
-          </div>
-          <div class="min-w-[220px] bg-white shadow-md rounded-xl overflow-hidden border">
-            <img src="{{ asset('images/egg fried rice.png') }}" alt="Yangzhou Fried Rice" class="h-48 w-full object-cover">
-            <div class="p-4">
-              <h3 class="text-lg font-bold">Yangzhou Fried Rice</h3>
-              <p class="text-sm text-gray-600">Mix of meats and peas</p>
-              <p class="text-sm font-semibold text-red-600 mt-1">IDR 28K</p>
-            </div>
-          </div>
-          <div class="min-w-[220px] bg-white shadow-md rounded-xl overflow-hidden border">
-            <img src="{{ asset('images/braised pork belly.png') }}" alt="Mapo Tofu" class="h-48 w-full object-cover">
-            <div class="p-4">
-              <h3 class="text-lg font-bold">Mapo Tofu</h3>
-              <p class="text-sm text-gray-600">Spicy tofu with minced pork</p>
-              <p class="text-sm font-semibold text-red-600 mt-1">IDR 27K</p>
-            </div>
-          </div>
-          <div class="min-w-[220px] bg-white shadow-md rounded-xl overflow-hidden border">
-            <img src="{{ asset('images/egg fried rice.png') }}" alt="Chicken Chow Mein" class="h-48 w-full object-cover">
-            <div class="p-4">
-              <h3 class="text-lg font-bold">Chicken Chow Mein</h3>
-              <p class="text-sm text-gray-600">Stir-fried noodles with chicken</p>
-              <p class="text-sm font-semibold text-red-600 mt-1">IDR 29K</p>
-            </div>
-          </div>
         </div>
-      </div>
-
-      <!-- Dessert Section -->
-      <div>
-        <h2 class="text-2xl font-semibold mb-4">Dessert</h2>
-        <div class="flex space-x-6 overflow-x-auto pb-2">
-          <!-- 7 Desserts -->
-          <div class="min-w-[220px] bg-white shadow-md rounded-xl overflow-hidden border">
-            <img src="{{ asset('images/steamed_buns.png') }}" alt="Red Bean Bun" class="h-48 w-full object-cover">
-            <div class="p-4">
-              <h3 class="text-lg font-bold">Red Bean Bun</h3>
-              <p class="text-sm text-gray-600">Sweet bun with red bean paste</p>
-              <p class="text-sm font-semibold text-red-600 mt-1">IDR 15K</p>
-            </div>
-          </div>
-          <div class="min-w-[220px] bg-white shadow-md rounded-xl overflow-hidden border">
-            <img src="{{ asset('images/egg fried rice.png') }}" alt="Egg Tart" class="h-48 w-full object-cover">
-            <div class="p-4">
-              <h3 class="text-lg font-bold">Egg Tart</h3>
-              <p class="text-sm text-gray-600">Creamy egg custard tart</p>
-              <p class="text-sm font-semibold text-red-600 mt-1">IDR 18K</p>
-            </div>
-          </div>
-          <div class="min-w-[220px] bg-white shadow-md rounded-xl overflow-hidden border">
-            <img src="{{ asset('images/dumplings.png') }}" alt="Mango Pudding" class="h-48 w-full object-cover">
-            <div class="p-4">
-              <h3 class="text-lg font-bold">Mango Pudding</h3>
-              <p class="text-sm text-gray-600">Chilled mango dessert</p>
-              <p class="text-sm font-semibold text-red-600 mt-1">IDR 16K</p>
-            </div>
-          </div>
-          <div class="min-w-[220px] bg-white shadow-md rounded-xl overflow-hidden border">
-            <img src="{{ asset('images/charsiu.png') }}" alt="Fried Milk" class="h-48 w-full object-cover">
-            <div class="p-4">
-              <h3 class="text-lg font-bold">Fried Milk</h3>
-              <p class="text-sm text-gray-600">Sweet fried custard cubes</p>
-              <p class="text-sm font-semibold text-red-600 mt-1">IDR 17K</p>
-            </div>
-          </div>
-          <div class="min-w-[220px] bg-white shadow-md rounded-xl overflow-hidden border">
-            <img src="{{ asset('images/steamed_buns.png') }}" alt="Sesame Balls" class="h-48 w-full object-cover">
-            <div class="p-4">
-              <h3 class="text-lg font-bold">Sesame Balls</h3>
-              <p class="text-sm text-gray-600">Glutinous rice with sesame</p>
-              <p class="text-sm font-semibold text-red-600 mt-1">IDR 15K</p>
-            </div>
-          </div>
-          <div class="min-w-[220px] bg-white shadow-md rounded-xl overflow-hidden border">
-            <img src="{{ asset('images/braised pork belly.png') }}" alt="Almond Jelly" class="h-48 w-full object-cover">
-            <div class="p-4">
-              <h3 class="text-lg font-bold">Almond Jelly</h3>
-              <p class="text-sm text-gray-600">Chilled almond-flavored jelly</p>
-              <p class="text-sm font-semibold text-red-600 mt-1">IDR 14K</p>
-            </div>
-          </div>
-          <div class="min-w-[220px] bg-white shadow-md rounded-xl overflow-hidden border">
-            <img src="{{ asset('images/dumplings.png') }}" alt="Lychee Ice" class="h-48 w-full object-cover">
-            <div class="p-4">
-              <h3 class="text-lg font-bold">Lychee Ice</h3>
-              <p class="text-sm text-gray-600">Icy dessert with lychee</p>
-              <p class="text-sm font-semibold text-red-600 mt-1">IDR 13K</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
     </div>
-  </div>
-</body>
-</html>
+
+    <!-- SweetAlert2 Delete -->
+    <script>
+        document.querySelectorAll('.btn-delete').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "This menu will be deleted permanently!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#aaa',
+                    confirmButtonText: 'Yes, delete it!',
+                    reverseButtons: true
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        fetch(this.dataset.url, {
+                                method: 'DELETE',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                },
+                            })
+                            .then(response => response.json())
+                            .then(async res => {
+                                if (res.success) {
+                                    await Swal.fire({
+                                        title: 'Deleted!',
+                                        text: res.message,
+                                        icon: "success"
+                                    });
+                                    location.reload();
+                                } else {
+                                    await Swal.fire({
+                                        title: 'Error',
+                                        text: res.message,
+                                        icon: "error"
+                                    });
+                                }
+                            })
+                            .catch(error => {
+                                Swal.fire({
+                                    title: 'Error',
+                                    text: error.message || error,
+                                    icon: 'error'
+                                });
+                            });
+                    }
+                });
+            });
+        });
+    </script>
+@endsection
