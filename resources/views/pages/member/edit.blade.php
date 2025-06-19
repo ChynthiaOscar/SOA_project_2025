@@ -21,14 +21,14 @@
 
                     <div>
                         <label for="email" class="block mb-2 text-lg font-semibold text-[#E2BB4D]">Email</label>
-                        <input type="email" id="email" name="email" value="{{ old('email', $member->email) }}"
+                        <input type="email" id="email" name="email" value="{{ old('email', $member['email']) }}"
                             class="w-full px-5 py-3 bg-[#EEEACB] text-[#65090D] border-2 border-[#A67D44] focus:outline-none focus:ring-2 focus:ring-[#E2BB4D] text-lg"
                             required>
                     </div>
 
                     <div>
                         <label for="no_hp" class="block mb-2 text-lg font-semibold text-[#E2BB4D]">No. Telepon</label>
-                        <input type="text" id="no_hp" name="no_hp" value="{{ old('no_hp', $member->no_hp) }}"
+                        <input type="text" id="no_hp" name="no_hp" value="{{ old('no_hp', $member['no_hp']) }}"
                             class="w-full px-5 py-3 bg-[#EEEACB] text-[#65090D] border-2 border-[#A67D44] focus:outline-none focus:ring-2 focus:ring-[#E2BB4D] text-lg"
                             required>
                     </div>

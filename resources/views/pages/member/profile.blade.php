@@ -16,21 +16,27 @@
 
             {{-- Info --}}
             <div class="flex-1">
-                <h1 class="text-3xl font-bold text-[#E2BB4D]">{{ $member->nama }}</h1>
+                <h1 class="text-3xl font-bold text-[#E2BB4D]">{{ $member['nama'] }}</h1>
                 <p class="text-md font-semibold text-[#A67D44] mt-1">Member</p>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-y-4 gap-x-8 mt-6 text-lg font-bold">
                     <div class="flex items-center gap-3">
                         <img src="/images/mail.png" alt="Email Icon" class="w-5 h-5">
-                        <p>{{ $member->email }}</p>
+                        <p>{{ $member['email'] }}</p>
                     </div>
                     <div class="flex items-center gap-3">
                         <img src="/images/date.png" alt="Email Icon" class="w-5 h-5">
-                        <p>{{ $member->tanggal_lahir->format('d-m-Y') }}</p>
+                        <p>
+                            @if(is_array($member['tanggal_lahir']) && isset($member['tanggal_lahir']['__value__']))
+                                {{ \Carbon\Carbon::parse($member['tanggal_lahir']['__value__'])->format('d-m-Y') }}
+                            @else
+                                {{ \Carbon\Carbon::parse($member['tanggal_lahir'])->format('d-m-Y') }}
+                            @endif
+                        </p>
                     </div>
                     <div class="flex items-center gap-3 sm:col-span-2">
                         <img src="/images/phone.png" alt="Phone Icon" class="w-5 h-5">
-                        <p>{{ $member->no_hp }}</p>
+                        <p>{{ $member['no_hp'] }}</p>
                     </div>
                 </div>
             </div>
@@ -51,6 +57,15 @@
                 </button>
             </form>
         </div>
+
+        {{-- Delete Account Form --}}
+        <form action="{{ route('profile.destroy') }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus akun? Tindakan ini tidak dapat dibatalkan.');" style="margin-top: 2rem;">
+            @csrf
+            @method('DELETE')
+            <button type="submit" class="bg-red-800 text-white hover:bg-red-700 font-bold px-8 py-4 rounded-full transition text-base w-full">
+                Delete Account
+            </button>
+        </form>
 
     </div>
 </div>

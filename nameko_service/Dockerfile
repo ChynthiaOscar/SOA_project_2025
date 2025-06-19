@@ -14,4 +14,4 @@ RUN pip install -r requirements.txt
 EXPOSE 8002
 
 # Jalankan Nameko service
-CMD ["nameko", "run", "nameko_service.auth_service", "nameko_service.gateway", "--config", "nameko.yml"]
+CMD ["nameko", "run", "auth_service", "--config", "nameko.yml"]

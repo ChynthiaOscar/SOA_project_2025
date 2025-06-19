@@ -182,13 +182,24 @@ class GatewayService:
     @http('DELETE', '/profile')
     def delete_profile(self, request):
         member_id = request.args.get('member_id')
+        print(f"[GATEWAY] Delete request for member_id: {member_id}")
         if not member_id:
             return Response(
                 json.dumps({'success': False, 'message': 'Member ID is required'}),
                 mimetype='application/json',
                 status=400
             )
-        result = self.auth_service.delete_member(member_id)
+        try:
+            member_id_int = int(member_id)
+        except Exception as e:
+            print(f"[GATEWAY] Invalid member_id type: {e}")
+            return Response(
+                json.dumps({'success': False, 'message': 'Invalid member_id'}),
+                mimetype='application/json',
+                status=400
+            )
+        result = self.auth_service.delete_member(member_id_int)
+        print(f"[GATEWAY] Delete result: {result}")
         if result.get('success'):
             return Response(
                 json.dumps(result),

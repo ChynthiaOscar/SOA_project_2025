@@ -24,7 +24,7 @@ class AuthController extends Controller
     public function register(Request $request) {
         $request->validate([
             'nama' => 'required|string|max:100',
-            'email' => 'required|email|unique:members,email',
+            'email' => 'required|email',
             'tanggal_lahir' => 'required|date',
             'no_hp' => 'required|string|max:15',
             'password' => 'required|string|min:6|confirmed',
@@ -38,110 +38,86 @@ class AuthController extends Controller
             'password' => $request->password,
         ];
 
-        $client = new \GuzzleHttp\Client();
-        try {
-            $response = $client->post(env('NAMEKO_GATEWAY_URL', 'http://localhost:8002') . '/register', [
-                'json' => $registerData,
-                'http_errors' => false
-            ]);
-
-            $result = json_decode($response->getBody(), true);
-            
-            if (!$result['success']) {
-                return back()->withErrors(['email' => $result['message']])->withInput();
-            }
-
-            $member = \DB::table('members')->where('email', $request->email)->first();
-            if ($member) {
-                $hash = $member->password;
-                if (strpos($hash, '$2b$') === 0) {
-                    $hash = '$2y$' . substr($hash, 4);
-                }
-                \App\Models\Member::updateOrCreate(
-                    ['email' => $member->email],
-                    [
-                        'nama' => $member->nama,
-                        'tanggal_lahir' => $member->tanggal_lahir,
-                        'no_hp' => $member->no_hp,
-                        'password' => $hash,
-                    ]
-                );
-            }
-
-            return redirect()->route('login')->with('success', 'Registration successful. Please login.');
-        } catch (\Exception $e) {
-            \Log::error('Failed to register user in Nameko: ' . $e->getMessage());
-            return back()->withErrors(['email' => 'Registration failed, please try again.'])->withInput();
+        $response = \Http::post('http://50.19.17.50:8002/register', $registerData);
+        $result = $response->json();
+        if (!$result['success']) {
+            return back()->withErrors(['email' => $result['message']])->withInput();
         }
+        return redirect()->route('login')->with('success', 'Registration successful. Please login.');
     }
 
     public function showLogin() {
         return view('pages.member.auth.login');
     }
 
-    public function login(Request $request) {
-        $credentials = $request->only('email', 'password');
+    public function login(Request $request)
+    {
+        \Log::info('Login attempt:', $request->only('email', 'password'));
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required',
+        ]);
 
-        if (Auth::guard('member')->attempt($credentials)) {
-            $member = Auth::guard('member')->user();
-            $token = (string) \Illuminate\Support\Str::uuid();
-            $expiresAt = now()->addMinutes(5);
-            $member->update([
-                'token' => $token,
-                'token_expires_at' => $expiresAt,
+        $response = \Http::post('http://50.19.17.50:8002/login', [
+            'email' => $request->email,
+            'password' => $request->password,
+        ]);
+
+        if ($response->ok() && $response->json('success')) {
+            $data = $response->json();
+            // Ambil data profile member dari API
+            $profileResponse = \Http::get('http://50.19.17.50:8002/profile', [
+                'member_id' => $data['member_id']
             ]);
-            $data = [
-                'member_id' => $member->id,
-                'token' => $token,
-                'token_expires_at' => $expiresAt->toDateTimeString(),
-                'email' => $member->email,
-            ];
-            try {
-                $connection = new AMQPStreamConnection(
-                    env('RABBITMQ_HOST', '127.0.0.1'),
-                    env('RABBITMQ_PORT', 5672),
-                    env('RABBITMQ_USER', 'guest'),
-                    env('RABBITMQ_PASSWORD', 'guest')
-                );
-                $channel = $connection->channel();
-                $channel->queue_declare(env('RABBITMQ_QUEUE', 'auth_login'), false, true, false, false);
-                $msg = new AMQPMessage(json_encode($data));
-                $channel->basic_publish($msg, '', env('RABBITMQ_QUEUE', 'auth_login'));
-                $channel->close();
-                $connection->close();
-            } catch (\Exception $e) {
-                \Log::error('Failed to sync token with Nameko: ' . $e->getMessage());
+            if ($profileResponse->ok() && $profileResponse->json('success')) {
+                $profile = $profileResponse->json('member');
+                // Tambahkan token dan expired ke profile
+                $profile['token'] = $data['token'] ?? null;
+                $profile['token_expires_at'] = $data['token_expires_at'] ?? null;
+                \Session::put('member', $profile);
+                // Debugging: pastikan session sudah terisi
+                \Log::info('Session member after login:', [session('member')]);
+                return redirect()->route('profile');
+            } else {
+                return back()->withErrors([
+                    'login' => 'Gagal mengambil data profile.',
+                ])->withInput();
             }
-            return redirect()->route('profile');
+        } else {
+            return back()->withErrors([
+                'login' => $response->json('message') ?? 'Login failed.',
+            ])->withInput();
         }
-        return back()->withErrors(['email' => 'Invalid credentials.'])->withInput();
     }
 
     public function profile() {
-        $member = Auth::guard('member')->user();
-        if ($member && $member->token_expires_at && now()->greaterThan($member->token_expires_at)) {
-            $member->update(['token' => null, 'token_expires_at' => null]);
-            Auth::guard('member')->logout();
+        $member = \Session::get('member');
+        if (!$member) {
             return redirect()->route('login')->withErrors(['email' => 'Sesi Anda telah berakhir, silakan login kembali.']);
+        }
+        // Ambil data profile terbaru dari API jika ingin selalu up-to-date
+        $response = \Http::get('http://50.19.17.50:8002/profile', [
+            'member_id' => $member['id']
+        ]);
+        $data = $response->json();
+        if ($response->ok() && $data['success']) {
+            $profile = $data['member'];
+            // Tambahkan token dan expired ke profile
+            $profile['token'] = $member['token'] ?? null;
+            $profile['token_expires_at'] = $member['token_expires_at'] ?? null;
+            \Session::put('member', $profile);
         }
         return view('pages.member.profile', compact('member'));
     }
 
     public function logout() {
-        $member = Auth::guard('member')->user();
-        if ($member && $member->token) {
-            try {
-                $client = new \GuzzleHttp\Client();
-                $client->post(env('NAMEKO_GATEWAY_URL', 'http://localhost:8002') . '/logout', [
-                    'json' => ['token' => $member->token],
-                    'http_errors' => false
-                ]);
-            } catch (\Exception $e) {
-                \Log::error('Failed to logout from Nameko: ' . $e->getMessage());
-            }
-            $member->update(['token' => null, 'token_expires_at' => null]);
+        $member = \Session::get('member');
+        if ($member && isset($member['token'])) {
+            \Http::post('http://50.19.17.50:8002/logout', [
+                'token' => $member['token']
+            ]);
         }
-        Auth::guard('member')->logout();
+        \Session::forget('member');
         return redirect()->route('login');
     }
 }

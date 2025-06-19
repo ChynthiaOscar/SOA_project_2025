@@ -12,7 +12,7 @@ class ProfileController extends Controller
 {
     public function edit()
     {
-        $member = Auth::guard('member')->user();
+        $member = \Session::get('member');
         return view('pages.member.edit', compact('member'));
     }
 
@@ -22,52 +22,47 @@ class ProfileController extends Controller
             'email' => 'required|email',
             'no_hp' => 'required|string|max:15',
         ]);
-
-        $member = Auth::guard('member')->user();
-        $member->update([
+        $member = \Session::get('member');
+        $data = [
+            'member_id' => $member['id'],
             'email' => $request->email,
             'no_hp' => $request->no_hp,
-        ]);
-
-        $data = [
-            'member_id' => $member->id,
-            'email' => $member->email,
-            'no_hp' => $member->no_hp,
         ];
-
-        try {
-            $connection = new AMQPStreamConnection(
-                env('RABBITMQ_HOST', '127.0.0.1'),
-                env('RABBITMQ_PORT', 5672),
-                env('RABBITMQ_USER', 'guest'),
-                env('RABBITMQ_PASSWORD', 'guest')
-            );
-            $channel = $connection->channel();
-            $channel->queue_declare('profile_update', false, true, false, false);
-
-            $msg = new AMQPMessage(json_encode($data));
-            $channel->basic_publish($msg, '', 'profile_update');
-
-            $channel->close();
-            $connection->close();
-        } catch (\Exception $e) {
-            \Log::error('Failed to sync profile update with Nameko: ' . $e->getMessage());
+        $response = \Http::put('http://50.19.17.50:8002/profile', $data);
+        $result = $response->json();
+        \Log::info('Profile update result:', $result);
+        if (!$result['success']) {
+            return back()->withErrors(['update' => $result['message'] ?? 'Gagal update profil.']);
         }
-
-        try {
-            $client = new \GuzzleHttp\Client();
-            $client->put(env('NAMEKO_GATEWAY_URL', 'http://localhost:8002') . '/profile', [
-                'json' => [
-                    'member_id' => $member->id,
-                    'email' => $member->email,
-                    'no_hp' => $member->no_hp,
-                ],
-                'http_errors' => false
-            ]);
-        } catch (\Exception $e) {
-            \Log::error('Failed to update profile in Nameko via API: ' . $e->getMessage());
+        // Ambil data profile terbaru dari API setelah update
+        $profileResponse = \Http::get('http://50.19.17.50:8002/profile', [
+            'member_id' => $member['id']
+        ]);
+        if ($profileResponse->ok() && $profileResponse->json('success')) {
+            $profile = $profileResponse->json('member');
+            $profile['token'] = $member['token'] ?? null;
+            $profile['token_expires_at'] = $member['token_expires_at'] ?? null;
+            \Session::put('member', $profile);
+            \Log::info('Session after update:', [session('member')]);
+        } else {
+            // Jika gagal ambil profile, tetap update session manual
+            $member['email'] = $request->email;
+            $member['no_hp'] = $request->no_hp;
+            \Session::put('member', $member);
         }
-
         return redirect()->route('profile')->with('success', 'Profil berhasil diperbarui.');
+    }
+
+    public function destroy(Request $request)
+    {
+        $member = \Session::get('member');
+        $url = 'http://50.19.17.50:8002/profile?member_id=' . $member['id'];
+        $response = \Http::delete($url);
+        $result = $response->json();
+        if (!isset($result['success']) || !$result['success']) {
+            return back()->withErrors(['delete' => $result['message'] ?? 'Gagal menghapus akun.']);
+        }
+        \Session::forget('member');
+        return redirect()->route('login')->with('success', 'Akun Anda berhasil dihapus.');
     }
 }
