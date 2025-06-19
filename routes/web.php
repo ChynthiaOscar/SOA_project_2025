@@ -16,7 +16,7 @@ Route::get('/menu', function () {
 Route::get('/order_menu', [MenuController::class, 'user_index'])->name('order_menu');
 Route::get('/add_menu', [MenuController::class, 'create'])->name('add_menu');
 Route::get('/menu_index', [MenuController::class, 'admin_index'])->name('menu_index');
-Route::get('/add_recipe', [MenuRecipeController::class, 'create'])->name('add_recipe');
+Route::post('/add_recipe', [MenuRecipeController::class, 'create'])->name('add_recipe');
 
 
 Route::get('/add_category', function () {

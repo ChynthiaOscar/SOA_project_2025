@@ -11,7 +11,8 @@
         {{-- form (main content with grow to push footer down if any) --}}
         <div class="flex-grow">
             <div class="max-w-2xl mx-auto mt-10 mb-10 bg-[#E2BB4D] border-2 border-[#65090D] shadow-lg p-8">
-                <form action="{{ route('add_recipe') }}" method="GET" enctype="multipart/form-data">
+                <form action="{{ route('add_recipe') }}" method="POST" enctype="multipart/form-data">
+                    @csrf
                     {{-- image --}}
                     <div class="mb-6">
                         <label for="image" class="block text-[#65090D] font-semibold text-lg mb-2">Image</label>

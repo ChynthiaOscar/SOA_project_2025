@@ -25,9 +25,7 @@ class MenuRecipeController extends Controller
             'description' => 'required|string',
             'price' => 'required|numeric',
             'category_id' => 'required|integer',
-        ]);
-
-        dd($validated_data);
+        ]); 
 
         return view('pages.service-menu.admin_pages.menu.add-recipe', [
             'image' => $validated_data['image'],
