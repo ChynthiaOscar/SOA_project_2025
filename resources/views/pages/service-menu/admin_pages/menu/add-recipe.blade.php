@@ -9,11 +9,12 @@
 
 
         <div class="mx-auto px-4 md:px-12 lg:px-20 py-8">
+            <form>
             <div class="flex flex-col md:flex-row gap-20 items-start">
                 <div class="bg-[#E2BB4D] border-2 border-[#65090D] shadow-lg p-6 flex-1 self-start">
                     <h3 class="text-2xl font-bold text-[#65090D] mb-6 text-center">{{ $name }}</h3>
 
-                    <form>
+                    
                         <div class="mb-6">
                             <div class="flex gap-4 mb-4">
                                 {{-- ingredient name --}}
@@ -59,7 +60,6 @@
                                 Add Ingredient
                             </button>
                         </div>
-                    </form>
                 </div>
 
                 <div class="flex-1 flex flex-col">
@@ -135,6 +135,7 @@
                 </div>
 
             </div>
+            </form>
         </div>
 
     </div>

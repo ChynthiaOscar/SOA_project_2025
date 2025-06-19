@@ -9,28 +9,27 @@
 
 
     <div class="mx-auto px-4 md:px-12 lg:px-20 py-8">
+        <form>
         <div class="flex flex-col md:flex-row gap-20 items-start">
             <div class="bg-[#E2BB4D] border-2 border-[#65090D] shadow-lg p-6 flex-1 self-start">
                 <h3 class="text-2xl font-bold text-[#65090D] mb-6 text-center">Menu Name</h3>
-
-                <form>
                     <div class="mb-6">
                         <div class="flex gap-4 mb-4">
                             {{-- ingredient name --}}
                             <div class="flex-1">
                                 <label for="ingredient" class="block text-[#65090D] font-semibold text-lg mb-2">Ingredient Name</label>
                                 <div class="relative">
-    <input type="text" id="ingredientSearch" placeholder="Search ingredient..." autocomplete="off"
-        class="w-full px-4 py-3 border border-[#E2BB4D] bg-[#E4C788] focus:outline-none focus:ring-2 focus:ring-[#65090D] rounded">
-    <ul id="ingredientList" class="absolute z-10 mt-1 w-full bg-[#FFF7DA] border border-[#65090D] rounded shadow-lg hidden max-h-60 overflow-auto">
-        <li class="px-4 py-2 cursor-pointer hover:bg-[#E2BB4D]" data-value="garlic">Garlic</li>
-        <li class="px-4 py-2 cursor-pointer hover:bg-[#E2BB4D]" data-value="onion">Onion</li>
-        <li class="px-4 py-2 cursor-pointer hover:bg-[#E2BB4D]" data-value="chicken">Chicken</li>
-        <li class="px-4 py-2 cursor-pointer hover:bg-[#E2BB4D]" data-value="beef">Beef</li>
-        <li class="px-4 py-2 cursor-pointer hover:bg-[#E2BB4D]" data-value="rice">Rice</li>
-    </ul>
-    <input type="hidden" id="ingredient" name="ingredient">
-</div>
+                                    <input type="text" id="ingredientSearch" placeholder="Search ingredient..." autocomplete="off"
+                                        class="w-full px-4 py-3 border border-[#E2BB4D] bg-[#E4C788] focus:outline-none focus:ring-2 focus:ring-[#65090D] rounded">
+                                    <ul id="ingredientList" class="absolute z-10 mt-1 w-full bg-[#FFF7DA] border border-[#65090D] rounded shadow-lg hidden max-h-60 overflow-auto">
+                                        <li class="px-4 py-2 cursor-pointer hover:bg-[#E2BB4D]" data-value="garlic">Garlic</li>
+                                        <li class="px-4 py-2 cursor-pointer hover:bg-[#E2BB4D]" data-value="onion">Onion</li>
+                                        <li class="px-4 py-2 cursor-pointer hover:bg-[#E2BB4D]" data-value="chicken">Chicken</li>
+                                        <li class="px-4 py-2 cursor-pointer hover:bg-[#E2BB4D]" data-value="beef">Beef</li>
+                                        <li class="px-4 py-2 cursor-pointer hover:bg-[#E2BB4D]" data-value="rice">Rice</li>
+                                    </ul>
+                                    <input type="hidden" id="ingredient" name="ingredient">
+                                </div>
 
                             </div>
 
@@ -47,7 +46,6 @@
                             Add Ingredient
                         </button>
                     </div>
-                </form>
             </div>
 
             <div class="flex-1 flex flex-col">
@@ -100,6 +98,7 @@
                 </tbody>
             </table>
         </div>
+        </form>
     </div>
 </div>
 
