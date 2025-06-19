@@ -24,7 +24,6 @@
                 <table class="min-w-full text-left border border-gray-200">
                     <thead>
                         <tr class="bg-black text-white">
-                            <th class="py-3 px-4">ID</th>
                             <th class="py-3 px-4">Customer</th>
                             <th class="py-3 px-4">Start Date</th>
                             <th class="py-3 px-4">End Date</th>
@@ -37,7 +36,6 @@
                     <tbody>
                         @forelse($reservations ?? [] as $reservation)
                             <tr class="{{ $loop->even ? 'bg-[#f7f6fa]' : 'bg-[#f3f1d6]' }} text-[#222] border-b border-gray-200">
-                                <td class="py-3 px-4">{{ $reservation->id }}</td>
                                 <td class="py-3 px-4">{{ $reservation->customer_name }}</td>
                                 <td class="py-3 px-4">
                                     @if(isset($reservation->start_date))
