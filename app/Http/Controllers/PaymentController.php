@@ -27,7 +27,7 @@ class PaymentController extends Controller
         try {
             $response = Http::withHeaders([
                 'Authorization' => 'order123',
-            ])->post('http://alamat-api.local/payment', $data);
+            ])->post('http://50.19.17.50:8002/payment', $data);
 
             if ($response->successful()) {
                 $apiData = $response->json();
@@ -83,7 +83,7 @@ class PaymentController extends Controller
         try {
             $response = Http::withHeaders([
                 'Authorization' => 'order123',
-            ])->post('http://alamat-api.local/payment', $data);
+            ])->post('http://50.19.17.50:8002/payment', $data);
 
             if ($response->successful()) {
                 $apiData = $response->json();
@@ -145,7 +145,7 @@ class PaymentController extends Controller
         try {
             $response = Http::withHeaders([
                 'Authorization' => 'order123',
-            ])->post('http://alamat-api.local/payment', $data);
+            ])->post('http://50.19.17.50:8002/payment', $data);
 
             if ($response->successful()) {
                 $apiData = $response->json();
@@ -188,7 +188,7 @@ class PaymentController extends Controller
         try {
             $response = Http::withHeaders([
                 'Authorization' => 'order123',
-            ])->delete("http://alamat-api.local/payment/{$paymentId}");
+            ])->delete("http://50.19.17.50:8002/payment/{$paymentId}");
 
             if ($response->successful()) {
                 return response()->json([
@@ -218,7 +218,7 @@ class PaymentController extends Controller
         try {
             $response = Http::withHeaders([
                 'Authorization' => 'order123',
-            ])->get("http://alamat-api.local/payment/{$paymentId}/status");
+            ])->get("http://50.19.17.50:8002/payment/{$paymentId}/status");
 
             if ($response->successful()) {
                 $data = $response->json();
