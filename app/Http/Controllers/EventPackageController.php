@@ -39,8 +39,6 @@ class EventPackageController extends Controller
         if ($response->successful() && isset($res->data)) {
             $eventSpaces = is_array($res->data) ? $res->data : ($res->data->data ?? []);
         }
-
-
         return view('pages.service-event.admin.event_packages.create', compact('eventSpaces'));
     }
 

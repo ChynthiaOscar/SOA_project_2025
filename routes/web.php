@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\InventoryItemController;
 use App\Http\Controllers\InventoryCategoryController;
 use App\Http\Controllers\DishCategoriesController;
+use App\Http\Controllers\EventMenuController;
 
 Route::get('/', [InventoryItemController::class, 'index'])->name('inventory.index');
 
@@ -70,4 +71,14 @@ Route::prefix('dish-categories')->name('dish-categories.')->group(function () {
     Route::get('/{id}', [DishCategoriesController::class, 'show'])->name('show');
     Route::put('/{id}', [DishCategoriesController::class, 'update'])->name('update');
     Route::delete('/{id}', [DishCategoriesController::class, 'destroy'])->name('destroy');
+});
+
+Route::prefix('event-menus')->name('event-menus.')->group(function () {
+    Route::get('/', [EventMenuController::class, 'index'])->name('index');
+    Route::get('/create', [EventMenuController::class, 'create'])->name('create');
+    Route::post('/', [EventMenuController::class, 'store'])->name('store');
+    Route::get('/edit/{id}', [EventMenuController::class, 'edit'])->name('edit');
+    Route::get('/{id}', [EventMenuController::class, 'show'])->name('show');
+    Route::put('/{id}', [EventMenuController::class, 'update'])->name('update');
+    Route::delete('/{id}', [EventMenuController::class, 'destroy'])->name('destroy');
 });
