@@ -46,7 +46,7 @@
             <!-- PROMO TABLE -->
             <h3 class="text-xl font-bold mb-3 text-black uppercase">DAFTAR PROMO</h3>
             <div class="overflow-x-auto shadow border border-black rounded mb-8">
-                <table class="min-w-full text-sm text-left">
+                <table class="min-w-full text-sm text-left bg-[#EEEACB]">
                     <thead class="bg-black text-[#E2BB4D] uppercase text-xs">
                         <tr>
                             <th class="px-4 py-3 border border-black font-bold">DESKRIPSI</th>
@@ -58,7 +58,7 @@
                             <th class="px-4 py-3 border border-black font-bold text-center">AKSI</th>
                         </tr>
                     </thead>
-                    <tbody class="bg-white text-black">
+                    <tbody class="text-black">
                         @forelse($promos as $promo)
                             <tr class="border-b border-black hover:bg-[#F9F1DC] transition duration-150">
                                 <td class="px-4 py-3 border border-black">{{ $promo['description'] }}</td>
@@ -116,7 +116,7 @@
             <!-- VOUCHER TABLE -->
             <h3 class="text-xl font-bold mb-3 text-black uppercase">DAFTAR VOUCHER</h3>
             <div class="overflow-x-auto shadow border border-black rounded">
-                <table class="min-w-full text-sm text-left">
+                <table class="min-w-full text-sm text-left bg-[#EEEACB]">
                     <thead class="bg-black text-[#E2BB4D] uppercase text-xs">
                         <tr>
                             <th class="px-4 py-3 border border-black font-bold">KODE VOUCHER</th>
@@ -126,7 +126,7 @@
                             <th class="px-4 py-3 border border-black font-bold text-center">AKSI</th>
                         </tr>
                     </thead>
-                    <tbody class="bg-white text-black">
+                    <tbody class="text-black">
                         @forelse($vouchers as $voucher)
                             <tr class="border-b border-black hover:bg-[#F9F1DC] transition duration-150">
                                 <td class="px-4 py-3 border border-black">{{ $voucher['promo_code'] }}</td>

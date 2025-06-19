@@ -100,10 +100,8 @@ class PromoController extends Controller
                 'Content-Type' => 'application/json'
             ])
             ->asJson()
-            ->post($this->gateway . '/update_promo', [
-                'promo_id' => $id,
-                'data' => $data
-            ]);
+            ->put($this->gateway . '/promos/' . $id, $data);
+
         return redirect('/promo')->with('success', 'Promo berhasil diperbarui!');
     }
 
@@ -113,10 +111,8 @@ class PromoController extends Controller
                 'Accept' => 'application/json',
                 'Content-Type' => 'application/json'
             ])
-            ->asJson()
-            ->post($this->gateway . '/delete_promo', [
-                'promo_id' => $id
-            ]);
+            ->delete($this->gateway . '/promos/' . $id);
+
         return redirect('/promo')->with('success', 'Promo berhasil dihapus!');
     }
 }

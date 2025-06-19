@@ -91,10 +91,8 @@ class VoucherController extends Controller
                 'Content-Type' => 'application/json'
             ])
             ->asJson()
-            ->post($this->gateway . '/update_voucher', [
-                'vid' => $id,
-                'data' => $data
-            ]);
+            ->put($this->gateway . '/vouchers/' . $id, $data);
+
         return redirect('/promo')->with('success', 'Voucher berhasil diperbarui!');
     }
 
@@ -104,10 +102,8 @@ class VoucherController extends Controller
                 'Accept' => 'application/json',
                 'Content-Type' => 'application/json'
             ])
-            ->asJson()
-            ->post($this->gateway . '/delete_voucher', [
-                'vid' => $id
-            ]);
+            ->delete($this->gateway . '/vouchers/' . $id);
+
         return redirect('/promo')->with('success', 'Voucher berhasil dihapus!');
     }
 }
