@@ -10,20 +10,10 @@
                     value="{{ $event_space->name }}">
             </div>
             <div>
-                <label class="block font-semibold mb-1">Location</label>
-                <input type="text" id="location" class="w-full border border-black rounded px-3 py-2"
-                    value="{{ $event_space->location }}">
-            </div>
-            <div>
-                <label class="block font-semibold mb-1">Capacity</label>
-                <input type="number" id="capacity" class="w-full border border-black rounded px-3 py-2"
-                    value="{{ $event_space->capacity }}">
-            </div>
-            <div>
                 <label class="block font-semibold mb-1">Price</label>
                 <input type="number" id="price" class="w-full border border-black rounded px-3 py-2"
                     value="{{ $event_space->price }}">
-                <input type="hidden" id="url" value="{{ route('event-space.update', $event_space->id) }}">
+                <input type="hidden" id="url" value="{{ route('event-addon.update', $event_space->id) }}">
             </div>
             <div class="flex justify-end gap-2 mt-4">
                 <a href="{{ route('event-space.index') }}"
@@ -47,8 +37,6 @@
                 if (result.isConfirmed) {
                     const data = {
                         name: document.getElementById('name').value,
-                        location: document.getElementById('location').value,
-                        capacity: document.getElementById('capacity').value,
                         price: document.getElementById('price').value,
                     };
                     fetch(document.getElementById('url').value, {
@@ -68,7 +56,7 @@
                                     icon: "success"
                                 }).then((result) => {
                                     if (result.isConfirmed) {
-                                        location.href = "{{ route('event-space.index') }}";
+                                        location.href="{{ route('event-addon.index') }}";
                                         return;
                                     }
                                 });
