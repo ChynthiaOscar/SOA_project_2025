@@ -95,15 +95,20 @@ class EventMenuController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $data = $request->all();
 
-        if ($request->hasFile('image')) {
-            $path = $request->file('image')->store('images', 'public');
-            $data['image'] = $path;
+        $file = $request->file('image');
+
+        if ($file) {
+            $response = Http::attach('image', file_get_contents($file), $file->getClientOriginalName())
+                ->put($this->url . '/event_menus/' . $id, $request->all());
+        } else {
+            $response = Http::put($this->url . '/event_menus/' . $id, $request->all());
         }
 
-        $response = Http::put("{$this->url}/event_menus/{$id}", $data);
         $res = json_decode($response);
+        if (!$res->success) {
+            return $this->error($res->message ?? "Failed to update event menu");
+        }
 
         return $this->success("Event menu updated successfully", $res->data ?? null);
     }
