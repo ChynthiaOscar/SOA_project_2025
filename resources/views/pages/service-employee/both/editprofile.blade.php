@@ -26,10 +26,16 @@
 
         <!-- Edit Form -->
         {{-- <form class="border border-gray-400 w-full max-w-2xl p-8 bg-[#E9E5C0] rounded-lg shadow-md" method="POST" action="{{ route('profile.update') }}" enctype="multipart/form-data"> --}}
-        <form class="border border-gray-400 w-full max-w-2xl p-8 bg-[#E9E5C0] rounded-lg shadow-md">
-            {{-- @csrf --}}
-            {{-- @method('PUT') --}}
-            
+        <form
+            method="POST"
+            action="{{ url('api/employee/' . ($user['id'] ?? '')) }}"
+            enctype="multipart/form-data"
+            class="border border-gray-400 w-full max-w-2xl p-8 bg-[#E9E5C0] rounded-lg shadow-md"
+            id="profile-form"
+        >
+            @csrf
+            @method('PUT')
+
             <div class="grid grid-cols-1 gap-y-6 text-base">
                 <!-- Name Field -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-y-2 sm:gap-y-0 items-center">
@@ -38,22 +44,9 @@
                         type="text"
                         id="name"
                         name="name"
-                        value="{{ old('name', 'Alex') }}"
+                        value="{{ old('name', $user['name'] ?? 'Alex') }}"
                         class="text-left sm:pl-4 p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#D9B54A] focus:border-transparent bg-white"
                         required
-                    >
-                </div>
-
-                <!-- ID Field (Read Only) -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-y-2 sm:gap-y-0 items-center">
-                    <label for="id" class="font-semibold text-right sm:pr-4">ID:</label>
-                    <input
-                        type="text"
-                        id="id"
-                        name="id"
-                        value="1"
-                        class="text-left sm:pl-4 p-3 border border-gray-300 rounded-md bg-gray-100 text-gray-600"
-                        readonly
                     >
                 </div>
 
@@ -64,7 +57,7 @@
                         type="email"
                         id="email"
                         name="email"
-                        value="{{ old('email', 'Alex@gmail.com') }}"
+                        value="{{ old('email', $user['email'] ?? 'Alex@gmail.com') }}"
                         class="text-left sm:pl-4 p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#D9B54A] focus:border-transparent bg-white"
                         required
                     >
@@ -77,7 +70,7 @@
                         type="text"
                         id="role"
                         name="role"
-                        value="Cashier"
+                        value="{{ $user['role'] ?? 'Cashier' }}"
                         class="text-left sm:pl-4 p-3 border border-gray-300 rounded-md bg-gray-100 text-gray-600"
                         readonly
                     >
@@ -110,31 +103,23 @@
 
             <!-- Hidden input for profile image -->
             <input type="hidden" name="profile_image" id="profile-image-data">
-        </form>
 
-        <!-- Action Buttons -->
-        <div class="flex flex-col sm:flex-row gap-4 w-full max-w-2xl">
-            <button
-                type="submit"
-                form="profile-form"
-                class="bg-[#DD8B24] hover:bg-[#c7791a] text-black font-bold text-lg py-3 px-6 rounded flex-1 transition"
-                onclick="document.querySelector('form').submit()"
-            >
-                Save Changes
-            </button>
-            {{-- <a
-                href="{{ route('profile.show') }}"
-                class="bg-gray-500 hover:bg-gray-600 text-white font-bold text-lg py-3 px-6 rounded flex-1 transition text-center"
-            >
-                Cancel
-            </a> --}}
-            <a
-                href="#"
-                class="bg-gray-500 hover:bg-gray-600 text-white font-bold text-lg py-3 px-6 rounded flex-1 transition text-center"
-            >
-                Cancel
-            </a>
-        </div>
+            <!-- Action Buttons -->
+            <div class="flex flex-col sm:flex-row gap-4 w-full max-w-2xl mt-8">
+                <button
+                    type="submit"
+                    class="bg-[#DD8B24] hover:bg-[#c7791a] text-black font-bold text-lg py-3 px-6 rounded flex-1 transition"
+                >
+                    Save Changes
+                </button>
+                <a
+                    href="{{ url()->previous() }}"
+                    class="bg-gray-500 hover:bg-gray-600 text-white font-bold text-lg py-3 px-6 rounded flex-1 transition text-center"
+                >
+                    Cancel
+                </a>
+            </div>
+        </form>
     </section>
 
     <!-- JavaScript for Image Preview -->

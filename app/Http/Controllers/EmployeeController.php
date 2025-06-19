@@ -15,9 +15,15 @@ class EmployeeController extends Controller
     {
         $this->apiBaseUrl = config('api.api_base_url');
     }
-    public function showForm()
+    public function edit()
     {
-        return view('/pages/service-employee/employee/register');
+        $user = session('user');
+
+        if (!$user) {
+            return redirect()->route('login')->withErrors('Please log in first.');
+        }
+
+        return view('pages.service-employee.both.editprofile', compact('user'));
     }
 
     public function dashboard(Request $request)

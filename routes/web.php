@@ -27,11 +27,9 @@ Route::prefix('employee')->group(function () {
         // Shared profile routes
         Route::get('/profile', function () {
             return view('pages.service-employee.both.profile');
-        });
+        })->name('employee.profile');
 
-        Route::get('/editprofile', function () {
-            return view('pages.service-employee.both.editprofile');
-        });
+        Route::get('/editprofile', [EmployeeController::class, 'edit'])->name('employee.edit');
 
         // Helper screens
         Route::get('/appManager', function () {

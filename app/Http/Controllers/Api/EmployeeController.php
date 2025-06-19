@@ -43,7 +43,7 @@ class EmployeeController extends Controller
                 // add more if you want
             ]);
 
-            return redirect('/dashboard'); // or any protected page
+            return redirect()->route('employee.dashboard'); // or any protected page
         } else {
             return back()->withErrors([
                 'login' => $response->json('message') ?? 'Login failed.',
@@ -68,12 +68,40 @@ class EmployeeController extends Controller
             Log::info('Register successful. API response:', $data);
             // Store token and user info in session
 
-            return redirect('/login');
+            return redirect()->route('employee.login');
         } else {
             return back()->withErrors([
                 'register' => $response->json('message') ?? 'Registration failed.',
             ])->withInput();
 
         }
+    }
+    public function updateProfile(Request $request, $id)
+    {
+        // Validate input here as needed
+        $data = $request->only(['name', 'email', 'password']);
+
+        if (empty($data['password'])) {
+            unset($data['password']);
+        }
+
+        $token = session('user.accessToken');
+
+        // Call the external API
+        $response = Http::withToken($token)
+            ->put("$this->apiBaseUrl/employee/$id", $data);
+
+        if ($response->successful()) {
+            // Optionally update the session with new data
+            $updatedUser = $response->json('data');
+            session(['user.name' => $updatedUser['name'], 'user.email' => $updatedUser['email']]);
+
+            return redirect()->route('employee.profile')
+                ->with('success', 'Profile updated successfully');
+        }
+
+        return redirect()->back()
+            ->withErrors($response->json('errors') ?? ['update' => 'Failed to update profile'])
+            ->withInput();
     }
 }

@@ -10,3 +10,4 @@ Route::get('/user', function (Request $request) {
 
 Route::post('/employee/login', [EmployeeController::class, 'login']);
 Route::post('/employee/register', [EmployeeController::class, 'register']);
+Route::put('/employee/{id}', [EmployeeController::class, 'updateProfile']);

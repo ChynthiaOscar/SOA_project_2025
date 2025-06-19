@@ -28,11 +28,11 @@
             <p class="text-xs text-[#e0a93a]">{{ session('user.email') ?? '' }}</p>
         </div>
         <nav class="flex flex-col space-y-8 text-xs font-normal">
-            <a href="{{ url('/dashboard') }}" class="flex items-center space-x-3">
+            <a href="{{ route('employee.dashboard') }}" class="flex items-center space-x-3">
                 <i class="fas fa-home text-[#e0a93a] text-sm"></i>
                 <span>Dashboard</span>
             </a>
-            <a href="{{ url('/profile') }}" class="flex items-center space-x-3">
+            <a href="{{ route('employee.profile') }}" class="flex items-center space-x-3">
                 <i class="fas fa-id-card-alt text-[#e0a93a] text-sm"></i>
                 <span>Profile</span>
             </a>
