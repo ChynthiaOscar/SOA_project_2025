@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Http;
 use Illuminate\Http\Request;
+use Storage;
 
 class MenuRecipeController extends Controller
 {
@@ -32,7 +33,12 @@ class MenuRecipeController extends Controller
         if ($request->hasFile('image')) {
             $image = $request->file('image');
             $original_name = $image->getClientOriginalName();
-            $image->storeAs('images/service-menu', $original_name, 'public');
+            $image_path = 'images/service-menu/' . $original_name;
+
+            // Cek apakah file sudah ada
+            if (!Storage::disk('public')->exists($image_path)) {
+                $image->storeAs('images/service-menu', $original_name, 'public');
+            }
             $validated_data['image'] = $original_name;
         }
 
@@ -89,9 +95,52 @@ class MenuRecipeController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(string $id, Request $request)
     {
-        //
+        $menu_response = Http::get("http://50.19.17.50:8002/menus/{$id}");
+        $recipe_response = Http::get("http://50.19.17.50:8002/menu-recipes");
+
+        if (!$menu_response->successful()) {
+            return response()->json(['error' => 'Failed to retrieve menu'], $menu_response->status());
+        } elseif (!$recipe_response->successful()) {
+            return response()->json(['error' => 'Failed to retrieve recipes'], $recipe_response->status());
+        }
+
+        $validated_data = $request->validate([
+            'name' => 'required|string',
+            'description' => 'required|string',
+            'price' => 'required|numeric',
+            'category_id' => 'required|integer',
+        ]);
+
+        // Handle the uploaded image
+        if ($request->hasFile('image')) {
+            $image = $request->file('image');
+            $original_name = $image->getClientOriginalName();
+            $image_path = 'images/service-menu/' . $original_name;
+
+            // Cek apakah file sudah ada
+            if (!Storage::disk('public')->exists($image_path)) {
+                $old_image = $menu_response->json()['image'] ?? null;
+                if ($old_image && Storage::disk('public')->exists('images/service-menu/' . $old_image)) {
+                    Storage::disk('public')->delete('images/service-menu/' . $old_image);
+                }
+                $image->storeAs('images/service-menu', $original_name, 'public');
+            }
+            $validated_data['image'] = $original_name;
+        } else {
+            $validated_data['image'] = $menu_response->json()['image'];
+        }
+
+        return view('pages.service-menu.admin_pages.menu.edit-recipe', [
+            'id' => $id,
+            'image' => $validated_data['image'],
+            'name' => $validated_data['name'],
+            'description' => $validated_data['description'],
+            'price' => $validated_data['price'],
+            'category_id' => $validated_data['category_id'],
+            'recipes' => $recipe_response->json(),
+        ]);
     }
 
     /**
@@ -99,7 +148,36 @@ class MenuRecipeController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $data = $request->all();
+        $ingredients = json_decode($data['list_ingredient'], true);
+
+        // Update the menu
+        $menu_response = Http::put("http://50.19.17.50:8002/menus", [
+            'id' => $id,
+            'image' => $data['image'],
+            'name' => $data['name'],
+            'description' => $data['description'],
+            'price' => $data['price'],
+            'category_id' => $data['category_id']
+        ]);
+
+        // Update the recipes
+        foreach ($ingredients as $ingredient) {
+            $recipe_response = Http::put("http://50.19.17.50:8002/menu-recipes", [
+                'id' => $ingredient['recipe_id'],
+                'quantity' => $ingredient['amount'],
+                'menu_id' => $id,
+                'inventory_id' => $ingredient['id']
+            ]);
+        }
+
+        if (!$menu_response->successful()) {
+            return response()->json(['error' => 'Failed to update menuasdjasjdjk'], $menu_response->status());
+        } elseif (!$recipe_response->successful()) {
+            return response()->json(['error' => 'Failed to update recipes'], $recipe_response->status());
+        } else {
+            return redirect()->route('menu_index')->with('success', 'Menu and recipes updated successfully');
+        }
     }
 
     /**

@@ -11,7 +11,8 @@
         {{-- form (main content with grow to push footer down if any) --}}
         <div class="flex-grow">
             <div class="max-w-2xl mx-auto mt-10 mb-10 bg-[#E2BB4D] border-2 border-[#65090D] shadow-lg p-8">
-                <form action="{{ route('add_recipe') }}" method="POST" enctype="multipart/form-data">
+                <form action="{{ route('edit_recipe', ['id' => $menu['id']]) }}" method="POST" enctype="multipart/form-data">
+                    @method('PUT')
                     @csrf
                     {{-- image --}}
                     <div class="mb-6">
@@ -26,7 +27,9 @@
                             class="w-full px-4 py-3 border border-[#E2BB4D] bg-[#E4C788] focus:outline-none focus:ring-2 focus:ring-[#65090D]">
                             <option value="" disabled selected style="color: #6B7280;">Select a category</option>
                             @foreach ($categories as $category)
-                                <option value="{{ $category['id'] }}">{{ $category['name'] }}</option>
+                                <option value="{{ $category['id'] }}"
+                                    {{ $category['id'] == $menu['category_id'] ? 'selected' : '' }}>{{ $category['name'] }}
+                                </option>
                             @endforeach
                         </select>
                     </div>
@@ -35,21 +38,21 @@
                         <label for="name" class="block text-[#65090D] font-semibold text-lg mb-2">Menu Name</label>
                         <input type="text" id="name" name="name"
                             class="w-full px-4 py-3 border border-[#E2BB4D] bg-[#E4C788]  focus:outline-none focus:ring-2 focus:ring-[#65090D]"
-                            placeholder="e.g. Mongolian Beef">
+                            placeholder="e.g. Mongolian Beef" value="{{ $menu['name'] }}">
                     </div>
                     {{-- description --}}
                     <div class="mb-6">
                         <label for="description" class="block text-[#65090D] font-semibold text-lg mb-2">Description</label>
                         <textarea id="description" name="description" rows="4"
                             class="w-full px-4 py-3 border border-[#E2BB4D] bg-[#E4C788] focus:outline-none focus:ring-2 focus:ring-[#65090D] resize-y"
-                            style="overflow: auto; scrollbar-width: none; -ms-overflow-style: none;" placeholder="Enter a short description..."></textarea>
+                            style="overflow: auto; scrollbar-width: none; -ms-overflow-style: none;" placeholder="Enter a short description...">{{ $menu['description'] }}</textarea>
                     </div>
                     {{-- price --}}
                     <div class="mb-6">
                         <label for="price" class="block text-[#65090D] font-semibold text-lg mb-2">Price (IDR)</label>
                         <input type="number" name="price" id="price" step="0.01"
                             class="w-full px-4 py-3 border border-[#E2BB4D] bg-[#E4C788]  focus:outline-none focus:ring-2 focus:ring-[#65090D]"
-                            placeholder="e.g. 175">
+                            placeholder="e.g. 175" value="{{ $menu['price'] }}">
                     </div>
 
                     <div class="flex justify-end">

@@ -59,18 +59,13 @@ class MenuController extends Controller
     public function create()
     {
         try {
-            $menu_response = Http::get('http://50.19.17.50:8002/menus');
             $category_response = Http::get('http://50.19.17.50:8002/menu-categories');
 
-            if (!$menu_response->successful()) {
-                return response()->json(['error' => 'Failed to retrieve menus'], $menu_response->status());
-            } elseif (!$category_response->successful()) {
+            if (!$category_response->successful()) {
                 return response()->json(['error' => 'Failed to retrieve categories'], $category_response->status());
             } else {
-                $menus = $menu_response->json();
                 $categories = $category_response->json();
                 return view('pages.service-menu.admin_pages.menu.create', [
-                    'menus' => $menus,
                     'categories' => $categories
                 ]);
             }
@@ -100,7 +95,25 @@ class MenuController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        try {
+            $category_response = Http::get('http://50.19.17.50:8002/menu-categories');
+            $menu_response = Http::get("http://50.19.17.50:8002/menus/{$id}");
+
+            if (!$category_response->successful()) {
+                return response()->json(['error' => 'Failed to retrieve categories'], $category_response->status());
+            } elseif (!$menu_response->successful()) {
+                return response()->json(['error' => 'Failed to retrieve menu'], $menu_response->status());
+            } else {
+                $categories = $category_response->json();
+                $menu = $menu_response->json();
+                return view('pages.service-menu.admin_pages.menu.edit', [
+                    'categories' => $categories,
+                    'menu' => $menu
+                ]);
+            }
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Failed to retrieve menus'], 500);
+        }
     }
 
     /**
@@ -108,16 +121,18 @@ class MenuController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Request $request)
     {
+        $id = $request->input('menu_id');
         try {
             $response = Http::delete("http://50.19.17.50:8002/menus/{$id}");
+            dd($response->json());
 
             if ($response->successful()) {
                 return redirect()->back()->with('success', 'Menu deleted successfully.');

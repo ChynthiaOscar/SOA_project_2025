@@ -15,10 +15,14 @@ Route::get('/menu', function () {
 });
 
 Route::get('/order_menu', [MenuController::class, 'user_index'])->name('order_menu');
-Route::get('/add_menu', [MenuController::class, 'create'])->name('add_menu');
 Route::get('/menu_index', [MenuController::class, 'admin_index'])->name('menu_index');
+Route::get('/add_menu', [MenuController::class, 'create'])->name('add_menu');
+Route::get('/edit_menu/{id}', [MenuController::class, 'edit'])->name('edit_menu');
 Route::post('/add_recipe', [MenuRecipeController::class, 'create'])->name('add_recipe');
+Route::put('/edit_recipe/{id}', [MenuRecipeController::class, 'edit'])->name('edit_recipe');
 Route::post('/store_menu', [MenuRecipeController::class, 'store'])->name('store.menu');
+Route::put('/update_menu/{id}', [MenuRecipeController::class, 'update'])->name('update.menu');
+Route::delete('/delete_menu', [MenuController::class, 'destroy'])->name('delete.menu');
 
 Route::get('/order-menu', [MenuCategoryController::class, 'index'])->name('order.menu');
 Route::get('/menu-category', [MenuCategoryController::class, 'admin_index'])->name('menu.category');
@@ -33,13 +37,6 @@ Route::delete('/delete_category/{id}', [MenuCategoryController::class, 'destroy'
 Route::get('/add_category', function () {
     return view('pages.service-menu.admin_pages.menu-category');
 });
-
-
-
-Route::get('/edit_menu', function () {
-    return view('pages.service-menu.admin_pages.menu.edit');
-});
-
 
 Route::get('/edit_recipe', function () {
     return view('pages.service-menu.admin_pages.menu.edit-recipe');

@@ -15,14 +15,14 @@
         <div class="flex items-center justify-between mt-2">
             <p class="text-xl font-semibold text-[#65090D]">${{ number_format($price) }}</p>
             <div class="flex items-center gap-x-2">
-                <a href="{{ url('/edit_menu') }}" title="Edit Menu">
+                <a href="{{ route('edit_menu', ['id' => $id]) }}" title="Edit Menu">
                     <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
                         fill="#65090D">
                         <path
                             d="M80 0v-160h800V0H80Zm80-240v-170l448-447q11-11 25.5-17t30.5-6q16 0 31 6t27 18l55 56q12 11 17.5 26t5.5 31q0 15-5.5 29.5T777-687L330-240H160Zm504-448 56-56-56-56-56 56 56 56Z" />
                     </svg>
                 </a>
-                <button onclick="openDeleteMenuPopup('{{ $id }}')" title="Delete Menu">
+                <button onclick="openDeleteMenuPopup('{{ $id }}', '{{ $name }}')" title="Delete Menu">
                     <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
                         fill="#1f1f1f">
                         <path
@@ -42,17 +42,24 @@
         </p>
         <div class="flex justify-center gap-4">
             <button onclick="closeDeletePopup()" class="px-4 py-2 rounded bg-gray-300 hover:bg-gray-400">Cancel</button>
-            <button onclick="confirmMenuDelete()"
-                class="px-4 py-2 rounded bg-red-600 text-white hover:bg-red-700">Delete</button>
+            <form action="{{ route('delete.menu') }}" method="POST" id="deleteMenuForm">
+                @csrf
+                @method('DELETE')
+                <input type="hidden" name="menu_id" id="menuId">
+                <button onclick="confirmMenuDelete()"
+                    class="px-4 py-2 rounded bg-red-600 text-white hover:bg-red-700">Delete</button>
+            </form>
         </div>
     </div>
 </div>
 
 <script>
     let currentMenuId = '';
+    let currentMenuName = '';
 
-    function openDeleteMenuPopup(menuId) {
+    function openDeleteMenuPopup(menuId, menuName) {
         currentMenuId = menuId;
+        currentMenuName = menuName;
         document.getElementById('modalBackdrop').classList.remove('hidden');
         document.getElementById('modalBackdrop').classList.add('flex');
         document.getElementById('menuName').textContent = menuName;
@@ -64,7 +71,7 @@
     }
 
     function confirmMenuDelete() {
-        alert(`Menu "${currentMenuId}" has been successfully deleted.`);
-        closeDeletePopup();
+        document.getElementById('menuId').value = currentMenuId;
+        document.getElementById('deleteMenuForm').submit();
     }
 </script>
