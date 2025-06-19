@@ -9,7 +9,7 @@ class PaymentController extends Controller
 
     public function ShowOVO(Request $request)
     {
-        return view('pages.service_payemnt.OVO');
+        return view('pages.service_payment.OVO');
     }
     
     public function generateOvoQr(Request $request)
@@ -25,23 +25,23 @@ class PaymentController extends Controller
 
     public function ShowTunai(Request $request)
     {
-        return view('pages.service_payemnt.Tunai');
+        return view('pages.service_payment.Tunai');
     }
 
     public function confirmPaymentTunai(Request $request)
     {
-        return view('pages.service_payemnt.Tunai');
+        return view('pages.service_payment.Tunai');
     }
 
 
     public function ShowBCA_VA(Request $request)
     {
-        return view('pages.service_payemnt.BCA_VA');
+        return view('pages.service_payment.BCA_VA');
     }
 
     public function ShowGopay(Request $request)
     {
-        return view('pages.service_payemnt.Gopay');
+        return view('pages.service_payment.Gopay');
     }
 
     public function generateGopayQr(Request $request)
@@ -57,7 +57,7 @@ class PaymentController extends Controller
 
     public function ShowQris(Request $request)
     {
-        return view('pages.service_payemnt.Qris');
+        return view('pages.service_payment.Qris');
     }
 
     public function generateQrisQr(Request $request)
@@ -73,6 +73,6 @@ class PaymentController extends Controller
 
     public function ShowSuccess(Request $request)
     {
-        return view('pages.service_payemnt.success');
+        return view('pages.service_payment.success');
     }
 }

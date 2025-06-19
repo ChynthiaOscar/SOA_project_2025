@@ -9,7 +9,7 @@ Route::get('/', function () {
 });
 
 Route::get('/payment/ovo', function () {
-    return view('pages.service_payemnt.OVO');
+    return view('pages.service_payment.OVO');
 });
 
 // success untuk semua payment method {masih subject to change}
@@ -27,9 +27,9 @@ Route::get('/payment/gris/generate-qr', [PaymentController::class, 'generateQris
 Route::get('/payment/success',[PaymentController::class, 'ShowSuccess'])->name('payment.success');
 
 Route::get('/payment/tunai', function () {
-    return view('pages.service_payemnt.Tunai');
+    return view('pages.service_payment.Tunai');
 });
 
 Route::get('/payment/BCA_VA', function () {
-    return view('pages.service_payemnt.BCA_VA');
+    return view('pages.service_payment.BCA_VA');
 });
