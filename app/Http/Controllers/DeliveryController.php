@@ -17,7 +17,22 @@ class DeliveryController extends Controller
 
     public function index()
     {
-        return view('pages.service-delivery.foradmin.index');
+        try {
+            $response = Http::get($this->gatewayUrl . '/delivery');
+            $data = $response->json();
+
+            // Ambil array deliveries dari response
+            $deliveries = $data['data']['data'] ?? [];
+
+            return view('pages.service-delivery.foradmin.index', [
+                'deliveries' => $deliveries
+            ]);
+        } catch (\Exception $e) {
+            return view('pages.service-delivery.foradmin.index', [
+                'deliveries' => [],
+                'error' => $e->getMessage()
+            ]);
+        }
     }
 
     public function userIndex(Request $request)
@@ -157,4 +172,6 @@ class DeliveryController extends Controller
             ]);
         }
     }
+
+    
 }

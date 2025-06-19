@@ -97,7 +97,7 @@
         </div>
     </div>
 </body>
-<script">
+<script>
     document.addEventListener('DOMContentLoaded', function() {
         // Get elements
         const deliveriesTable = document.getElementById('deliveries_table');
@@ -120,15 +120,22 @@
             });
         }
 
-        // Functions
         function fetchDeliveries() {
             fetch('/api/delivery')
                 .then(response => response.json())
                 .then(result => {
-                    if (result.data) {
-                        renderDeliveries(result.data);
+                    let deliveries = [];
+                    if (Array.isArray(result.data)) {
+                        deliveries = result.data;
+                    } else if (result.data && result.data.data) {
+                        deliveries = result.data.data;
+                    }
+                    if (deliveries.length) {
+                        renderDeliveries(deliveries);
                     } else {
                         showNotification('No deliveries found', 'warning');
+                        deliveriesTable.innerHTML =
+                            '<tr><td colspan="8" class="p-3 text-center text-gray-400">No deliveries found</td></tr>';
                     }
                 })
                 .catch(error => {
@@ -141,8 +148,14 @@
             fetch(`/api/delivery/status/${status}`)
                 .then(response => response.json())
                 .then(result => {
-                    if (result.data) {
-                        renderDeliveries(result.data);
+                    let deliveries = [];
+                    if (Array.isArray(result.data)) {
+                        deliveries = result.data;
+                    } else if (result.data && result.data.data) {
+                        deliveries = result.data.data;
+                    }
+                    if (deliveries.length) {
+                        renderDeliveries(deliveries);
                     } else {
                         showNotification(`No deliveries with status: ${status}`, 'warning');
                         deliveriesTable.innerHTML =
@@ -169,21 +182,21 @@
                 <td class="p-3">${delivery.id}</td>
                 <td class="p-3">${delivery.order_id || 'N/A'}</td>
                 <td class="p-3">${delivery.member_id || 'N/A'}</td>
-                <td class="p-3">${delivery.destination || 'N/A'}</td>
-                <td class="p-3">${delivery.distance ? delivery.distance + ' km' : 'N/A'}</td>
-                <td class="p-3">${delivery.price ? 'Rp ' + numberWithCommas(delivery.price) : 'N/A'}</td>
+                <td class="p-3">${delivery.tujuan || delivery.destination || 'N/A'}</td>
+                <td class="p-3">${delivery.jarak || delivery.distance ? (delivery.jarak || delivery.distance) + ' km' : 'N/A'}</td>
+                <td class="p-3">${delivery.harga_delivery || delivery.price ? 'Rp ' + numberWithCommas(delivery.harga_delivery || delivery.price) : 'N/A'}</td>
                 <td class="p-3">
                     <span class="${getStatusClass(delivery.status)}">${delivery.status || 'pending'}</span>
                 </td>
                 <td class="p-3">
                     <div class="flex gap-2">
-                        <button 
+                        <button
                             class="bg-gold hover:bg-gold-light text-black px-3 py-1 rounded text-xs"
                             onclick="updateDeliveryStatus(${delivery.id})"
                         >
                             Update
                         </button>
-                        <button 
+                        <button
                             class="bg-maroon hover:bg-maroon-dark text-cream px-3 py-1 rounded text-xs"
                             onclick="deleteDelivery(${delivery.id})"
                         >
@@ -298,5 +311,4 @@
         };
     });
 </script>
-
 </html>
