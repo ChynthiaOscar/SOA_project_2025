@@ -6,6 +6,7 @@ use App\Http\Controllers\EventSpaceController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\InventoryItemController;
 use App\Http\Controllers\InventoryCategoryController;
+use App\Http\Controllers\DishCategoriesController;
 
 Route::get('/', [InventoryItemController::class, 'index'])->name('inventory.index');
 
@@ -59,4 +60,14 @@ Route::prefix('event-spaces')->name('event-space.')->group(function () {
     Route::get('/{id}', [EventSpaceController::class, 'show'])->name('show');
     Route::put('/{id}', [EventSpaceController::class, 'update'])->name('update');
     Route::delete('/{id}', [EventSpaceController::class, 'destroy'])->name('destroy');
+});
+
+Route::prefix('dish-categories')->name('dish-categories.')->group(function () {
+    Route::get('/', [DishCategoriesController::class, 'index'])->name('index');
+    Route::get('/create', [DishCategoriesController::class, 'create'])->name('create');
+    Route::post('/', [DishCategoriesController::class, 'store'])->name('store');
+    Route::get('/edit/{id}', [DishCategoriesController::class, 'edit'])->name('edit');
+    Route::get('/{id}', [DishCategoriesController::class, 'show'])->name('show');
+    Route::put('/{id}', [DishCategoriesController::class, 'update'])->name('update');
+    Route::delete('/{id}', [DishCategoriesController::class, 'destroy'])->name('destroy');
 });
