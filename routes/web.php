@@ -16,7 +16,7 @@ Route::get('/payment/ovo', function () {
 Route::get('/payment/success', [PaymentController::class, 'ShowSuccess'])->name('payment.success');
 // ovo
 Route::get('/payment/ovo', [PaymentController::class, 'SHowOVO'])->name('payment.ovo');
-Route::get('/payment/ovo/generate-qr', [PaymentController::class, 'generateOvoQr'])->name('payment.ovo.generate');
+Route::post('/payment/ovo/generate-qr', [PaymentController::class, 'generateOvoQr'])->name('payment.ovo.generate');
 // gopay
 Route::get('/payment/gopay', [PaymentController::class, 'ShowGopay'])->name('payment.gopay');
 Route::get('/payment/gopay/generate-qr', [PaymentController::class, 'generateGopayQr'])->name('payment.gopay.generate');
@@ -30,6 +30,11 @@ Route::get('/payment/tunai', function () {
     return view('pages.service_payment.Tunai');
 });
 
-Route::get('/payment/BCA_VA', function () {
-    return view('pages.service_payment.BCA_VA');
-});
+Route::get('/payment/BCA_VA', [PaymentController::class, 'ShowBCA_VA'])->name('payment.BCA_VA');
+Route::get('/payment/BCA_VA/generate-va', [PaymentController::class, 'generateBCA_VA'])->name('payment.BCA_VA.generate');
+
+Route::get('/payment/getstatus/{payment_id}',[PaymentController::class, 'getStatustoPayment'])->name('payment.getstatus');
+;
+
+
+Route::delete('/payment/cancel', [PaymentController::class, 'cancelPayment'])->name('payment.cancel');
