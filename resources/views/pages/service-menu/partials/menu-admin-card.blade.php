@@ -22,7 +22,7 @@
                             d="M80 0v-160h800V0H80Zm80-240v-170l448-447q11-11 25.5-17t30.5-6q16 0 31 6t27 18l55 56q12 11 17.5 26t5.5 31q0 15-5.5 29.5T777-687L330-240H160Zm504-448 56-56-56-56-56 56 56 56Z" />
                     </svg>
                 </a>
-                <button onclick="openDeleteMenuPopup('{{ $name }}')" title="Delete Menu">
+                <button onclick="openDeleteMenuPopup('{{ $id }}')" title="Delete Menu">
                     <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
                         fill="#1f1f1f">
                         <path
@@ -49,10 +49,10 @@
 </div>
 
 <script>
-    let currentMenuName = '';
+    let currentMenuId = '';
 
-    function openDeleteMenuPopup(menuName) {
-        currentMenuName = menuName;
+    function openDeleteMenuPopup(menuId) {
+        currentMenuId = menuId;
         document.getElementById('modalBackdrop').classList.remove('hidden');
         document.getElementById('modalBackdrop').classList.add('flex');
         document.getElementById('menuName').textContent = menuName;
@@ -64,7 +64,7 @@
     }
 
     function confirmMenuDelete() {
-        alert(`Menu "${currentMenuName}" has been successfully deleted.`);
+        alert(`Menu "${currentMenuId}" has been successfully deleted.`);
         closeDeletePopup();
     }
 </script>

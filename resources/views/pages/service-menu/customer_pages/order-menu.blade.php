@@ -182,44 +182,6 @@
                 renderMenus(activeCategoryId);
             }
         });
-        }
-
-        function rotateTo(clickedItem) {
-            const targetIndex = Array.from(items).indexOf(clickedItem);
-            const currentClickedItemAngle = startAngleDeg + (targetIndex * anglePerItem);
-            let newOffset = targetClickAngleDeg - currentClickedItemAngle;
-
-            currentOffsetAngleDeg = Math.max(minOffsetAngle, Math.min(maxOffsetAngle, newOffset));
-            updatePositions();
-
-            const activeCategoryId = clickedItem.dataset.categoryId;
-            renderMenus(activeCategoryId);
-        }
-
-        let scrollAccumulator = 0;
-        const scrollThreshold = 100;
-
-        circleElement?.addEventListener('wheel', (event) => {
-            event.preventDefault();
-            scrollAccumulator += event.deltaY;
-            if (scrollAccumulator > scrollThreshold) {
-                currentOffsetAngleDeg = Math.max(minOffsetAngle, currentOffsetAngleDeg - anglePerItem);
-                updatePositions();
-                scrollAccumulator = 0;
-            } else if (scrollAccumulator < -scrollThreshold) {
-                currentOffsetAngleDeg = Math.min(maxOffsetAngle, currentOffsetAngleDeg + anglePerItem);
-                updatePositions();
-                scrollAccumulator = 0;
-            }
-
-            let activeIndex = Math.round((targetClickAngleDeg - currentOffsetAngleDeg - startAngleDeg) /
-                anglePerItem);
-            activeIndex = Math.max(0, Math.min(items.length - 1, activeIndex));
-            const activeCategoryId = items[activeIndex]?.dataset.categoryId;
-            if (activeCategoryId) {
-                renderMenus(activeCategoryId);
-            }
-        });
 
         items.forEach(item => {
             item.addEventListener('click', () => {

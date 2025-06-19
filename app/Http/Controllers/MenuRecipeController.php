@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Http;
 use Illuminate\Http\Request;
 
 class MenuRecipeController extends Controller
@@ -25,7 +26,15 @@ class MenuRecipeController extends Controller
             'description' => 'required|string',
             'price' => 'required|numeric',
             'category_id' => 'required|integer',
-        ]); 
+        ]);
+
+        // Handle the uploaded image
+        if ($request->hasFile('image')) {
+            $image = $request->file('image');
+            $original_name = $image->getClientOriginalName();
+            $image->storeAs('images/service-menu', $original_name, 'public');
+            $validated_data['image'] = $original_name;
+        }
 
         return view('pages.service-menu.admin_pages.menu.add-recipe', [
             'image' => $validated_data['image'],
@@ -41,7 +50,32 @@ class MenuRecipeController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $data = $request->all();
+        $ingredients = json_decode($data['list_ingredient'], true);
+
+        $menu_response = Http::post('http://100.24.124.206:8002/menus', [
+            'image' => $data['image'],
+            'name' => $data['name'],
+            'description' => $data['description'],
+            'price' => $data['price'],
+            'category_id' => $data['category_id']
+        ]);
+
+        foreach ($ingredients as $ingredient) {
+            $recipe_response = Http::post('http://100.24.124.206:8002/menu-recipes', [
+                'quantity' => $ingredient['amount'],
+                'menu_id' => $menu_response->json()['id'],
+                'inventory_id' => $ingredient['id']
+            ]);
+        }
+
+        if (!$menu_response->successful()) {
+            return response()->json(['error' => 'Failed to create menus'], $menu_response->status());
+        } elseif (!$recipe_response->successful()) {
+            return response()->json(['error' => 'Failed to create recipes'], $recipe_response->status());
+        } else {
+            return redirect()->route('menu_index')->with('success', 'Menu and recipes created successfully');
+        }
     }
 
     /**

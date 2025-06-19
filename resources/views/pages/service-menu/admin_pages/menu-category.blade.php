@@ -23,10 +23,19 @@
             </div>
 
             {{-- Category Cards --}}
-            @include('pages.service-menu.partials.category-card', [
-                    'title' => 'Appetizers',
-                    'count' => '23',
+            @foreach ($categories as $category)
+                @php
+                    $count = count(
+                        array_filter($menus, function ($menu) use ($category) {
+                            return $menu['category_id'] == $category['id'];
+                        }),
+                    );
+                @endphp
+                @include('pages.service-menu.partials.category-card', [
+                    'title' => $category['name'],
+                    'count' => $count,
                 ])
+            @endforeach
 
         </div>
     </div>

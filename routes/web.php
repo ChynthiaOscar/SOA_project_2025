@@ -18,6 +18,8 @@ Route::get('/order_menu', [MenuController::class, 'user_index'])->name('order_me
 Route::get('/add_menu', [MenuController::class, 'create'])->name('add_menu');
 Route::get('/menu_index', [MenuController::class, 'admin_index'])->name('menu_index');
 Route::post('/add_recipe', [MenuRecipeController::class, 'create'])->name('add_recipe');
+Route::post('/store_menu', [MenuRecipeController::class, 'store'])->name('store.menu');
+
 Route::get('/order-menu', [MenuCategoryController::class, 'index'])->name('order.menu');
 Route::get('/menu-category', [MenuCategoryController::class, 'admin_index'])->name('menu.category');
 Route::get('/add_category', [MenuCategoryController::class, 'create'])->name('add.category');

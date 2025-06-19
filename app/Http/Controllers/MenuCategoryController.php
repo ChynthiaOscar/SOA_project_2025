@@ -14,8 +14,8 @@ class MenuCategoryController extends Controller
     public function index()
     {
         try {
-            $categoryResponse = Http::get(self::BASE_API_URL . '/menu-categories');
-            $menuResponse = Http::get(self::BASE_API_URL . '/menus');
+            $categoryResponse = Http::get(self::API_BASE_URL . '/menu-categories');
+            $menuResponse = Http::get(self::API_BASE_URL . '/menus');
 
             if ($categoryResponse->successful() && $menuResponse->successful()) {
                 $categories = $categoryResponse->json();
@@ -33,10 +33,12 @@ class MenuCategoryController extends Controller
     public function admin_index()
     {
         try {
-            $response = Http::get(self::BASE_API_URL . '/menu-categories');
-            if ($response->successful()) {
+            $response = Http::get(self::API_BASE_URL . '/menu-categories');
+            $menuResponse = Http::get(self::API_BASE_URL . '/menus');
+            if ($response->successful() && $menuResponse->successful()) {
                 $categories = $response->json();
-                return view('pages.service-menu.admin_pages.menu-category', compact('categories'));
+                $menus = $menuResponse->json();
+                return view('pages.service-menu.admin_pages.menu-category', ['categories' => $categories, 'menus' => $menus]);
             } else {
                 return back()->withErrors(['error' => 'Failed to retrieve categories']);
             }
@@ -51,16 +53,16 @@ class MenuCategoryController extends Controller
     public function create()
     {
         try {
-        $response = Http::get(self::BASE_API_URL . '/some-needed-data');
-        if ($response->successful()) {
-            $data = $response->json();
-            return view('pages.service-menu.admin_pages.menu-category', compact('data'));
-        } else {
-            return back()->withErrors(['error' => 'Failed to retrieve categories']);
+            $response = Http::get(self::API_BASE_URL . '/some-needed-data');
+            if ($response->successful()) {
+                $data = $response->json();
+                return view('pages.service-menu.admin_pages.menu-category', compact('data'));
+            } else {
+                return back()->withErrors(['error' => 'Failed to retrieve categories']);
+            }
+        } catch (\Exception $e) {
+            return back()->withErrors(['error' => 'Server error']);
         }
-    } catch (\Exception $e) {
-        return back()->withErrors(['error' => 'Server error']);
-    }
     }
 
     /**
@@ -73,7 +75,7 @@ class MenuCategoryController extends Controller
         ]);
 
         try {
-            $response = Http::post(self::BASE_API_URL . '/menu-categories', $validated);
+            $response = Http::post(self::API_BASE_URL . '/menu-categories', $validated);
             return $response->successful()
                 ? redirect()->back()->with('success', 'Category created successfully.')
                 : back()->withErrors(['error' => 'Failed to create category'])->withInput();
@@ -108,7 +110,7 @@ class MenuCategoryController extends Controller
         ]);
 
         try {
-            $response = Http::put(self::BASE_API_URL . "/menu-categories/{$id}", $validated);
+            $response = Http::put(self::API_BASE_URL . "/menu-categories/{$id}", $validated);
             return $response->successful()
                 ? redirect()->back()->with('success', 'Category updated successfully.')
                 : back()->withErrors(['error' => 'Failed to update category'])->withInput();
@@ -123,7 +125,7 @@ class MenuCategoryController extends Controller
     public function destroy(string $id)
     {
         try {
-            $response = Http::delete(self::BASE_API_URL . "/menu-categories/{$id}");
+            $response = Http::delete(self::API_BASE_URL . "/menu-categories/{$id}");
             return $response->successful()
                 ? redirect()->back()->with('success', 'Category deleted successfully.')
                 : back()->withErrors(['error' => 'Failed to delete category']);

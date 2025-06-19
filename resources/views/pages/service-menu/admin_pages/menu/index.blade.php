@@ -12,6 +12,7 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 p-8">
             @foreach ($menus as $menu)
                 @include('pages.service-menu.partials.menu-admin-card', [
+                    'id' => $menu['id'],
                     'image' => asset('images/service-menu/mongolian-beef.png'),
                     'name' => $menu['name'],
                     'description' => $menu['description'],
