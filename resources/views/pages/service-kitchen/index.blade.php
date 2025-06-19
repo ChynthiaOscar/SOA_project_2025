@@ -67,33 +67,30 @@
     <h1>Kitchen Order List</h1>
 
     <div class="container">
-        @foreach ($orders as $order)
+        @foreach ($orderDetails as $detail)
         <div class="order">
-            <h3>Order #{{ $order['order_id'] }}</h3>
-            @foreach ($order['order_details'] as $detail)
-            <div style="margin-bottom: 12px;">
-                <span><span class="label">{{ $detail['order_detail_quantity'] }}</span>x {{ $detail['menu']['menu_name'] }}</span>
-                <p>{{ $detail['order_detail_note'] }}</p>
+            <h3>Order #{{ $detail['order_id'] }}</h3>
 
-                <form action="{{ route('kitchen.assign') }}" method="POST">
-                    @csrf
-                    <input type="hidden" name="order_detail_id" value="{{ $detail['order_detail_id'] }}">
-                    <input type="hidden" name="order_id" value="{{ $order['order_id'] }}">
-                    <input type="hidden" name="menu_id" value="{{ $detail['menu_id'] }}">
-                    <input type="hidden" name="quantity" value="{{ $detail['order_detail_quantity'] }}">
-                    <input type="hidden" name="notes" value="{{ $detail['order_detail_note'] }}">
+            <span><span class="label">{{ $detail['quantity'] }}</span>x {{ $detail['menu_name'] ?? 'Menu' }}</span>
+            <p>{{ $detail['note'] ?? '' }}</p>
 
-                    <label for="chef_id"><span class="label">Chef:</span></label>
-                    <select name="chef" required>
-                        <option value="">Pilih Chef</option>
-                        @foreach ($chefs as $chef)
-                        <option value="{{ $chef['employee_id'] }}">{{ $chef['employee_name'] }}</option>
-                        @endforeach
-                    </select>
-                    <button type="submit" class="assign-button">Assign</button>
-                </form>
-            </div>
-            @endforeach
+            <form action="{{ route('kitchen.assign') }}" method="POST">
+                @csrf
+                <input type="hidden" name="order_detail_id" value="{{ $detail['id'] }}">
+                <input type="hidden" name="order_id" value="{{ $detail['order_id'] }}">
+                <input type="hidden" name="menu_id" value="{{ $detail['menu_id'] }}">
+                <input type="hidden" name="quantity" value="{{ $detail['quantity'] }}">
+                <input type="hidden" name="notes" value="{{ $detail['note'] }}">
+
+                <label for="chef_id"><span class="label">Chef:</span></label>
+                <select name="chef" required>
+                    <option value="">Pilih Chef</option>
+                    @foreach ($chefs as $chef)
+                    <option value="{{ $chef['employee_id'] }}">{{ $chef['employee_name'] }}</option>
+                    @endforeach
+                </select>
+                <button type="submit" class="assign-button">Assign</button>
+            </form>
         </div>
         @endforeach
     </div>

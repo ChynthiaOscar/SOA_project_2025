@@ -9,11 +9,12 @@ class ChefController extends Controller
 {
     public function chefTasks(Request $request)
     {
-        $token = $request->bearerToken();
+        // $token = $request->bearerToken();
+        $token = "token";
 
-        $employee = Http::withToken($token)->get('http://gateway-service/employee/me')->json()['data'];
+        $employee = Http::withToken($token)->get('http://50.19.17.50:8002/employee/me')->json()['data'];
 
-        $tasks = Http::get('http://gateway-service/kitchen-tasks/' . $employee['name'])->json();
+        $tasks = Http::get('http://50.19.17.50:8002/tasks/chef/' . $employee['name'])->json();
 
         return view('pages.service-kitchen.show', [
             'chef' => $employee,
@@ -23,12 +24,10 @@ class ChefController extends Controller
 
     public function updateStatus(Request $request)
     {
-        $payload = [
-            'kitchen_task_id' => $request->task_id,
-            'status' => 'done'
-        ];
+        $payload = ['status' => 'done'];
 
-        Http::post('http://gateway-service/kitchen-tasks/status', $payload);
+        Http::put('http://50.19.17.50:8002/tasks/' . $request->task_id, $payload);
+
 
         return redirect()->back();
     }
