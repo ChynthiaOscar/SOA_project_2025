@@ -2,10 +2,6 @@
 
 @section('title', 'Login')
 
-<!-- @section('illustration')
-    <img src="https://t4.ftcdn.net/jpg/03/24/16/57/360_F_324165757_buAX78dg7TGgjh0pB8aUCwOWRkNejmwA.jpg" alt="Chinese Food" class="rounded-3xl shadow-2xl border-4 border-[#A67D44]">
-@endsection -->
-
 @section('content')
 <div class="mb-6 text-center">
     <h1 class="text-3xl font-bold text-[#E2BB4D]">Welcome Back</h1>

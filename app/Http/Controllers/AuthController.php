@@ -40,7 +40,7 @@ class AuthController extends Controller
 
         $client = new \GuzzleHttp\Client();
         try {
-            $response = $client->post(env('NAMEKO_GATEWAY_URL', 'http://localhost:8001') . '/register', [
+            $response = $client->post(env('NAMEKO_GATEWAY_URL', 'http://localhost:8002') . '/register', [
                 'json' => $registerData,
                 'http_errors' => false
             ]);
@@ -51,11 +51,9 @@ class AuthController extends Controller
                 return back()->withErrors(['email' => $result['message']])->withInput();
             }
 
-            // Ambil hash password dari database setelah register sukses
             $member = \DB::table('members')->where('email', $request->email)->first();
             if ($member) {
                 $hash = $member->password;
-                // Konversi prefix $2b$ ke $2y$ agar bisa diterima Laravel
                 if (strpos($hash, '$2b$') === 0) {
                     $hash = '$2y$' . substr($hash, 4);
                 }
@@ -82,96 +80,67 @@ class AuthController extends Controller
     }
 
     public function login(Request $request) {
-    $credentials = $request->only('email', 'password');
+        $credentials = $request->only('email', 'password');
 
-    // Dua pendekatan login:
-    // 1. Login via Laravel Auth (mempertahankan session web)
-    // 2. Sync token dengan Microservice Nameko
-
-    if (Auth::guard('member')->attempt($credentials)) {
-        $member = Auth::guard('member')->user();
-
-        // Generate token & expired
-        $token = (string) \Illuminate\Support\Str::uuid();
-        $expiresAt = now()->addMinutes(5); // Durasi lebih singkat (1 menit)
-
-        // Simpan ke DB lokal
-        $member->update([
-            'token' => $token,
-            'token_expires_at' => $expiresAt,
-        ]);
-
-        // Kirim token ke Nameko via RabbitMQ untuk sinkronisasi
-        $data = [
-            'member_id' => $member->id,
-            'token' => $token,
-            'token_expires_at' => $expiresAt->toDateTimeString(),
-            'email' => $member->email,
-        ];
-
-        // RabbitMQ logic - bersifat asinkron, tidak menghalangi user
-        try {
-            $connection = new AMQPStreamConnection(
-                env('RABBITMQ_HOST', '127.0.0.1'),
-                env('RABBITMQ_PORT', 5672),
-                env('RABBITMQ_USER', 'guest'),
-                env('RABBITMQ_PASSWORD', 'guest')
-            );
-            $channel = $connection->channel();
-            $channel->queue_declare(env('RABBITMQ_QUEUE', 'auth_login'), false, true, false, false);
-
-            $msg = new AMQPMessage(json_encode($data));
-            $channel->basic_publish($msg, '', env('RABBITMQ_QUEUE', 'auth_login'));
-
-            $channel->close();
-            $connection->close();
-        } catch (\Exception $e) {
-            // Log error tetapi jangan blokir user, kita masih punya token lokal
-            \Log::error('Failed to sync token with Nameko: ' . $e->getMessage());
+        if (Auth::guard('member')->attempt($credentials)) {
+            $member = Auth::guard('member')->user();
+            $token = (string) \Illuminate\Support\Str::uuid();
+            $expiresAt = now()->addMinutes(5);
+            $member->update([
+                'token' => $token,
+                'token_expires_at' => $expiresAt,
+            ]);
+            $data = [
+                'member_id' => $member->id,
+                'token' => $token,
+                'token_expires_at' => $expiresAt->toDateTimeString(),
+                'email' => $member->email,
+            ];
+            try {
+                $connection = new AMQPStreamConnection(
+                    env('RABBITMQ_HOST', '127.0.0.1'),
+                    env('RABBITMQ_PORT', 5672),
+                    env('RABBITMQ_USER', 'guest'),
+                    env('RABBITMQ_PASSWORD', 'guest')
+                );
+                $channel = $connection->channel();
+                $channel->queue_declare(env('RABBITMQ_QUEUE', 'auth_login'), false, true, false, false);
+                $msg = new AMQPMessage(json_encode($data));
+                $channel->basic_publish($msg, '', env('RABBITMQ_QUEUE', 'auth_login'));
+                $channel->close();
+                $connection->close();
+            } catch (\Exception $e) {
+                \Log::error('Failed to sync token with Nameko: ' . $e->getMessage());
+            }
+            return redirect()->route('profile');
         }
-
-        return redirect()->route('profile');
-    }
-
-    return back()->withErrors(['email' => 'Invalid credentials.'])->withInput();
+        return back()->withErrors(['email' => 'Invalid credentials.'])->withInput();
     }
 
     public function profile() {
         $member = Auth::guard('member')->user();
-        // Cek token expired
         if ($member && $member->token_expires_at && now()->greaterThan($member->token_expires_at)) {
-            // Hapus token di database
             $member->update(['token' => null, 'token_expires_at' => null]);
-            // Logout dari Laravel Auth
             Auth::guard('member')->logout();
-            // Redirect ke login dengan pesan
             return redirect()->route('login')->withErrors(['email' => 'Sesi Anda telah berakhir, silakan login kembali.']);
         }
         return view('pages.member.profile', compact('member'));
     }
 
-
     public function logout() {
         $member = Auth::guard('member')->user();
-        
         if ($member && $member->token) {
-            // Hapus token di Nameko microservice via gateway
             try {
                 $client = new \GuzzleHttp\Client();
-                $client->post(env('NAMEKO_GATEWAY_URL', 'http://localhost:8001') . '/logout', [
+                $client->post(env('NAMEKO_GATEWAY_URL', 'http://localhost:8002') . '/logout', [
                     'json' => ['token' => $member->token],
                     'http_errors' => false
                 ]);
             } catch (\Exception $e) {
-                // Log error tapi tetap lanjutkan logout
                 \Log::error('Failed to logout from Nameko: ' . $e->getMessage());
             }
-            
-            // Hapus token di database lokal
             $member->update(['token' => null, 'token_expires_at' => null]);
         }
-        
-        // Logout dari Laravel Auth
         Auth::guard('member')->logout();
         return redirect()->route('login');
     }

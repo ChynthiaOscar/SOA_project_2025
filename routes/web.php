@@ -1,7 +1,5 @@
 <?php
 
-// routes/web.php
-
 use App\Http\Controllers\AuthController;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Http\Request;
