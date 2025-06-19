@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\EventAddOnsController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\EventPackageController;
 use App\Http\Controllers\EventSpaceController;
@@ -63,6 +64,16 @@ Route::prefix('event-spaces')->name('event-space.')->group(function () {
     Route::get('/{id}', [EventSpaceController::class, 'show'])->name('show');
     Route::put('/{id}', [EventSpaceController::class, 'update'])->name('update');
     Route::delete('/{id}', [EventSpaceController::class, 'destroy'])->name('destroy');
+});
+
+Route::prefix('event-addons')->name('event-addon.')->group(function () {
+    Route::get('/', [EventAddOnsController::class, 'index'])->name('index');
+    Route::get('/create', [EventAddOnsController::class, 'create'])->name('create');
+    Route::post('/', [EventAddOnsController::class, 'store'])->name('store');
+    Route::get('/edit/{id}', [EventAddOnsController::class, 'edit'])->name('edit');
+    Route::get('/{id}', [EventAddOnsController::class, 'show'])->name('show');
+    Route::put('/{id}', [EventAddOnsController::class, 'update'])->name('update');
+    Route::delete('/{id}', [EventAddOnsController::class, 'destroy'])->name('destroy');
 });
 
 Route::prefix('dish-categories')->name('dish-categories.')->group(function () {
