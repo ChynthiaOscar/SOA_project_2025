@@ -46,12 +46,15 @@ class EventReservationController extends Controller
         $eventSpaceResponse = Http::get($this->url . '/event_spaces?per_page=1000');
         $eventSpaces = json_decode($eventSpaceResponse);
 
+        $event_add_onResponse = Http::get($this->url . '/event_add_ons?per_page=1000');
+        $event_add_ons = json_decode($event_add_onResponse);
+
         $data['title'] = "Create Event Reservation";
         $data['categories'] = $categories->data->data ?? [];
         $data['event_spaces'] = $eventSpaces->data->data ?? [];
+        $data['event_add_ons'] = $event_add_ons->data->data ?? [];
         return view('pages.service-event.admin.event_reservations.create', $data);
     }
-
 
     /**
      * Store a newly created resource in storage.
@@ -74,19 +77,50 @@ class EventReservationController extends Controller
      */
     public function edit(string $id)
     {
-        $reservationResponse = Http::get($this->url . '/event_reservations/' . $id);
-        $reservation = json_decode($reservationResponse);
-
         $categoriesResponse = Http::get($this->url . "/dish_categories?per_page=1000");
         $categories = json_decode($categoriesResponse);
 
         $eventSpaceResponse = Http::get($this->url . '/event_spaces?per_page=1000');
         $eventSpaces = json_decode($eventSpaceResponse);
 
+        $addOnsResponse = Http::get($this->url . '/event_add_ons?per_page=1000');
+        $eventAddOns = json_decode($addOnsResponse);
+
+        $reservationResponse = Http::get($this->url . '/event_reservations/' . $id);
+        $reservation = json_decode($reservationResponse);
+
+        if (!$reservation || !$reservation->success) {
+
+            return redirect()->route('your.reservation.index.route.name')->with('error', 'Reservation not found.');
+        }
+
+        $reservationData = $reservation->data ?? null;
+
+
+        $selectedMenuIds = [];
+
+        if (isset($reservationData->event_menus) && is_array($reservationData->event_menus)) {
+            $selectedMenuIds = array_map(function ($menu) {
+                return $menu->id;
+            }, $reservationData->event_menus);
+        }
+
+        $selectedAddOnIds = [];
+
+        if (isset($reservationData->event_add_ons) && is_array($reservationData->event_add_ons)) {
+            $selectedAddOnIds = array_map(function ($addon) {
+                return $addon->id;
+            }, $reservationData->event_add_ons);
+        }
+
+
         $data['title'] = "Edit Event Reservation";
         $data['categories'] = $categories->data->data ?? [];
         $data['event_spaces'] = $eventSpaces->data->data ?? [];
-        $data['reservation'] = $reservation->data ?? null;
+        $data['event_add_ons'] = $eventAddOns->data->data ?? [];
+        $data['event_reservation'] = $reservationData;
+        $data['selectedMenuIds'] = $selectedMenuIds;
+        $data['selectedAddOnIds'] = $selectedAddOnIds;
         return view('pages.service-event.admin.event_reservations.edit', $data);
     }
 

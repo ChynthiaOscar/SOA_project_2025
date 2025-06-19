@@ -52,8 +52,8 @@
                                     @endif
                                 </td>
                                 <td class="py-3 px-4">{{ $reservation->pax }}</td>
-                                <td class="py-3 px-4">{{ number_format($reservation->total_price, 2) }}</td>
-                                <td class="py-3 px-4">{{ ucfirst($reservation->status) }}</td>
+                                <td class="py-3 px-4">Rp{{ number_format($reservation->total_price, 0, ',', '.') }}</td>
+                                <td class="py-3 px-4 uppercase">{{ $reservation->status }}</td>
                                 <td class="py-3 px-4 text-center flex gap-2 justify-center">
                                     <a href="{{ route('event-reservations.edit', $reservation->id) }}"
                                         class="inline-block text-yellow-600 hover:text-yellow-800" title="Edit">

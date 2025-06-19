@@ -6,47 +6,71 @@
         <div class="bg-[#f7ebc6] border-4 border-[#8b0000] rounded-lg shadow-xl p-8 w-full max-w-5xl">
             <h1 class="text-3xl font-extrabold mb-6 text-center text-[#8b0000]">EDIT EVENT RESERVATION</h1>
 
-            @php
-                    $selectedMenus = array_column((array) $reservation->event_menus, 'id');
-            @endphp
-
+            <div class="mb-4">
+                <label class="block font-bold text-[#8b0000] mb-1" for="status">Reservation Status</label>
+                @php
+                    $statuses = ['pending', 'dp1', 'dp2', 'paid', 'cancelled'];
+                @endphp
+                <select name="status" id="status" class="w-full border-2 border-[#8b0000] rounded px-3 py-2" required>
+                    @foreach ($statuses as $status)
+                        <option value="{{ $status }}"
+                            {{ old('status', $event_reservation->status) == $status ? 'selected' : '' }}>
+                            @if ($status == 'dp1' || $status == 'dp2')
+                                {{ strtoupper($status) }}
+                            @else
+                                <span class="uppercase">{{ ($status) }}</span>
+                            @endif
+                        </option>
+                    @endforeach
+                </select>
+            </div>
             <div class="mb-4">
                 <label class="block font-bold text-[#8b0000] mb-1">Customer Name</label>
+
                 <input type="text" name="customer_name" id="customer_name"
-                    class="w-full border-2 border-[#8b0000] rounded px-3 py-2" value="{{ $reservation->customer_name }}"
-                    required>
+                    value="{{ old('customer_name', $event_reservation->customer_name) }}"
+                    class="w-full border-2 border-[#8b0000] rounded px-3 py-2" required>
             </div>
             <div class="mb-4">
                 <label class="block font-bold text-[#8b0000] mb-1">Event Space</label>
                 <select id="event_space_id" class="w-full border-2 border-[#8b0000] rounded px-3 py-2" required>
                     <option value="" disabled>Select Event Space</option>
                     @foreach ($event_spaces as $e)
-                        <option value="{{ $e->id }}" @if ($e->id == $reservation->event_space_id) selected @endif>
-                            {{ $e->name }}</option>
+                        <option value="{{ $e->id }}"
+                            {{ old('event_space_id', $event_reservation->event_space_id) == $e->id ? 'selected' : '' }}>
+                            {{ $e->name }}
+                        </option>
                     @endforeach
                 </select>
             </div>
-            <div class="mb-4">
-                <label class="block font-bold text-[#8b0000] mb-1">Start Date</label>
-                <input type="date" name="start_date" id="start_date"
-                    class="w-full border-2 border-[#8b0000] rounded px-3 py-2" value="{{ $reservation->start_date }}"
-                    required>
-            </div>
-            <div class="mb-4">
-                <label class="block font-bold text-[#8b0000] mb-1">End Date</label>
-                <input type="date" name="end_date" id="end_date"
-                    class="w-full border-2 border-[#8b0000] rounded px-3 py-2" value="{{ $reservation->end_date }}"
-                    required>
+            <div class="grid md:grid-cols-2 gap-4 mb-4">
+                <div>
+                    <label class="block font-bold text-[#8b0000] mb-1">Start Date</label>
+
+                    <input type="date" name="start_date" id="start_date"
+                        value="{{ old('start_date', $event_reservation->start_date) }}"
+                        class="w-full border-2 border-[#8b0000] rounded px-3 py-2" required>
+                </div>
+                <div>
+                    <label class="block font-bold text-[#8b0000] mb-1">End Date</label>
+
+                    <input type="date" name="end_date" id="end_date"
+                        value="{{ old('end_date', $event_reservation->end_date) }}"
+                        class="w-full border-2 border-[#8b0000] rounded px-3 py-2" required>
+                </div>
             </div>
             <div class="mb-4">
                 <label class="block font-bold text-[#8b0000] mb-1">Number of Pax</label>
-                <input type="number" name="pax" id="pax"
-                    class="w-full border-2 border-[#8b0000] rounded px-3 py-2" value="{{ $reservation->pax }}" required>
+
+                <input type="number" name="pax" id="pax" value="{{ old('pax', $event_reservation->pax) }}"
+                    class="w-full border-2 border-[#8b0000] rounded px-3 py-2" required min="1">
             </div>
             <div class="mb-4">
                 <label class="block font-bold text-[#8b0000] mb-1">Notes (optional)</label>
-                <textarea name="notes" id="notes" class="w-full border-2 border-[#8b0000] rounded px-3 py-2">{{ $reservation->notes }}</textarea>
+
+                <textarea name="notes" id="notes" class="w-full border-2 border-[#8b0000] rounded px-3 py-2">{{ old('notes', $event_reservation->notes) }}</textarea>
             </div>
+
 
             @if (!empty($categories))
                 @foreach ($categories as $category)
@@ -59,13 +83,13 @@
                                     <label
                                         class="relative group rounded-lg shadow-lg overflow-hidden border-4 border-yellow-700 bg-[#8b0000] text-white hover:scale-105 transition-all cursor-pointer">
                                         <input type="radio" name="menu_{{ Str::slug($category->name, '_') }}"
-                                            value="{{ $menu->id }}"
-                                            class="absolute top-2 left-2 w-5 h-5 text-yellow-500 focus:ring-yellow-400 border-gray-300 rounded"
-                                            {{ in_array($menu->id, $selectedMenus) ? 'checked' : '' }} required>
+                                            value="{{ $menu->id }}" data-price="{{ $menu->price }}"
+                                            class="menu-radio absolute top-3 left-3 w-5 h-5 text-yellow-500 focus:ring-yellow-400 border-gray-300 rounded"
+                                            {{ in_array($menu->id, $selectedMenuIds) ? 'checked' : '' }} required>
 
                                         <div class="w-full h-32 overflow-hidden">
-                                            <img src="{{ 'http://localhost:8080/storage/' . $menu->image }}"
-                                                alt="{{ $menu->name }}" class="w-full h-full object-cover">
+                                            <img src="{{ env('STORAGE_URL') . $menu->image }}" alt="{{ $menu->name }}"
+                                                class="w-full h-full object-cover">
                                         </div>
 
                                         <div class="p-3 text-center">
@@ -80,13 +104,44 @@
                         </div>
                     @endif
                 @endforeach
-            @else
-                <div class="text-center text-gray-500 my-4">No menu categories available</div>
             @endif
 
-            <div class="flex justify-end mt-8">
+
+            @if (isset($event_add_ons))
+                <div class="mb-10">
+                    <h2 class="text-xl font-extrabold text-[#8b0000] mb-4 uppercase border-b-2 border-[#8b0000]">
+                        ADD-ONS
+                    </h2>
+                    <div class="grid sm:grid-cols-2 md:grid-cols-3 gap-6">
+                        @foreach ($event_add_ons as $addon)
+                            <label
+                                class="relative group rounded-lg shadow-lg overflow-hidden border-4 border-yellow-700 bg-[#8b0000] text-white hover:scale-105 transition-all cursor-pointer">
+                                <input type="checkbox" name="event_add_ons[]" value="{{ $addon->id }}"
+                                    data-price="{{ $addon->price }}"
+                                    {{ in_array($addon->id, $selectedAddOnIds) ? 'checked' : '' }}
+                                    class="addon-checkbox absolute top-3 left-3 w-5 h-5 text-yellow-500 bg-gray-700 border-gray-500 rounded focus:ring-yellow-600 focus:ring-2">
+                                <div class="p-4 text-center">
+                                    <div class="font-bold text-lg mt-2">{{ $addon->name }}</div>
+                                    <div class="mt-1 font-semibold text-yellow-300">Rp
+                                        {{ number_format($addon->price, 0, ',', '.') }}
+                                    </div>
+                                </div>
+                            </label>
+                        @endforeach
+                    </div>
+                </div>
+            @endif
+
+
+            <div class="flex justify-between items-center mt-8 border-t-4 border-dashed border-[#8b0000] pt-6">
+                <div>
+                    <p class="text-2xl font-extrabold text-[#8b0000]">
+                        TOTAL PRICE: <span id="total_price_display">Rp 0</span>
+                    </p>
+                </div>
+
                 <button type="submit" id="submit"
-                    class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold px-6 py-2 rounded">
+                    class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold px-6 py-3 rounded text-lg">
                     Update Reservation
                 </button>
             </div>
@@ -94,69 +149,127 @@
     </div>
 @endsection
 
-
 @push('scripts')
     <script>
-        document.getElementById("submit").addEventListener("click", () => {
-            Swal.fire({
-                icon: "warning",
-                title: "Confirm Update",
-                text: "Are you sure you want to update this reservation?",
-                showDenyButton: true,
-                confirmButtonText: 'Update',
-                denyButtonText: `Cancel`,
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    const menus = [];
-                    document.querySelectorAll('input[type="radio"]:checked').forEach(radio => {
-                        menus.push(radio.value);
-                    });
+        document.addEventListener('DOMContentLoaded', function() {
 
-                    const data = {
-                        customer_name: document.getElementById('customer_name').value,
-                        start_date: document.getElementById('start_date').value,
-                        end_date: document.getElementById('end_date').value,
-                        notes: document.getElementById('notes').value,
-                        pax: document.getElementById('pax').value,
-                        event_space_id: document.getElementById('event_space_id').value,
-                        event_menu_id: menus,
-                        _method: 'PUT' 
-                    };
 
-                    console.log("data", data);
 
-                    fetch(`{{ route('event-reservations.update', $reservation->id) }}`, {
-                            method: 'POST', 
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                            },
-                            body: JSON.stringify(data)
-                        })
-                        .then(response => response.json())
-                        .then(async res => {
-                            if (res.success) {
-                                await Swal.fire({
-                                    title: 'Success',
-                                    text: res.message,
-                                    icon: "success"
-                                });
-                            } else {
-                                await Swal.fire({
-                                    title: 'Error',
-                                    text: res.message,
-                                    icon: "error"
-                                });
-                            }
-                        })
-                        .catch(error => {
-                            Swal.fire({
-                                title: 'Error',
-                                text: error.message || 'An unexpected error occurred.',
-                                icon: 'error'
-                            });
+            function calculateFinalTotal() {
+                const pax = parseInt(document.getElementById('pax').value) || 0;
+                let totalMenuPrice = 0;
+                document.querySelectorAll('.menu-radio:checked').forEach(radio => {
+                    totalMenuPrice += parseFloat(radio.dataset.price);
+                });
+                let totalAddOnPrice = 0;
+                document.querySelectorAll('.addon-checkbox:checked').forEach(checkbox => {
+                    totalAddOnPrice += parseFloat(checkbox.dataset.price);
+                });
+                return (pax * totalMenuPrice) + totalAddOnPrice;
+            }
+
+            function updateTotalPrice() {
+                const finalTotalPrice = calculateFinalTotal();
+                const displayElement = document.getElementById('total_price_display');
+                displayElement.textContent = 'Rp ' + finalTotalPrice.toLocaleString('id-ID');
+            }
+
+            const paxInput = document.getElementById('pax');
+            const allMenuRadios = document.querySelectorAll('.menu-radio');
+            const allAddOnCheckboxes = document.querySelectorAll('.addon-checkbox');
+
+            paxInput.addEventListener('input', updateTotalPrice);
+            allMenuRadios.forEach(radio => {
+                radio.addEventListener('change', updateTotalPrice);
+            });
+            allAddOnCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', updateTotalPrice);
+            });
+
+
+            updateTotalPrice();
+
+
+            document.getElementById("submit").addEventListener("click", () => {
+                Swal.fire({
+                    icon: "warning",
+                    title: "Update Reservation",
+                    text: "Are you sure you want to save the changes?",
+                    showDenyButton: true,
+                    confirmButtonText: 'Yes, Save Changes',
+                    denyButtonText: `No, Cancel`,
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        const finalTotalPrice = calculateFinalTotal();
+                        const menus = [];
+                        document.querySelectorAll('.menu-radio:checked').forEach(radio => {
+                            menus.push(radio.value);
                         });
-                }
+                        const addOns = [];
+                        document.querySelectorAll('.addon-checkbox:checked').forEach(checkbox => {
+                            addOns.push(checkbox.value);
+                        });
+
+                        const data = {
+                            status: document.getElementById('status').value,
+                            customer_name: document.getElementById('customer_name').value,
+                            start_date: document.getElementById('start_date').value,
+                            end_date: document.getElementById('end_date').value,
+                            notes: document.getElementById('notes').value,
+                            pax: document.getElementById('pax').value,
+                            event_space_id: document.getElementById('event_space_id').value,
+                            event_menu_id: menus,
+                            event_add_on_id: addOns,
+                            total_price: finalTotalPrice
+                        };
+
+                        fetch(`{{ route('event-reservations.update', $event_reservation->id) }}`, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                },
+
+                                body: JSON.stringify({
+                                    ...data,
+                                    '_method': 'PUT'
+                                })
+                            })
+                            .then(response => response.json())
+                            .then(async res => {
+                                if (res.success) {
+                                    await Swal.fire({
+                                        title: 'Success',
+                                        text: res.message,
+                                        icon: "success"
+                                    });
+                                    window.location.href =
+                                        "{{ route('event-reservations.index') }}";
+                                } else {
+
+                                    let errorText = res.message;
+                                    if (res.errors) {
+                                        errorText = Object.values(res.errors).map(e => e
+                                            .join('\n')).join('\n');
+                                    }
+                                    await Swal.fire({
+                                        title: 'Error',
+                                        html: errorText.replace(/\n/g, '<br>'),
+                                        icon: "error"
+                                    });
+                                }
+                            })
+                            .catch(error => {
+
+                                Swal.fire({
+                                    title: 'Error',
+                                    text: 'An unexpected error occurred.',
+                                    icon: 'error'
+                                });
+                                console.error('Fetch Error:', error);
+                            });
+                    }
+                });
             });
         });
     </script>
