@@ -1,0 +1,35 @@
+version: '3.8'
+services:
+  nameko:
+    build:
+      context: ./nameko_service
+    container_name: nameko_service
+    command: nameko run nameko_service.auth_service nameko_service.gateway --config nameko.yml
+    volumes:
+      - ./nameko_service:/app
+    working_dir: /app
+    ports:
+      - "8002:8002"
+    depends_on:
+      - rabbitmq
+      - mysql
+    environment:
+      - PYTHONUNBUFFERED=1
+  rabbitmq:
+    image: rabbitmq:management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: soa_project_2025
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+volumes:
+  mysql_data:
