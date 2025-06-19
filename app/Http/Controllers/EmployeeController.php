@@ -77,7 +77,38 @@ class EmployeeController extends Controller
             'salary_per_shift' => 0, // default value
         ]);
 
-       return redirect()->route('employee.login')->with('success', 'Register berhasil!');
+        return redirect('/employee/login')->with('success', 'Register berhasil! Silakan login.');
+    }
 
+    public function login(Request $request)
+    {
+        $credentials = $request->validate([
+            'email' => 'required|email',
+            'password' => 'required',
+        ]);
+
+        $employee = Employee::where('email', $credentials['email'])->first();
+
+        if (!$employee || !Hash::check($credentials['password'], $employee->password)) {
+            return back()->withErrors(['email' => 'Email atau password salah'])->withInput();
+        }
+
+        session([
+            'user' => [
+                'id' => $employee->id,
+                'name' => $employee->name,
+                'email' => $employee->email,
+                'role' => $employee->role,
+                'salary_per_shift' => $employee->salary_per_shift,
+            ]
+        ]);
+
+        // ✅ redirect ke route dengan prefix 'employee'
+        return redirect('/employee/dashboard');
+    }
+    public function logout()
+    {
+        session()->forget('user');
+        return redirect()->route('employee.login')->with('success', 'Anda telah berhasil logout.');
     }
 }

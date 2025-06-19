@@ -7,7 +7,7 @@ use App\Http\Controllers\EmployeeController;
 Route::get('/', function () {
     return view('pages.homepage');
 });
-Route::prefix('employee')->group(function () {
+Route::prefix('employee')->group(function () {  
 
     Route::get('/login', function () {
         return view('pages.service-employee.login');
@@ -17,9 +17,8 @@ Route::prefix('employee')->group(function () {
         return view('pages.service-employee.employee.register');
     });
 
-    Route::post('/api/employee/register', [EmployeeController::class, 'store']);
+ 
 
-    
 
     // Authenticated Employee
     Route::middleware(['role'])->group(function () {
