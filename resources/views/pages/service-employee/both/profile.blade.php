@@ -12,13 +12,13 @@
         <div class="border border-gray-400 w-full max-w-2xl p-8 bg-[#E9E5C0] rounded-lg shadow-md">
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-y-4 text-base">
                 <p class="font-semibold text-right pr-4">Name:</p>
-                <p class="text-left pl-4">Alex</p>
+                <p class="text-left pl-4">{{ session('user.name') ?? '-' }}</p>
                 <p class="font-semibold text-right pr-4">ID:</p>
-                <p class="text-left pl-4">1</p>
+                <p class="text-left pl-4">{{ session('user.id') ?? '-' }}</p>
                 <p class="font-semibold text-right pr-4">Email:</p>
-                <p class="text-left pl-4">Alex@gmail.com</p>
+                <p class="text-left pl-4">{{ session('user.email') ?? '-' }}</p>
                 <p class="font-semibold text-right pr-4">Role:</p>
-                <p class="text-left pl-4">Cashier</p>
+                <p class="text-left pl-4">{{ ucfirst(session('user.role')) ?? '-' }}</p>
             </div>
         </div>
 

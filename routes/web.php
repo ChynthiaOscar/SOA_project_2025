@@ -3,9 +3,26 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\EmployeeController;
 
+// Public
 Route::get('/', function () {
     return view('pages.homepage');
 });
+Route::get('/login', function () {
+    return view('/pages/service-employee/login');
+})->name('login');
+Route::get('/register', function () {
+    return view('/pages/service-employee/employee/register');
+});
+
+// Auth needed
+Route::middleware(['role'])->get('/dashboard', function () {
+    return view('/pages/service-employee/employee/dashboard');
+});
+
+Route::middleware(['role:manager'])->group(function () {
+    Route::get('/manager/dashboard', [ManagerController::class, 'index']);
+});
+
 
 // Employee Routes
 Route::get('/appManager', function () {
@@ -17,16 +34,7 @@ Route::get('/appEmployee', function () {
 });
 
 
-Route::get('/login', function () {
-    return view('/pages/service-employee/login');
-});
 
-Route::get('/dashboard', function () {
-    return view('/pages/service-employee/employee/dashboard');
-});
-Route::get('/register', function () {
-    return view('/pages/service-employee/employee/register');
-});
 
 // Employee & Manager PROFILE
 

@@ -24,8 +24,8 @@
             </div>
         </div>
         <div class="mb-10">
-            <p class="font-semibold text-[#e0a93a] mb-1">Owen Samsudin</p>
-            <p class="text-xs text-[#e0a93a]">owenganteng@gmail.com</p>
+            <p class="font-semibold text-[#e0a93a] mb-1">{{ session('user.name') ?? 'Guest' }}</p>
+            <p class="text-xs text-[#e0a93a]">{{ session('user.email') ?? '' }}</p>
         </div>
         <nav class="flex flex-col space-y-8 text-xs font-normal">
             <a href="{{ url('/dashboard') }}" class="flex items-center space-x-3">
