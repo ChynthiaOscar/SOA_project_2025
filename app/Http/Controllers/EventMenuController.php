@@ -23,14 +23,14 @@ class EventMenuController extends Controller
     public function index(Request $request)
     {
         $page = $request->query('page', 1);
-        $response = Http::get($this->url . "/event_menus?page={$page}");
+        $response = Http::get($this->url . "/dish_categories?page={$page}");
         $res = json_decode($response);
 
-        $menus = $res->data->data ?? [];
-        $pagination = $res->data ?? null;
+        $categories = $res->data->data;
+        $pagination = $res->data;
 
         $data['title'] = "Manage Event Menus";
-        $data['menus'] = $menus;
+        $data['categories'] = $categories;
         $data['pagination'] = $pagination;
         return view('pages.service-event.admin.event_menus.index', $data);
     }

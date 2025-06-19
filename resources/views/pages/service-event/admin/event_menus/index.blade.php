@@ -23,18 +23,18 @@
                 </div>
 
                 <!-- Loop by Category -->
-                @foreach ($groupedMenus as $category => $menus)
+                @foreach ($categories as $category)
                     <div class="mb-10">
-                        <h2 class="text-2xl font-bold text-[#222] mb-4">{{ $category }}</h2>
+                        <h2 class="text-2xl font-bold text-[#222] mb-4">{{ $category->name }}</h2>
                         <div class="flex space-x-4 overflow-x-auto pb-2">
-                            @foreach ($menus as $menu)
+                            @foreach ($category->event_menus as $menu)
                                 <div class="bg-white rounded-lg shadow-md w-60 shrink-0">
                                     <img src="{{ asset('storage/' . $menu->image) }}" alt="{{ $menu->name }}"
                                         class="w-full h-40 object-cover rounded-t-lg">
                                     <div class="p-4">
                                         <h3 class="text-lg font-semibold text-[#222]">{{ $menu->name }}</h3>
                                         <p class="text-sm text-gray-600">{{ $menu->description }}</p>
-                                        <p class="text-red-600 font-semibold">IDR {{ $menu->price }}K</p>
+                                        <p class="text-red-600 font-semibold">IDR {{ number_format($menu->price) }}</p>
                                         <div class="mt-4 flex justify-between text-sm text-[#333]">
                                             <a href="{{ route('event-menus.edit', $menu->id) }}"
                                                 class="text-yellow-600 hover:text-yellow-800">
