@@ -53,7 +53,7 @@
                 @foreach ($menus as $key => $menu)
                     <div class="menu-card-wrapper" data-category-id="{{ $menu['category_id'] }}">
                         @include('pages.service-menu.partials.menu-order-card', [
-                            'image' => asset('images/service-menu/mongolian-beef.png'),
+                            'image' => asset('storage/images/service-menu/' . $menu['image']),
                             'title' => $menu['name'],
                             'description' => $menu['description'],
                             'price' => $menu['price'],

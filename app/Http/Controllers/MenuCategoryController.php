@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Http;
 
 class MenuCategoryController extends Controller
 {
-    const API_BASE_URL = 'http://100.24.124.206:8002';
+    const API_BASE_URL = 'http://3.228.0.178:8002';
     /**
      * Display a listing of the resource.
      */

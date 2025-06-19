@@ -13,7 +13,7 @@
             @foreach ($menus as $menu)
                 @include('pages.service-menu.partials.menu-admin-card', [
                     'id' => $menu['id'],
-                    'image' => asset('images/service-menu/mongolian-beef.png'),
+                    'image' => asset('storage/images/service-menu/' . $menu['image']),
                     'name' => $menu['name'],
                     'description' => $menu['description'],
                     'price' => $menu['price'],

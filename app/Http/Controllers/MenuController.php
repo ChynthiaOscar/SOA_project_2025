@@ -13,8 +13,8 @@ class MenuController extends Controller
     public function user_index()
     {
         try {
-            $menu_response = Http::get('http://100.24.124.206:8002/menus');
-            $category_response = Http::get('http://100.24.124.206:8002/menu-categories');
+            $menu_response = Http::get('http://3.228.0.178:8002/menus');
+            $category_response = Http::get('http://3.228.0.178:8002/menu-categories');
             // TODO: Handle rating response
             // TODO: Handle availability response
 
@@ -38,7 +38,7 @@ class MenuController extends Controller
     public function admin_index()
     {
         try {
-            $menu_response = Http::get('http://100.24.124.206:8002/menus');
+            $menu_response = Http::get('http://3.228.0.178:8002/menus');
 
             if ($menu_response->successful()) {
                 $menus = $menu_response->json();
@@ -59,8 +59,8 @@ class MenuController extends Controller
     public function create()
     {
         try {
-            $menu_response = Http::get('http://100.24.124.206:8002/menus');
-            $category_response = Http::get('http://100.24.124.206:8002/menu-categories');
+            $menu_response = Http::get('http://3.228.0.178:8002/menus');
+            $category_response = Http::get('http://3.228.0.178:8002/menu-categories');
 
             if (!$menu_response->successful()) {
                 return response()->json(['error' => 'Failed to retrieve menus'], $menu_response->status());
@@ -117,7 +117,7 @@ class MenuController extends Controller
     public function destroy(string $id)
     {
         try {
-            $response = Http::delete("http://100.24.124.206:8002/menus/{$id}");
+            $response = Http::delete("http://3.228.0.178:8002/menus/{$id}");
 
             if ($response->successful()) {
                 return redirect()->back()->with('success', 'Menu deleted successfully.');
