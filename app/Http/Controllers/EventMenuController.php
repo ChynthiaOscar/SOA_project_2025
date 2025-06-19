@@ -22,8 +22,7 @@ class EventMenuController extends Controller
      */
     public function index(Request $request)
     {
-        $page = $request->query('page', 1);
-        $response = Http::get($this->url . "/dish_categories?page={$page}");
+        $response = Http::get($this->url . "/dish_categories?per_page=100");
         $res = json_decode($response);
 
         $categories = $res->data->data;

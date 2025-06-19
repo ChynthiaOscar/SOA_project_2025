@@ -29,7 +29,7 @@
                         <div class="flex space-x-4 overflow-x-auto pb-2">
                             @foreach ($category->event_menus as $menu)
                                 <div class="bg-white rounded-lg shadow-md w-60 shrink-0">
-                                    <img src="{{ asset('storage/' . $menu->image) }}" alt="{{ $menu->name }}"
+                                    <img src="{{ 'http://localhost:8080/storage/' . $menu->image }}" alt="{{ $menu->name }}"
                                         class="w-full h-40 object-cover rounded-t-lg">
                                     <div class="p-4">
                                         <h3 class="text-lg font-semibold text-[#222]">{{ $menu->name }}</h3>
