@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Utils\HttpResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
+use App\Models\EventReservation;
 
 class EventReservationController extends Controller
 {
@@ -29,6 +30,10 @@ class EventReservationController extends Controller
         $data['pagination'] = $res->data ?? null;
         $data['title'] = "Manage Event Reservations";
         return view('pages.service-event.admin.event_reservations.index', $data);
+        $reservations = EventReservation::with('eventMenus')->paginate(10);
+        return response()->json([
+            'data' => $reservations
+        ]);
     }
 
     /**
