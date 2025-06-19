@@ -125,16 +125,16 @@
                         .then(async res => {
                             if (res.success) {
                                 await Swal.fire({
-                                    title: 'Success',
-                                    text: res.message,
-                                    icon: "success"
-                                })
-                                // .then((result) => {
-                                //     if (result.isConfirmed) {
-                                //         location.reload();
-                                //         return;
-                                //     }
-                                // });
+                                        title: 'Success',
+                                        text: res.message,
+                                        icon: "success"
+                                    })
+                                    .then((result) => {
+                                        if (result.isConfirmed) {
+                                            location.reload();
+                                            return;
+                                        }
+                                    });
                             } else {
                                 await Swal.fire({
                                     title: 'Error',
