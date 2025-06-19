@@ -37,6 +37,7 @@ class EmployeeController extends Controller
                 'id' => $data['data']['id'],
                 'name' => $data['data']['name'],
                 'email' => $data['data']['email'],
+                'salaryPerShift' => $data['data']['salary_per_shift'],
                 'accessToken' => $data['data']['access_token'],
                 'role' => $data['data']['role'],
                 // add more if you want

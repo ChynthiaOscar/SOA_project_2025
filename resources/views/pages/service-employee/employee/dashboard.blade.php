@@ -5,48 +5,47 @@
 
 @section('content')
     <section class="p-10 max-w-screen-xl mx-auto">
-        <h2 class="font-playfair text-4xl mb-8">Performance Report</h2>
+        {{-- Shift Summary --}}
+        <h2 class="font-playfair text-4xl mb-8">Shift Summary ({{ $currentMonthName }})</h2>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
             <div class="border border-[#1A1A1A] bg-[#E9E6CC] p-8 flex flex-col items-center space-y-5 rounded-xl shadow-lg">
-                <i class="fas fa-cloud text-4xl"></i>
-                <div class="text-xl font-sans">Number of Shift</div>
-                <div class="font-sans font-bold text-3xl">18</div>
+                <i class="fas fa-calendar-alt text-4xl"></i>
+                <div class="text-xl font-sans">Shifts Worked</div>
+                <div class="font-sans font-bold text-3xl">{{ $summary['shifts'] }}</div>
             </div>
             <div class="border border-[#1A1A1A] bg-[#E9E6CC] p-8 flex flex-col items-center space-y-5 rounded-xl shadow-lg">
-                <i class="fas fa-dollar-sign text-4xl"></i>
-                <div class="text-xl font-sans">Salary per Month</div>
-                <div class="font-sans font-bold text-3xl">Rp 2.500.000</div>
+                <i class="fas fa-clock text-4xl"></i>
+                <div class="text-xl font-sans">Hours Worked</div>
+                <div class="font-sans font-bold text-3xl">{{ $summary['hours'] }} Jam</div>
             </div>
             <div class="border border-[#1A1A1A] bg-[#E9E6CC] p-8 flex flex-col items-center space-y-5 rounded-xl shadow-lg">
-                <i class="fas fa-dollar-sign text-4xl"></i>
-                <div class="text-xl font-sans">Total Salary</div>
-                <div class="font-sans font-bold text-3xl">Rp 45.000.000</div>
+                <i class="fas fa-money-bill-wave text-4xl"></i>
+                <div class="text-xl font-sans">Salary This Month</div>
+                <div class="font-sans font-bold text-3xl">Rp {{ number_format($summary['salary'], 0, ',', '.') }}</div>
             </div>
         </div>
 
-        <h2 class="font-playfair text-4xl mb-8">Report per Month</h2>
+        {{-- Upcoming Schedule --}}
+        <h2 class="font-playfair text-4xl mb-8">Upcoming Shifts</h2>
 
-        <div class="grid grid-cols-3 gap-6 text-lg font-sans font-semibold mb-4 py-3 border-b border-[#1A1A1A]">
-            <div>Month</div>
-            <div>Number of Shifts</div>
-            <div>Total Salary</div>
-        </div>
-
-        <div class="grid grid-cols-3 gap-6 text-lg font-sans mb-3 py-3">
-            <div>January</div>
-            <div>10</div>
-            <div>Rp 25.000.000</div>
-        </div>
-        <div class="grid grid-cols-3 gap-6 text-lg font-sans mb-3 py-3">
-            <div>February</div>
-            <div>8</div>
-            <div>Rp 20.000.000</div>
-        </div>
-        <div class="grid grid-cols-3 gap-6 text-lg font-sans py-3">
-            <div>March</div>
-            <div>4</div>
-            <div>Rp 15.000.000</div>
-        </div>
+        @if(count($upcomingShifts))
+            <div class="space-y-4">
+                @foreach($upcomingShifts as $shift)
+                    <div class="border border-[#1A1A1A] bg-[#F6F3D7] rounded-lg p-6 shadow-md">
+                        <div class="flex justify-between text-lg font-sans mb-1">
+                            <span class="font-semibold">{{ \Carbon\Carbon::parse($shift['date'])->format('l, d M Y') }}</span>
+                            <span>{{ $shift['start'] }} - {{ $shift['end'] }}</span>
+                        </div>
+                        <p class="text-sm text-gray-700">Role: {{ ucfirst($shift['role']) }}</p>
+                        @if(!empty($shift['location']))
+                            <p class="text-sm text-gray-700">Location: {{ $shift['location'] }}</p>
+                        @endif
+                    </div>
+                @endforeach
+            </div>
+        @else
+            <p class="text-gray-600 text-lg font-sans">No upcoming shifts.</p>
+        @endif
     </section>
 @endsection
