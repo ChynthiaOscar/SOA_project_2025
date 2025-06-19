@@ -35,25 +35,15 @@ class EventReservationController extends Controller
      * Show the form for creating a new resource.
      */
     public function create()
-{
-    // Ambil kategori + menu dari API
-    $categoriesResponse = Http::get($this->url . '/dish_categories');
-    $categories = json_decode($categoriesResponse);
+    {
+        // Ambil kategori + menu dari API
+        $categoriesResponse = Http::get($this->url . "/dish_categories?per_page=100");
+        $categories = json_decode($categoriesResponse);
 
-    $data['categories'] = [];
-
-    // FIX di sini -> akses ke data->data karena paginasi
-    if (isset($categories->data->data) && is_array($categories->data->data)) {
-        foreach ($categories->data->data as $category) {
-            if (is_object($category) && isset($category->name) && isset($category->event_menus)) {
-                $data['categories'][] = $category;
-            }
-        }
+        $data['title'] = "Create Event Reservation";
+        $data['categories'] = $categories->data->data;
+        return view('pages.service-event.admin.event_reservations.create', $data);
     }
-
-    $data['title'] = "Create Event Reservation";
-    return view('pages.service-event.admin.event_reservations.create', $data);
-}
 
 
     /**
@@ -84,7 +74,7 @@ class EventReservationController extends Controller
         $reservation = Http::get($this->url . "/event_reservations/" . $id);
         $data['reservation'] = json_decode($reservation)->data ?? null;
         $data['title'] = "Edit Event Reservation";
-        
+
         // Get menu categories for editing
         $categoriesResponse = Http::get($this->url . '/dish_categories?with_menus=1');
         $categories = json_decode($categoriesResponse);
@@ -96,7 +86,7 @@ class EventReservationController extends Controller
                 }
             }
         }
-        
+
         return view('pages.service-event.admin.event_reservations.edit', $data);
     }
 
