@@ -11,7 +11,7 @@
 </head>
 <body class="bg-[#EEEACB] text-gray-900">
 
-    <main class="min-h-screen pt-10">
+    <main class="min-h-screen">
         @yield('content')
     </main>
 
