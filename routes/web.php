@@ -24,6 +24,8 @@ Route::get('/payment/gopay/generate-qr', [PaymentController::class, 'generateGop
 Route::get('/payment/qris', [PaymentController::class, 'ShowQris'])->name('payment.qris');
 Route::get('/payment/gris/generate-qr', [PaymentController::class, 'generateQrisQr'])->name('payment.qris.generate');
 
+Route::get('/payment/success',[PaymentController::class, 'ShowSuccess'])->name('payment.success');
+
 Route::get('/payment/tunai', function () {
     return view('pages.service_payemnt.Tunai');
 });
