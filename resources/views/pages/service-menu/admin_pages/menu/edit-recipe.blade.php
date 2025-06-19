@@ -9,7 +9,8 @@
 
 
     <div class="mx-auto px-4 md:px-12 lg:px-20 py-8">
-        <form>
+        <form action="{{ route('store.menu') }}" method="POST" enctype="multipart/form-data">
+                @csrf
         <div class="flex flex-col md:flex-row gap-20 items-start">
             <div class="bg-[#E2BB4D] border-2 border-[#65090D] shadow-lg p-6 flex-1 self-start">
                 <h3 class="text-2xl font-bold text-[#65090D] mb-6 text-center">Menu Name</h3>
@@ -22,14 +23,48 @@
                                     <input type="text" id="ingredientSearch" placeholder="Search ingredient..." autocomplete="off"
                                         class="w-full px-4 py-3 border border-[#E2BB4D] bg-[#E4C788] focus:outline-none focus:ring-2 focus:ring-[#65090D] rounded">
                                     <ul id="ingredientList" class="absolute z-10 mt-1 w-full bg-[#FFF7DA] border border-[#65090D] rounded shadow-lg hidden max-h-60 overflow-auto">
-                                        <li class="px-4 py-2 cursor-pointer hover:bg-[#E2BB4D]" data-value="garlic">Garlic</li>
-                                        <li class="px-4 py-2 cursor-pointer hover:bg-[#E2BB4D]" data-value="onion">Onion</li>
-                                        <li class="px-4 py-2 cursor-pointer hover:bg-[#E2BB4D]" data-value="chicken">Chicken</li>
-                                        <li class="px-4 py-2 cursor-pointer hover:bg-[#E2BB4D]" data-value="beef">Beef</li>
-                                        <li class="px-4 py-2 cursor-pointer hover:bg-[#E2BB4D]" data-value="rice">Rice</li>
-                                    </ul>
-                                    <input type="hidden" id="ingredient" name="ingredient">
-                                </div>
+                                        @php
+                                                $ingredients = [
+                                                    ['id' => 1, 'name' => 'Garlic'],
+                                                    ['id' => 2, 'name' => 'Beef'],
+                                                    ['id' => 3, 'name' => 'Soy Sauce'],
+                                                    ['id' => 4, 'name' => 'Bao Bun'],
+                                                    ['id' => 5, 'name' => 'Pork Belly'],
+                                                    ['id' => 6, 'name' => 'Carrot'],
+                                                    ['id' => 7, 'name' => 'Rice Noodle'],
+                                                    ['id' => 8, 'name' => 'Wonton Skin'],
+                                                    ['id' => 9, 'name' => 'Noodles'],
+                                                    ['id' => 10, 'name' => 'Rice'],
+                                                    ['id' => 11, 'name' => 'Corn'],
+                                                    ['id' => 12, 'name' => 'Tea Leaves'],
+                                                    ['id' => 13, 'name' => 'Cucumber'],
+                                                    ['id' => 14, 'name' => 'Mantou Bun'],
+                                                    ['id' => 15, 'name' => 'Baijiu'],
+                                                    ['id' => 16, 'name' => 'Cabernet Franc'],
+                                                    ['id' => 17, 'name' => 'Condensed Milk'],
+                                                    ['id' => 18, 'name' => 'Chicken'],
+                                                    ['id' => 19, 'name' => 'Tofu'],
+                                                    ['id' => 20, 'name' => 'Red Bean Paste'],
+                                                    ['id' => 21, 'name' => 'Sesame Seeds'],
+                                                    ['id' => 22, 'name' => 'Scallion'],
+                                                    ['id' => 23, 'name' => 'Lotus Root'],
+                                                    ['id' => 24, 'name' => 'Fish Fillet'],
+                                                    ['id' => 25, 'name' => 'Tomato'],
+                                                    ['id' => 26, 'name' => 'Egg'],
+                                                    ['id' => 27, 'name' => 'Mushroom'],
+                                                    ['id' => 28, 'name' => 'Chili Sauce'],
+                                                ];
+                                            @endphp
+                                    @foreach ($ingredients as $ingredient)
+                                                <li class="px-4 py-2 cursor-pointer hover:bg-[#E2BB4D]"
+                                                    data-value="{{ $ingredient['id'] }}">
+                                                    {{ $ingredient['name'] }}
+                                                </li>
+                                            @endforeach
+                                        </ul>
+                                        <input type="hidden" id="ingredient">
+                                    </div>
+
 
                             </div>
 
@@ -62,51 +97,24 @@
         </table>
 
         <div style="max-height: 18rem; overflow-y: auto;">
-            <table class="min-w-full text-left">
-                <tbody class="text-[#65090D]">
-                    @php
-                        $ingredients = [
-                            ['name' => 'Garlic', 'amount' => '2g'],
-                            ['name' => 'Onion', 'amount' => '5g'],
-                            ['name' => 'Chicken', 'amount' => '150g'],
-                            ['name' => 'Rice', 'amount' => '300g'],
-                            ['name' => 'Scallions', 'amount' => '5g'],
-                            ['name' => 'Pepper', 'amount' => '1g'],
-                            ['name' => 'Salt', 'amount' => '1g'],
-                            ['name' => 'Chilis', 'amount' => '20g'],
-                        ];
-                    @endphp
-
-                    @foreach ($ingredients as $ingredient)
-                    <tr class="border-t border-[#65090D]/40 bg-[#E4C788]">
-                        <td class="px-6 py-3 border-r border-[#65090D]">{{ $ingredient['name'] }}</td>
-                        <td class="px-6 py-3">
-                        <div class="flex items-center justify-between w-full">
-                            <span>{{ $ingredient['amount'] }}</span>
-                                <div class="flex items-center gap-2 ml-auto">
-                                <svg onclick="openEditModal('{{ $ingredient['name'] }}', this.closest('tr'))" xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 -960 960 960" width="20px" fill="#65090D" class="cursor-pointer hover:scale-110 transition">
-                                    <path d="M80 0v-160h800V0H80Zm80-240v-170l448-447q11-11 25.5-17t30.5-6q16 0 31 6t27 18l55 56q12 11 17.5 26t5.5 31q0 15-5.5 29.5T777-687L330-240H160Zm504-448 56-56-56-56-56 56 56 56Z"/>
-                                </svg>
-                                <svg onclick="openDeleteModal('{{ $ingredient['name'] }}', this.closest('tr'))" xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 -960 960 960" width="20px" fill="#1f1f1f" class="cursor-pointer hover:scale-110 transition">
-                                    <path d="M280-120q-33 0-56.5-23.5T200-200v-520h-40v-80h200v-40h240v40h200v80h-40v520q0 33-23.5 56.5T680-120H280Zm400-600H280v520h400v-520ZM360-280h80v-360h-80v360Zm160 0h80v-360h-80v360ZM280-720v520-520Z"/>
-                                </svg>
+                                    <table class="min-w-full text-left">
+                                        <tbody class="text-[#65090D]" id="cartTableBody">
+                                        </tbody>
+                                    </table>
                                 </div>
+                            </div>
                         </div>
-                        </td>
-                    </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        </div>
-        </form>
-    </div>
-</div>
-
-                <div class="mt-6 self-end">
-                    <a href="{{ url('/menu_index') }}" title="Menu Page">
-                        <button type="button" class="bg-[#65090D] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#4e070a] transition">
-                            Edit Menu
-                        </button>
+                        <input type="hidden" name="list_ingredient" id="list_ingredient">
+                        <input type="hidden" name="image" value="{{ $image }}">
+                        <input type="hidden" name="name" value="{{ $name }}">
+                        <input type="hidden" name="description" value="{{ $description }}">
+                        <input type="hidden" name="price" value="{{ $price }}">
+                        <input type="hidden" name="category_id" value="{{ $category_id }}">
+                        <div class="mt-6 self-end">
+                            <button type="submit"
+                                class="bg-[#65090D] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#4e070a] transition">
+                                Add Menu
+                            </button>
                     </a>
                 </div>
             </div>
