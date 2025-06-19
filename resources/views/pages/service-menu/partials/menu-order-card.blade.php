@@ -1,6 +1,6 @@
 <div class="p-3 bg-[#65090D] border-4 border-[#65090D] w-80 h-[340px] flex flex-col justify-between">
     <div class="px-3 py-2 border-4 border-[#A67D44] flex flex-col h-full">
-        <img src="{{ $image }}" alt="{{ $title }}" class="w-40 h-40 mx-auto rounded-full object-cover -mt-16">
+        <img src="{{ $image }}" alt="{{ $title }}" class="w-40 h-40 mx-auto rounded-full object-cover object-center -mt-16">
         
         <div class="flex justify-center gap-1 text-[#E09121] mt-2">
             @for ($i = 0; $i < 5; $i++)
