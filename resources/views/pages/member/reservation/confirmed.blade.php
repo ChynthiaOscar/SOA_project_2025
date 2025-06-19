@@ -145,12 +145,7 @@
                     <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-6 mb-6">
                         <h3 class="font-semibold text-yellow-800 mb-3">Kebijakan Pembatalan:</h3>
                         <div class="text-sm text-yellow-700 space-y-2">
-                            @if ($diffInDays >= 2 && $diffInDays <= 7)
-                                <p>• Pembatalan H-2 s/d H-7: Tidak ada potongan biaya DP</p>
-                            @elseif($diffInDays == 1)
-                                <p>• Pembatalan H-1: Potongan 25% dari biaya DP</p>
-                            @endif
-                            <p>• Untuk pembatalan, silakan hubungi customer service kami</p>
+                            <p>Potongan 25% dari biaya DP</p>
                         </div>
 
                         @if ($diffInDays >= 1)
@@ -185,13 +180,7 @@
         <div class="bg-white rounded-lg p-6 max-w-md mx-4">
             <h3 class="text-lg font-semibold text-gray-800 mb-4">Batalkan Reservasi</h3>
 
-            @if ($diffInDays >= 2 && $diffInDays <= 7)
-                <p class="text-gray-600 mb-4">Apakah Anda yakin ingin membatalkan reservasi ini?</p>
-                <p class="text-sm text-green-600 mb-4"><strong>Catatan:</strong> Tidak ada potongan biaya DP (H-2 s/d H-7)
-                </p>
-            @elseif($diffInDays == 1)
-                <p class="text-gray-600 mb-4">Membatalkan reservasi akan memotong 25% pengembalian biaya DP.</p>
-            @endif
+            <p class="text-gray-600 mb-4">Membatalkan reservasi akan memotong 25% pengembalian biaya DP.</p>
 
             <div class="flex justify-end space-x-3">
                 <button onclick="hideCancelModal()"
