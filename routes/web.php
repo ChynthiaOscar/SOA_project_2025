@@ -7,6 +7,8 @@ use App\Http\Controllers\EventSpaceController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\InventoryItemController;
 use App\Http\Controllers\InventoryCategoryController;
+use App\Http\Controllers\DishCategoriesController;
+use App\Http\Controllers\EventMenuController;
 
 Route::get('/', [InventoryItemController::class, 'index'])->name('inventory.index');
 
@@ -27,7 +29,7 @@ Route::get('/service-kitchen/{id}', function () {
 });
 
 /**
- * Event Routes 
+ * Event Routes
  */
 
 Route::prefix('events')->name('events.')->group(function () {
@@ -41,15 +43,14 @@ Route::get('/employee-data', function () {
 })->name('employee.data');
 
 // Event Package Routes
-Route::prefix('event-packages')->group(function () {
-    Route::get('/', [EventPackageController::class, 'index']);
-    Route::get('/create', [EventPackageController::class, 'create']);
-    Route::post('/', [EventPackageController::class, 'store']);
-    Route::get('/{id}/edit', [EventPackageController::class, 'edit']);
-    Route::get('/{id}', [EventPackageController::class, 'show']);
-    Route::put('/{id}', [EventPackageController::class, 'update']);
-    Route::patch('/{id}', [EventPackageController::class, 'update']);
-    Route::delete('/{id}', [EventPackageController::class, 'destroy']);
+Route::prefix('event-packages')->name('event-packages.')->group(function () {
+    Route::get('/', [EventPackageController::class, 'index'])->name('index');
+    Route::get('/create', [EventPackageController::class, 'create'])->name('create');
+    Route::post('/', [EventPackageController::class, 'store'])->name('store');
+    Route::get('/{id}/edit', [EventPackageController::class, 'edit'])->name('edit');
+    Route::get('/{id}', [EventPackageController::class, 'show'])->name('show');
+    Route::put('/{id}', [EventPackageController::class, 'update'])->name('update');
+    Route::delete('/{id}', [EventPackageController::class, 'destroy'])->name('destroy');
 });
 
 // Route::resource('event-spaces', [EventSpaceController::class]);
@@ -71,4 +72,24 @@ Route::prefix('event-addons')->name('event-addon.')->group(function () {
     Route::get('/{id}', [EventAddOnsController::class, 'show'])->name('show');
     Route::put('/{id}', [EventAddOnsController::class, 'update'])->name('update');
     Route::delete('/{id}', [EventAddOnsController::class, 'destroy'])->name('destroy');
+});
+
+Route::prefix('dish-categories')->name('dish-categories.')->group(function () {
+    Route::get('/', [DishCategoriesController::class, 'index'])->name('index');
+    Route::get('/create', [DishCategoriesController::class, 'create'])->name('create');
+    Route::post('/', [DishCategoriesController::class, 'store'])->name('store');
+    Route::get('/edit/{id}', [DishCategoriesController::class, 'edit'])->name('edit');
+    Route::get('/{id}', [DishCategoriesController::class, 'show'])->name('show');
+    Route::put('/{id}', [DishCategoriesController::class, 'update'])->name('update');
+    Route::delete('/{id}', [DishCategoriesController::class, 'destroy'])->name('destroy');
+});
+
+Route::prefix('event-menus')->name('event-menus.')->group(function () {
+    Route::get('/', [EventMenuController::class, 'index'])->name('index');
+    Route::get('/create', [EventMenuController::class, 'create'])->name('create');
+    Route::post('/', [EventMenuController::class, 'store'])->name('store');
+    Route::get('/edit/{id}', [EventMenuController::class, 'edit'])->name('edit');
+    Route::get('/{id}', [EventMenuController::class, 'show'])->name('show');
+    Route::put('/{id}', [EventMenuController::class, 'update'])->name('update');
+    Route::delete('/{id}', [EventMenuController::class, 'destroy'])->name('destroy');
 });
