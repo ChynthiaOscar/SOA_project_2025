@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="min-h-screen bg-[#131313] pt-16 md:pl-[25%] xl:pl-[15%] relative overflow-x-hidden">
+<div class="min-h-screen bg-[#131313] pt-16 md:pl-[25%] xl:pl-[15%] relative overflow-x-hidden">
         <aside
             class="hidden md:flex fixed top-0 left-0 h-screen w-[25%] xl:w-[15%] bg-[#E2BB4D] items-center justify-end py-10 z-20"
             style="clip-path: ellipse(92% 70% at 0% 50%); overflow: visible;">
@@ -23,7 +23,7 @@
             </aside>
         </aside>
 
-        <div class="md:hidden bg-[#65090D] text-[#E2BB4D] overflow-x-auto whitespace-nowrap flex gap-6 px-4 py-3">
+    <div class="md:hidden bg-[#65090D] text-[#E2BB4D] overflow-x-auto whitespace-nowrap flex gap-6 px-4 py-3">
             @foreach ($categories as $category)
                 <span
                     class="font-serif hover:text-[#E09121] cursor-pointer text-sm whitespace-nowrap">{{ $category['name'] }}</span>
@@ -77,80 +77,80 @@
                 </svg>
             </a>
         </div>
-    </div>
+</div>
 
-    <style>
-        .menu-item {
-            position: absolute;
-            white-space: nowrap;
-            transform: translate(-100%, -50%);
-            transition: left 0.5s ease-out, top 0.5s ease-out, color 0.3s ease;
-        }
-    </style>
+<style>
+    .menu-item {
+        position: absolute;
+        white-space: nowrap; 
+        transform: translate(-100%, -50%);
+        transition: left 0.5s ease-out, top 0.5s ease-out, color 0.3s ease;
+    }
+</style>
 
-    <script>
-        const circleElement = document.getElementById('circle');
-        const items = document.querySelectorAll('.menu-item');
-        const totalItems = items.length;
+<script>
+    const circleElement = document.getElementById('circle');
+    const items = document.querySelectorAll('.menu-item');
+    const totalItems = items.length;
 
-        const radius = 250;
-        const centerX = -80;
-        const centerY = 150;
-        const startAngleDeg = -90;
-        const endAngleDeg = 90;
-        const totalAngleSpan = endAngleDeg - startAngleDeg;
-        const anglePerItem = totalItems > 1 ? totalAngleSpan / (totalItems - 1) : 0;
+    const radius = 250;
+    const centerX = -80;
+    const centerY = 150;
+    const startAngleDeg = -90;
+    const endAngleDeg = 90;
+    const totalAngleSpan = endAngleDeg - startAngleDeg;
+    const anglePerItem = totalItems > 1 ? totalAngleSpan / (totalItems - 1) : 0;
 
-        const targetClickAngleDeg = 0;
-        let currentOffsetAngleDeg = 0;
-        const maxOffsetAngle = 0 - startAngleDeg;
-        const minOffsetAngle = 0 - (startAngleDeg + ((totalItems - 1) * anglePerItem));
+    const targetClickAngleDeg = 0;
+    let currentOffsetAngleDeg = 0;
+    const maxOffsetAngle = 0 - startAngleDeg;
+    const minOffsetAngle = 0 - (startAngleDeg + ((totalItems - 1) * anglePerItem));
 
-        function updatePositions() {
-            items.forEach((item, i) => {
-                let baseAngleDeg = startAngleDeg + (i * anglePerItem);
-                let finalAngleDeg = baseAngleDeg + currentOffsetAngleDeg;
-                const angleRad = (finalAngleDeg * Math.PI) / 180;
-                const x = centerX + radius * Math.cos(angleRad);
-                const y = centerY + radius * Math.sin(angleRad);
-                item.style.position = 'absolute';
-                item.style.left = `${x}px`;
-                item.style.top = `${y}px`;
-            });
-        }
-
-        function rotateTo(clickedItem) {
-            const targetIndex = Array.from(items).indexOf(clickedItem);
-            const currentClickedItemAngle = startAngleDeg + (targetIndex * anglePerItem);
-            let newOffset = targetClickAngleDeg - currentClickedItemAngle;
-
-            currentOffsetAngleDeg = Math.max(minOffsetAngle, Math.min(maxOffsetAngle, newOffset));
-            updatePositions();
-        }
-
-        let scrollAccumulator = 0;
-        const scrollThreshold = 100;
-
-        circleElement?.addEventListener('wheel', (event) => {
-            event.preventDefault();
-            scrollAccumulator += event.deltaY;
-            if (scrollAccumulator > scrollThreshold) {
-                currentOffsetAngleDeg = Math.max(minOffsetAngle, currentOffsetAngleDeg - anglePerItem);
-                updatePositions();
-                scrollAccumulator = 0;
-            } else if (scrollAccumulator < -scrollThreshold) {
-                currentOffsetAngleDeg = Math.min(maxOffsetAngle, currentOffsetAngleDeg + anglePerItem);
-                updatePositions();
-                scrollAccumulator = 0;
-            }
+    function updatePositions() {
+        items.forEach((item, i) => {
+            let baseAngleDeg = startAngleDeg + (i * anglePerItem);
+            let finalAngleDeg = baseAngleDeg + currentOffsetAngleDeg;
+            const angleRad = (finalAngleDeg * Math.PI) / 180;
+            const x = centerX + radius * Math.cos(angleRad);
+            const y = centerY + radius * Math.sin(angleRad);
+            item.style.position = 'absolute'; 
+            item.style.left = `${x}px`;
+            item.style.top = `${y}px`;
         });
+    }
 
-        items.forEach(item => {
-            item.addEventListener('click', () => {
-                rotateTo(item);
-            });
-        });
+    function rotateTo(clickedItem) {
+        const targetIndex = Array.from(items).indexOf(clickedItem);
+        const currentClickedItemAngle = startAngleDeg + (targetIndex * anglePerItem);
+        let newOffset = targetClickAngleDeg - currentClickedItemAngle;
 
+        currentOffsetAngleDeg = Math.max(minOffsetAngle, Math.min(maxOffsetAngle, newOffset));
         updatePositions();
-    </script>
+    }
+
+    let scrollAccumulator = 0;
+    const scrollThreshold = 100;
+
+    circleElement?.addEventListener('wheel', (event) => {
+        event.preventDefault();
+        scrollAccumulator += event.deltaY;
+        if (scrollAccumulator > scrollThreshold) {
+            currentOffsetAngleDeg = Math.max(minOffsetAngle, currentOffsetAngleDeg - anglePerItem);
+            updatePositions();
+            scrollAccumulator = 0;
+        } else if (scrollAccumulator < -scrollThreshold) {
+            currentOffsetAngleDeg = Math.min(maxOffsetAngle, currentOffsetAngleDeg + anglePerItem);
+            updatePositions();
+            scrollAccumulator = 0;
+        }
+    });
+
+    items.forEach(item => {
+        item.addEventListener('click', () => {
+            rotateTo(item);
+        });
+    });
+
+    updatePositions();
+</script>
 @endsection
