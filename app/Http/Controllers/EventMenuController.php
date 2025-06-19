@@ -29,19 +29,10 @@ class EventMenuController extends Controller
         $menus = $res->data->data ?? [];
         $pagination = $res->data ?? null;
 
-        // ✅ Optional: Group menu berdasarkan kategori (kalau untuk keperluan tampilan)
-        $groupedMenus = [];
-        foreach ($menus as $menu) {
-            $category = $menu->dish_category->name ?? 'Uncategorized';
-            $groupedMenus[$category][] = $menu;
-        }
-
-        return view('pages.service-event.admin.event_menus.index', [
-            'title' => "Manage Event Menus",
-            'menus' => $menus,
-            'pagination' => $pagination,
-            'groupedMenus' => $groupedMenus, // opsional, tergantung view
-        ]);
+        $data['title'] = "Manage Event Menus";
+        $data['menus'] = $menus;
+        $data['pagination'] = $pagination;
+        return view('pages.service-event.admin.event_menus.index', $data);
     }
 
     /**
@@ -67,14 +58,11 @@ class EventMenuController extends Controller
      */
     public function store(Request $request)
     {
-        $data = $request->all();
 
-        if ($request->hasFile('image')) {
-            $path = $request->file('image')->store('images', 'public');
-            $data['image'] = $path;
-        }
+        $file = $request->file('image');
 
-        $response = Http::post($this->url . '/event_menus', $data);
+        $response = Http::attach('image', file_get_contents($file), $file->getClientOriginalName())
+            ->post($this->url . '/event_menus', $request->all());
         $res = json_decode($response);
 
         return $this->success("Event menu created successfully", $res->data ?? null);
