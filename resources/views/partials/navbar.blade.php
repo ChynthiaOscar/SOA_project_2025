@@ -16,7 +16,10 @@
   <nav id="navbar" class="fixed top-0 left-0 w-full z-50 transition-bg bg-transparent text-white">
     <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
       <!-- Logo -->
-      <div class="text-xl font-bold">Logo</div>
+      <div>
+          <img src="{{ asset('images/logo.png') }}" alt="YÙ JADE Logo" class="h-12 w-auto">
+      </div>
+
 
         <!-- Center -->
      <div class="hidden md:flex gap-6 text-base" id="nav-menu">
@@ -37,7 +40,7 @@
       <!-- Order Now -->
       <div>
         <button class="font-serif bg-[#7a0c0c] text-[#d4af37] border border-[#d4af37] rounded-full px-6 py-2 text-[16px] font-semibold shadow-xl transition transform active:translate-y-0.5 hover:shadow-lg active:shadow-sm">
-        BOOK NOW
+        LOGIN
         </button>
       </div>
     </div>
