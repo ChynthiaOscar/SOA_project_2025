@@ -11,13 +11,11 @@ class ChefController extends Controller
     {
         $token = $request->bearerToken();
 
-        // Ambil info chef yang login
         $employee = Http::withToken($token)->get('http://gateway-service/employee/me')->json()['data'];
 
-        // Ambil task berdasarkan nama atau ID employee
         $tasks = Http::get('http://gateway-service/kitchen-tasks/' . $employee['name'])->json();
 
-        return view('pages.service-kitchen.chef', [
+        return view('pages.service-kitchen.show', [
             'chef' => $employee,
             'tasks' => $tasks
         ]);

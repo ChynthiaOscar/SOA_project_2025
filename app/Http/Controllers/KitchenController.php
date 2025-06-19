@@ -27,7 +27,7 @@ class KitchenController extends Controller
 
         // Akses berdasarkan role
         if ($employee['role'] === 'Chef') {
-            return redirect()->route('kitchen.chef'); // arahkan ke halaman chef
+            return redirect()->route('kitchen.show'); // arahkan ke halaman chef
         } elseif ($employee['role'] !== 'Cashier') {
             abort(403, 'Akses ditolak');
         }
