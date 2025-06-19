@@ -53,7 +53,7 @@ class MenuRecipeController extends Controller
         $data = $request->all();
         $ingredients = json_decode($data['list_ingredient'], true);
 
-        $menu_response = Http::post('http://3.228.0.178:8002/menus', [
+        $menu_response = Http::post('http://50.19.17.50:8002/menus', [
             'image' => $data['image'],
             'name' => $data['name'],
             'description' => $data['description'],
@@ -62,7 +62,7 @@ class MenuRecipeController extends Controller
         ]);
 
         foreach ($ingredients as $ingredient) {
-            $recipe_response = Http::post('http://3.228.0.178:8002/menu-recipes', [
+            $recipe_response = Http::post('http://50.19.17.50:8002/menu-recipes', [
                 'quantity' => $ingredient['amount'],
                 'menu_id' => $menu_response->json()['id'],
                 'inventory_id' => $ingredient['id']
