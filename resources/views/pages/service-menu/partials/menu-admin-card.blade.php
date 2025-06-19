@@ -1,8 +1,9 @@
 <div class="bg-[#E2BB4D] border-2 border-[#65090D] shadow-md flex w-full relative min-h-[10rem]">
     {{-- image --}}
-    <div class="w-32 flex-shrink-0 flex items-center justify-center ml-4 mr-2">
-        <img src="{{ $image }}" alt="{{ $name }}" class="w-30 h-30 rounded-full object-cover">
+    <div class="w-32 h-32 flex-shrink-0 flex items-center justify-center ml-4 mr-2">
+        <img src="{{ $image }}" alt="{{ $name }}" class="w-28 h-28 object-cover">
     </div>
+
 
     <div class="p-4 flex flex-col justify-between flex-grow">
         <div>
