@@ -37,11 +37,15 @@ class EventReservationController extends Controller
     public function create()
     {
         // Ambil kategori + menu dari API
-        $categoriesResponse = Http::get($this->url . "/dish_categories?per_page=100");
+        $categoriesResponse = Http::get($this->url . "/dish_categories?per_page=1000");
         $categories = json_decode($categoriesResponse);
 
+        $eventSpaceResponse = Http::get($this->url . '/event_spaces?per_page=1000');
+        $eventSpaces = json_decode($eventSpaceResponse);
+
         $data['title'] = "Create Event Reservation";
-        $data['categories'] = $categories->data->data;
+        $data['categories'] = $categories->data->data ?? [];
+        $data['event_spaces'] = $eventSpaces->data->data ?? [];
         return view('pages.service-event.admin.event_reservations.create', $data);
     }
 
@@ -51,19 +55,15 @@ class EventReservationController extends Controller
      */
     public function store(Request $request)
     {
-        // Map field dari form ke field API
-        $payload = [
-            'customer_name' => $request->input('user'),
-            'event_date' => $request->input('date'),
-            'notes' => $request->input('detail'),
-            'total_price' => $request->input('total_price'),
-            'status' => 'pending'
-        ];
 
-        $response = Http::post($this->url . '/event_reservations', $payload);
+        $response = Http::post($this->url . '/event_reservations', $request->all());
         $res = json_decode($response);
 
-        return redirect()->route('event-reservations.index')->with('success', 'Event reservation created successfully');
+        if (!$res->success) {
+            return $this->error($res->message ?? 'Failed to create event reservation');
+        }
+
+        return $this->success('Event reservation created successfully', $res->data);
     }
 
     /**
