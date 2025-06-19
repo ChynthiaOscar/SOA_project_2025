@@ -11,13 +11,11 @@ class Reservation extends Model
 
     protected $fillable = [
         'user_id',
-        'table_id',
-        'slot_time_id',
         'reservation_date',
-        'slot_time',
+        'guest_count',
         'table_count',
-        'table_numbers',
         'dp_amount',
+        'minimal_charge',
         'status',
         'payment_time',
         'payment_method',
@@ -25,10 +23,10 @@ class Reservation extends Model
     ];
 
     protected $casts = [
-        'slot_time' => 'array',
-        'table_numbers' => 'array',
         'reservation_date' => 'date',
         'payment_time' => 'datetime',
+        'dp_amount' => 'decimal:2',
+        'minimal_charge' => 'decimal:2',
     ];
 
     public function user()
@@ -36,13 +34,36 @@ class Reservation extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function table()
+    public function slotTimes()
     {
-        return $this->belongsTo(Table::class);
+        return $this->belongsToMany(SlotTime::class, 'reservation_slot_times');
     }
 
-    public function slotTime()
+    public function tables()
     {
-        return $this->belongsTo(SlotTime::class);
+        return $this->belongsToMany(Table::class, 'reservation_tables');
+    }
+
+    public function getFormattedSlotTimesAttribute()
+    {
+        return $this->slotTimes->map(function ($slot) {
+            return $slot->start_time . ' - ' . $slot->end_time;
+        })->implode(', ');
+    }
+
+    public function getTableNumbersAttribute()
+    {
+        return $this->tables->pluck('number')->toArray();
+    }
+
+    public function calculateDpAmount()
+    {
+        $slotCount = $this->slotTimes()->count();
+        return $this->table_count * $slotCount * 15000;
+    }
+
+    public function calculateMinimalCharge()
+    {
+        return $this->table_count * 50000;
     }
 }
