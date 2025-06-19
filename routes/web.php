@@ -8,6 +8,8 @@ use App\Http\Controllers\InventoryItemController;
 use App\Http\Controllers\InventoryCategoryController;
 use App\Http\Controllers\DishCategoriesController;
 use App\Http\Controllers\EventMenuController;
+use App\Http\Controllers\EventReservationController;
+
 
 Route::get('/', [InventoryItemController::class, 'index'])->name('inventory.index');
 
@@ -81,4 +83,14 @@ Route::prefix('event-menus')->name('event-menus.')->group(function () {
     Route::get('/{id}', [EventMenuController::class, 'show'])->name('show');
     Route::put('/{id}', [EventMenuController::class, 'update'])->name('update');
     Route::delete('/{id}', [EventMenuController::class, 'destroy'])->name('destroy');
+});
+
+Route::prefix('event-reservations')->name('event-reservations.')->group(function () {
+    Route::get('/', [EventReservationController::class, 'index'])->name('index');
+    Route::get('/create', [EventReservationController::class, 'create'])->name('create');
+    Route::post('/', [EventReservationController::class, 'store'])->name('store');
+    Route::get('/edit/{id}', [EventReservationController::class, 'edit'])->name('edit');
+    Route::get('/{id}', [EventReservationController::class, 'show'])->name('show');
+    Route::put('/{id}', [EventReservationController::class, 'update'])->name('update');
+    Route::delete('/{id}', [EventReservationController::class, 'destroy'])->name('destroy');
 });
