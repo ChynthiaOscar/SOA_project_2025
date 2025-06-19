@@ -40,12 +40,10 @@
                         <polyline points="12 5 19 12 12 19" />
                     </svg>
                 </button>
-                <p class="text-white text-xs italic text-right -mt-2">
-                    Forgot password?
-                </p>
+            
                 <p class="text-xs text-white text-center">
                     Don’t have an account?
-                    <a href="{{ url('/register') }}" class="italic text-[#7f1a12] hover:underline">Register Now</a>
+                    <a href="{{ url('/employee/register') }}" class="italic text-[#7f1a12] hover:underline">Register Now</a>
                 </p>
                 @if ($errors->has('login'))
                     <p class="text-xs text-center text-red-500 mt-2">

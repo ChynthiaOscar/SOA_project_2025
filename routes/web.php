@@ -17,6 +17,10 @@ Route::prefix('employee')->group(function () {
         return view('pages.service-employee.employee.register');
     });
 
+    Route::post('/api/employee/register', [EmployeeController::class, 'store']);
+
+    
+
     // Authenticated Employee
     Route::middleware(['role'])->group(function () {
         Route::get('/dashboard', [EmployeeController::class, 'dashboard'])->name('employee.dashboard');

@@ -62,7 +62,7 @@
             </button>
             <p class="text-xs text-white text-center mt-6">
                 Already have an account?
-                <a href="{{ url('/login') }}" class="italic text-[#7f1a12] hover:underline">Login
+                <a href="{{ url('/employee/login') }}" class="italic text-[#7f1a12] hover:underline">Login
                     now</a>
             </p>
 

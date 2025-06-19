@@ -77,6 +77,7 @@ class EmployeeController extends Controller
             'salary_per_shift' => 0, // default value
         ]);
 
-        return redirect('/register')->with('success', 'Employee registered successfully!');
+       return redirect()->route('employee.login')->with('success', 'Register berhasil!');
+
     }
 }
