@@ -1,13 +1,14 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\MenuController;
+use App\Http\Controllers\ManagerController;
+use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\MenuRecipeController;
 use App\Http\Controllers\MenuCategoryController;
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\EmployeeController;
-use App\Http\Controllers\ManagerController;
 
 Route::get('/', function () {
     return view('pages.homepage');
@@ -103,3 +104,38 @@ Route::prefix('api')->group(function () {
     Route::put('/employee/schedule/{id}', [ManagerController::class, 'updateSchedule'])->name('manager.schedule.update');
 });
 // Batas Routes untuk Employee
+
+
+// routes untuk payment 
+
+Route::prefix('payment')->group(function () {
+    // Success page
+    Route::get('/success', [PaymentController::class, 'ShowSuccess'])->name('payment.success');
+
+    // OVO
+    Route::get('/ovo', [PaymentController::class, 'SHowOVO'])->name('payment.ovo');
+    Route::post('/ovo/generate-qr', [PaymentController::class, 'generateOvoQr'])->name('payment.ovo.generate');
+
+    // Gopay
+    Route::get('/gopay', [PaymentController::class, 'ShowGopay'])->name('payment.gopay');
+    Route::get('/gopay/generate-qr', [PaymentController::class, 'generateGopayQr'])->name('payment.gopay.generate');
+
+    // QRIS
+    Route::get('/qris', [PaymentController::class, 'ShowQris'])->name('payment.qris');
+    Route::get('/qris/generate-qr', [PaymentController::class, 'generateQrisQr'])->name('payment.qris.generate');
+
+    // Tunai
+    Route::get('/tunai', function () {
+        return view('pages.service_payment.Tunai');
+    });
+
+    // BCA VA
+    Route::get('/BCA_VA', [PaymentController::class, 'ShowBCA_VA'])->name('payment.BCA_VA');
+    Route::get('/BCA_VA/generate-va', [PaymentController::class, 'generateBCA_VA'])->name('payment.BCA_VA.generate');
+
+    // Get Payment Status
+    Route::get('/getstatus/{payment_id}', [PaymentController::class, 'getStatustoPayment'])->name('payment.getstatus');
+
+    // Cancel Payment
+    Route::delete('/cancel', [PaymentController::class, 'cancelPayment'])->name('payment.cancel');
+});
