@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Http;
 
 class PromoController extends Controller
 {
-    private $gateway = 'http://127.0.0.1:8000/api';
+    private $gateway = 'http://50.19.17.50:8002';
 
     public function index()
     {
@@ -14,7 +14,7 @@ class PromoController extends Controller
                 'Accept' => 'application/json',
                 'Content-Type' => 'application/json'
             ])
-            ->get($this->gateway . '/all');
+            ->get($this->gateway . '/promo/all');
         $result = $response->json();
         $promos = isset($result['promos']) ? $result['promos'] : [];
         return view('pages.voucher-promo.promo.index', ['promos' => $promos]);
@@ -51,7 +51,7 @@ class PromoController extends Controller
                 'Content-Type' => 'application/json'
             ])
             ->asJson()
-            ->post($this->gateway . '/create_promo', [
+            ->post($this->gateway . '/promo/create', [
                 'data' => $data
             ]);
         return redirect('/promo')->with('success', 'Promo berhasil ditambahkan!');
@@ -63,7 +63,7 @@ class PromoController extends Controller
                 'Accept' => 'application/json',
                 'Content-Type' => 'application/json'
             ])
-            ->get($this->gateway . '/all');
+            ->get($this->gateway . '/promo/all');
         $result = $response->json();
         $promos = isset($result['promos']) ? $result['promos'] : [];
         $promo = collect($promos)->firstWhere('id', $id);
@@ -100,7 +100,7 @@ class PromoController extends Controller
                 'Content-Type' => 'application/json'
             ])
             ->asJson()
-            ->put($this->gateway . '/promos/' . $id, $data);
+            ->put($this->gateway . '/promo/update/' . $id, $data);
 
         return redirect('/promo')->with('success', 'Promo berhasil diperbarui!');
     }
@@ -111,7 +111,7 @@ class PromoController extends Controller
                 'Accept' => 'application/json',
                 'Content-Type' => 'application/json'
             ])
-            ->delete($this->gateway . '/promos/' . $id);
+            ->delete($this->gateway . '/promo/delete/' . $id);
 
         return redirect('/promo')->with('success', 'Promo berhasil dihapus!');
     }

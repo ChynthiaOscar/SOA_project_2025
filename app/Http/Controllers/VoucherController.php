@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Http;
 
 class VoucherController extends Controller
 {
-    private $gateway = 'http://127.0.0.1:8000/api';
+    private $gateway = 'http://50.19.17.50:8002';
 
     public function index()
     {
@@ -14,7 +14,7 @@ class VoucherController extends Controller
                 'Accept' => 'application/json',
                 'Content-Type' => 'application/json'
             ])
-            ->get($this->gateway . '/all');
+            ->get($this->gateway . '/promo/all');
         $result = $response->json();
         $vouchers = isset($result['vouchers']) ? $result['vouchers'] : [];
         return view('pages.voucher-promo.voucher.index', ['vouchers' => $vouchers]);
@@ -46,7 +46,7 @@ class VoucherController extends Controller
                 'Content-Type' => 'application/json'
             ])
             ->asJson()
-            ->post($this->gateway . '/create_voucher', [
+            ->post($this->gateway . '/voucher/create', [
                 'data' => $data
             ]);
         return redirect('/promo')->with('success', 'Voucher berhasil ditambahkan!');
@@ -58,7 +58,7 @@ class VoucherController extends Controller
                 'Accept' => 'application/json',
                 'Content-Type' => 'application/json'
             ])
-            ->get($this->gateway . '/all');
+            ->get($this->gateway . '/promo/all');
         $result = $response->json();
         $vouchers = isset($result['vouchers']) ? $result['vouchers'] : [];
         $voucher = collect($vouchers)->firstWhere('id', $id);
@@ -91,7 +91,7 @@ class VoucherController extends Controller
                 'Content-Type' => 'application/json'
             ])
             ->asJson()
-            ->put($this->gateway . '/vouchers/' . $id, $data);
+            ->put($this->gateway . '/voucher/update/' . $id, $data);
 
         return redirect('/promo')->with('success', 'Voucher berhasil diperbarui!');
     }
@@ -102,7 +102,7 @@ class VoucherController extends Controller
                 'Accept' => 'application/json',
                 'Content-Type' => 'application/json'
             ])
-            ->delete($this->gateway . '/vouchers/' . $id);
+            ->delete($this->gateway . '/voucher/delete/' . $id);
 
         return redirect('/promo')->with('success', 'Voucher berhasil dihapus!');
     }

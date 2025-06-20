@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\Http;
 
 class PromoVoucherHomeController extends Controller
 {
+    private $gateway = 'http://50.19.17.50:8002';
+    
     public function index(Request $request)
     {
         $searchPromo = $request->input('search_promo');
@@ -16,7 +18,8 @@ class PromoVoucherHomeController extends Controller
         $response = Http::withHeaders([
             'Accept' => 'application/json',
             'Content-Type' => 'application/json'
-        ])->get('http://127.0.0.1:8000/api/all');
+        ])->get($this->gateway . '/promo/all');
+        
         $result = $response->json();
         $promos = isset($result['promos']) ? $result['promos'] : [];
         $vouchers = isset($result['vouchers']) ? $result['vouchers'] : [];
