@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
@@ -20,31 +21,31 @@ class PromoController extends Controller
         return view('pages.voucher-promo.promo.index', ['promos' => $promos]);
     }
 
-    public function create()
-    {
-        return view('pages.voucher-promo.promo.createPromo');
-    }
+  public function create()
+  {
+    return view('pages.voucher-promo.promo.createPromo');
+  }
 
-    public function store(Request $request)
-    {
-        $request->validate([
-            'description' => 'required|max:100',
-            'promo_value' => 'required|integer',
-            'value_type' => 'required|in:fixed,percentage',
-            'minimum_order' => 'required|integer',
-            'usage_limit' => 'required|integer',
-            'status' => 'required'
-        ]);
+  public function store(Request $request)
+  {
+    $request->validate([
+      'description' => 'required|max:100',
+      'promo_value' => 'required|integer',
+      'value_type' => 'required|in:fixed,percentage',
+      'minimum_order' => 'required|integer',
+      'usage_limit' => 'required|integer',
+      'status' => 'required'
+    ]);
 
-        $data = [
-            'description' => $request->input('description'),
-            'promo_value' => (int)$request->input('promo_value'),
-            'value_type' => $request->input('value_type'),
-            'minimum_order' => (int)$request->input('minimum_order'),
-            'usage_limit' => (int)$request->input('usage_limit'),
-            'status' => filter_var($request->input('status'), FILTER_VALIDATE_BOOLEAN),
-            'usage' => 0
-        ];
+    $data = [
+      'description' => $request->input('description'),
+      'promo_value' => (int)$request->input('promo_value'),
+      'value_type' => $request->input('value_type'),
+      'minimum_order' => (int)$request->input('minimum_order'),
+      'usage_limit' => (int)$request->input('usage_limit'),
+      'status' => filter_var($request->input('status'), FILTER_VALIDATE_BOOLEAN),
+      'usage' => 0
+    ];
 
         $response = Http::withHeaders([
                 'Accept' => 'application/json',
@@ -68,32 +69,32 @@ class PromoController extends Controller
         $promos = isset($result['promos']) ? $result['promos'] : [];
         $promo = collect($promos)->firstWhere('id', $id);
 
-        if (!$promo) {
-            return redirect('/promo')->with('error', 'Promo tidak ditemukan!');
-        }
-
-        return view('pages.voucher-promo.promo.editPromo', compact('promo'));
+    if (!$promo) {
+      return redirect('/promo')->with('error', 'Promo tidak ditemukan!');
     }
 
-    public function update(Request $request, $id)
-    {
-        $request->validate([
-            'description' => 'required|max:100',
-            'promo_value' => 'required|integer',
-            'value_type' => 'required|in:fixed,percentage',
-            'minimum_order' => 'required|integer',
-            'usage_limit' => 'required|integer',
-            'status' => 'required'
-        ]);
+    return view('pages.voucher-promo.promo.editPromo', compact('promo'));
+  }
 
-        $data = [
-            'description' => $request->input('description'),
-            'promo_value' => (int)$request->input('promo_value'),
-            'value_type' => $request->input('value_type'),
-            'minimum_order' => (int)$request->input('minimum_order'),
-            'usage_limit' => (int)$request->input('usage_limit'),
-            'status' => filter_var($request->input('status'), FILTER_VALIDATE_BOOLEAN)
-        ];
+  public function update(Request $request, $id)
+  {
+    $request->validate([
+      'description' => 'required|max:100',
+      'promo_value' => 'required|integer',
+      'value_type' => 'required|in:fixed,percentage',
+      'minimum_order' => 'required|integer',
+      'usage_limit' => 'required|integer',
+      'status' => 'required'
+    ]);
+
+    $data = [
+      'description' => $request->input('description'),
+      'promo_value' => (int)$request->input('promo_value'),
+      'value_type' => $request->input('value_type'),
+      'minimum_order' => (int)$request->input('minimum_order'),
+      'usage_limit' => (int)$request->input('usage_limit'),
+      'status' => filter_var($request->input('status'), FILTER_VALIDATE_BOOLEAN)
+    ];
 
         $response = Http::withHeaders([
                 'Accept' => 'application/json',
@@ -102,8 +103,8 @@ class PromoController extends Controller
             ->asJson()
             ->put($this->gateway . '/promo/update/' . $id, $data);
 
-        return redirect('/promo')->with('success', 'Promo berhasil diperbarui!');
-    }
+    return redirect('/promo')->with('success', 'Promo berhasil diperbarui!');
+  }
 
     public function destroy($id)
     {
@@ -113,6 +114,6 @@ class PromoController extends Controller
             ])
             ->delete($this->gateway . '/promo/delete/' . $id);
 
-        return redirect('/promo')->with('success', 'Promo berhasil dihapus!');
-    }
+    return redirect('/promo')->with('success', 'Promo berhasil dihapus!');
+  }
 }
