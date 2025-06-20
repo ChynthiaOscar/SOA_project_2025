@@ -88,8 +88,8 @@
 
             <!-- Delivery Form -->
             <form id="deliveryForm" class="mb-8 bg-black/30 p-6 rounded-lg border border-tan/20" method="POST" href="api/delivery/create">
-                <input type="hidden" id="order_id" name="order_id" value="{{ $orderId }}">
-                <input type="hidden" id="member_id" name="member_id" value="{{ $order['member_id'] ?? 1 }}">
+                <input type="hidden" id="order_id" name="order_id" key="order_id" value="{{ $orderId }}">
+                <input type="hidden" id="member_id" name="member_id" key="member_id" value="{{ $order['member_id'] ?? 1 }}">
 
                 <h3 class="text-gold text-xl mb-4">Search Location</h3>
                 <div class="flex mb-4">
@@ -110,12 +110,12 @@
                 </div>
 
                 <h3 class="text-gold text-xl mb-4">Delivery Address</h3>
-                <textarea id="tujuan" name="destination"
+                <textarea id="tujuan" name="destination" key="desination"
                     class="w-full bg-transparent border border-tan rounded p-3 text-cream focus:border-gold focus:outline-none mb-4"
                     placeholder="Enter delivery address" required rows="3"></textarea>
 
-                <input type="hidden" id="lat" name="lat" value="">
-                <input type="hidden" id="lon" name="lon" value="">
+                <input type="hidden" id="lat" name="lat" key="lat" value="">
+                <input type="hidden" id="lon" name="lon" key="lon" value="">
 
                 <div id="distance_info" class="hidden border border-tan rounded p-4 mb-6">
                     <div class="flex justify-between mb-2">
@@ -126,7 +126,7 @@
                         <span>Delivery Fee:</span>
                         <span id="price_value">Rp 0</span>
                     </div>
-                    <input type="hidden" id="distance" name="distance" value="">
+                    <input type="hidden" id="distance" name="distance" key="distance" value="">
                     <input type="hidden" id="price" name="price" value="">
                 </div>
 
@@ -349,7 +349,7 @@
 
 
         function createDelivery(formData) {
-            fetch('/api/delivery', {
+            fetch('/api/delivery/create', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
