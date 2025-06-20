@@ -42,7 +42,8 @@
             Do you really want to delete the "<span id="menuName"></span>" menu item?
         </p>
         <div class="flex justify-center gap-4">
-            <button onclick="closeDeletePopup()" class="px-4 py-2 rounded bg-gray-300 hover:bg-gray-400">Cancel</button>
+            <button type="button" onclick="closeDeletePopup()"
+                class="px-4 py-2 rounded bg-gray-300 hover:bg-gray-400">Cancel</button>
             <form action="{{ route('delete.menu') }}" method="POST" id="deleteMenuForm">
                 @csrf
                 @method('DELETE')

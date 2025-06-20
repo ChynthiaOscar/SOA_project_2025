@@ -24,9 +24,8 @@ Route::post('/store_menu', [MenuRecipeController::class, 'store'])->name('store.
 Route::put('/update_menu/{id}', [MenuRecipeController::class, 'update'])->name('update.menu');
 Route::delete('/delete_menu', [MenuController::class, 'destroy'])->name('delete.menu');
 
-Route::get('/order-menu', [MenuCategoryController::class, 'index'])->name('order.menu');
-Route::get('/menu-category', [MenuCategoryController::class, 'admin_index'])->name('menu.category');
-Route::get('/add_category', [MenuCategoryController::class, 'create'])->name('add.category');
+
+Route::get('/menu-category', [MenuCategoryController::class, 'index'])->name('menu.category');
 Route::post('/store_category', [MenuCategoryController::class, 'store'])->name('store.category');
 Route::put('/update_category/{id}', [MenuCategoryController::class, 'update'])->name('update.category');
 Route::delete('/delete_category/{id}', [MenuCategoryController::class, 'destroy'])->name('delete.category');

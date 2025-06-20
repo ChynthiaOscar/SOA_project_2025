@@ -14,25 +14,6 @@ class MenuCategoryController extends Controller
     public function index()
     {
         try {
-            $categoryResponse = Http::get(self::API_BASE_URL . '/menu-categories');
-            $menuResponse = Http::get(self::API_BASE_URL . '/menus');
-
-            if ($categoryResponse->successful() && $menuResponse->successful()) {
-                $categories = $categoryResponse->json();
-                $menus = collect($menuResponse->json())->groupBy('category_id');
-
-                return view('pages.service-menu.customer_pages.order-menu', compact('categories', 'menus'));
-            } else {
-                return redirect()->back()->withErrors(['error' => 'Failed to fetch data']);
-            }
-        } catch (\Exception $e) {
-            return redirect()->back()->withErrors(['error' => 'An error occurred: ' . $e->getMessage()]);
-        }
-    }
-
-    public function admin_index()
-    {
-        try {
             $response = Http::get(self::API_BASE_URL . '/menu-categories');
             $menuResponse = Http::get(self::API_BASE_URL . '/menus');
             if ($response->successful() && $menuResponse->successful()) {
@@ -52,17 +33,7 @@ class MenuCategoryController extends Controller
      */
     public function create()
     {
-        try {
-            $response = Http::get(self::API_BASE_URL . '/some-needed-data');
-            if ($response->successful()) {
-                $data = $response->json();
-                return view('pages.service-menu.admin_pages.menu-category', compact('data'));
-            } else {
-                return back()->withErrors(['error' => 'Failed to retrieve categories']);
-            }
-        } catch (\Exception $e) {
-            return back()->withErrors(['error' => 'Server error']);
-        }
+        //
     }
 
     /**
@@ -75,10 +46,14 @@ class MenuCategoryController extends Controller
         ]);
 
         try {
-            $response = Http::post(self::API_BASE_URL . '/menu-categories', $validated);
-            return $response->successful()
-                ? redirect()->back()->with('success', 'Category created successfully.')
-                : back()->withErrors(['error' => 'Failed to create category'])->withInput();
+            $response = Http::post(self::API_BASE_URL . '/menu-categories', [
+                'name' => $validated['name'],
+            ]);
+            if (!$response->successful()) {
+                return response()->json(['error' => 'Failed to create category'], $response->status());
+            } else {
+                return redirect()->back()->with('success', 'Menu and recipes created successfully');
+            }
         } catch (\Exception $e) {
             return back()->withErrors(['error' => 'Server error'])->withInput();
         }
@@ -110,10 +85,15 @@ class MenuCategoryController extends Controller
         ]);
 
         try {
-            $response = Http::put(self::API_BASE_URL . "/menu-categories/{$id}", $validated);
-            return $response->successful()
-                ? redirect()->back()->with('success', 'Category updated successfully.')
-                : back()->withErrors(['error' => 'Failed to update category'])->withInput();
+            $response = Http::put(self::API_BASE_URL . '/menu-categories', [
+                'id' => $id,
+                'name' => $validated['name'],
+            ]);
+            if (!$response->successful()) {
+                return response()->json(['error' => 'Failed to update category'], $response->status());
+            } else {
+                return redirect()->back()->with('success', 'Menu and recipes updated successfully');
+            }
         } catch (\Exception $e) {
             return back()->withErrors(['error' => 'Server error'])->withInput();
         }
@@ -125,12 +105,15 @@ class MenuCategoryController extends Controller
     public function destroy(string $id)
     {
         try {
-            $response = Http::delete(self::API_BASE_URL . "/menu-categories/{$id}");
-            return $response->successful()
-                ? redirect()->back()->with('success', 'Category deleted successfully.')
-                : back()->withErrors(['error' => 'Failed to delete category']);
+            $response = Http::delete("http://50.19.17.50:8002/menu-categories/{$id}");
+
+            if ($response->successful()) {
+                return redirect()->back()->with('success', 'Category deleted successfully.');
+            } else {
+                return response()->json(['error' => 'Failed to delete category'], $response->status());
+            }
         } catch (\Exception $e) {
-            return back()->withErrors(['error' => 'Server error']);
+            return response()->json(['error' => 'Failed to delete category'], 500);
         }
     }
 }

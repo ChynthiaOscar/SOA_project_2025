@@ -132,7 +132,6 @@ class MenuController extends Controller
         $id = $request->input('menu_id');
         try {
             $response = Http::delete("http://50.19.17.50:8002/menus/{$id}");
-
             if ($response->successful()) {
                 return redirect()->back()->with('success', 'Menu deleted successfully.');
             } else {

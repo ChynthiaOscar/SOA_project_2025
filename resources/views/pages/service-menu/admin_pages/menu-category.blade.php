@@ -32,6 +32,7 @@
                     );
                 @endphp
                 @include('pages.service-menu.partials.category-card', [
+                    'id' => $category['id'],
                     'title' => $category['name'],
                     'count' => $count,
                 ])
@@ -47,9 +48,10 @@
                 <h3 class="text-xl font-bold text-[#65090D]">Add New Category</h3>
                 <button onclick="closeModal()" class="text-gray-500 hover:text-black">&times;</button>
             </div>
-            <form id="categoryForm">
+            <form id="categoryForm" action="{{ route('store.category') }}" method="POST">
+                @csrf
                 <label class="block mb-2 text-sm font-medium text-gray-700">Category Name</label>
-                <input type="text" id="categoryName" name="categoryName"
+                <input type="text" id="categoryName" name="name"
                     class="w-full px-4 py-2 border border-gray-300 rounded-lg mb-4" placeholder="e.g., Dessert">
                 <div class="flex justify-end gap-2">
                     <button type="button" onclick="closeModal()"
@@ -72,18 +74,5 @@
             document.getElementById('categoryModal').classList.remove('flex');
             document.getElementById('categoryForm').reset();
         }
-
-        document.getElementById('categoryForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-
-            const name = document.getElementById('categoryName').value.trim();
-            if (name === '') {
-                alert('Please enter a category name.');
-                return;
-            }
-
-            alert(`Category "${name}" added (not actually saved - no backend).`);
-            closeModal();
-        });
     </script>
 @endsection
