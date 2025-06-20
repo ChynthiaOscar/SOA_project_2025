@@ -1,4 +1,4 @@
-@extends('pages.service-employee.helper.appEmployee')
+@extends(session('user.role') === 'manager' ? 'pages.service-employee.helper.appManager' : 'pages.service-employee.helper.appEmployee')
 
 @section('title', 'Edit Profile Page')
 

@@ -1,120 +1,161 @@
 <?php
 
-// app/Http/Controllers/EmployeeController.php
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
-use App\Models\Employee;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
 
 class EmployeeController extends Controller
 {
+    protected string $apiBaseUrl;
+
     public function __construct()
     {
         $this->apiBaseUrl = config('api.api_base_url');
+    }
+
+    public function dashboard(Request $request)
+    {
+        $user = session('user');
+
+        $month = $request->input('month', now()->format('Y-m'));
+        $today = now()->toDateString();
+        $salaryPerShift = $user['salaryPerShift'] ?? 0;
+
+        $monthlyShifts = Http::withToken($user['accessToken'])
+            ->get("{$this->apiBaseUrl}/employee/schedule", [
+                'month' => $month,
+                'employee_id' => $user['id'],
+            ])
+            ->json('data') ?? [];
+
+        $upcomingShifts = Http::withToken($user['accessToken'])
+            ->get("{$this->apiBaseUrl}/employee/schedule", [
+                'from_date' => $today,
+                'employee_id' => $user['id'],
+            ])
+            ->json('data') ?? [];
+
+        $shiftCount = count($monthlyShifts);
+        $summary = [
+            'shifts' => $shiftCount,
+            'hours' => $shiftCount * 8,
+            'salary' => $shiftCount * $salaryPerShift,
+        ];
+
+        return view('pages.service-employee.employee.dashboard', [
+            'currentMonthName' => Carbon::parse($month)->format('F Y'),
+            'summary' => $summary,
+            'upcomingShifts' => $upcomingShifts,
+        ]);
+    }
+    public function login(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required',
+        ]);
+
+        $response = Http::post("{$this->apiBaseUrl}/employee/login", $request->only('email', 'password'));
+
+        if ($response->ok()) {
+            $data = $response->json('data');
+
+            session(['user' => [
+                'id' => $data['id'],
+                'name' => $data['name'],
+                'email' => $data['email'],
+                'salaryPerShift' => $data['salary_per_shift'],
+                'accessToken' => $data['access_token'],
+                'role' => $data['role'],
+            ]]);
+
+            return $data['role'] === 'manager'
+                ? redirect()->to('/employee/manager/dashboard')
+                : redirect()->route('employee.dashboard');
+        }
+
+        return back()->withErrors([
+            'login' => $response->json('message') ?? 'Login failed.',
+        ])->withInput();
+    }
+    public function logout()
+    {
+        $token = session('user.accessToken');
+
+        $response = Http::withToken($token)->post("{$this->apiBaseUrl}/employee/logout");
+
+        if ($response->successful()) {
+            session()->forget('user');
+            return redirect()->route('employee.login')->with('success', 'Logged out successfully.');
+        }
+
+        return back()->withErrors(['logout' => 'Failed to log out.']);
+    }
+    public function register(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string',
+            'email' => 'required|email',
+            'password' => 'required|string',
+        ]);
+
+        $response = Http::post("{$this->apiBaseUrl}/employee", $request->only('name', 'email', 'password'));
+
+        return $response->successful()
+            ? redirect()->route('employee.login')->with('success', 'Registered successfully.')
+            : back()->withErrors([
+                'register' => $response->json('message') ?? 'Registration failed.',
+            ])->withInput();
     }
     public function edit()
     {
         $user = session('user');
 
         if (!$user) {
-            return redirect()->route('login')->withErrors('Please log in first.');
+            return redirect()->route('employee.login')->withErrors('Please log in first.');
         }
 
         return view('pages.service-employee.both.editprofile', compact('user'));
     }
-
-    public function dashboard(Request $request)
+    public function updateProfile(Request $request, $id)
     {
-        $user = session('user');
-        $month = $request->input('month', now()->format('Y-m'));
-        $today = now()->toDateString();
-        $salaryPerShift = $user['salary_per_shift'] ?? 0;
+        $data = $request->only(['name', 'email', 'password']);
 
-        // 1. Fetch all shifts for this employee in the current month
-        $monthlyShiftsResponse = Http::withToken($user['accessToken'])
-            ->get($this->apiBaseUrl . "/employee/schedule", [
-                'month' => $month,
-                'employee_id' => $user['id'],
-            ]);
-
-        // 2. Fetch upcoming shifts from today onward
-        $upcomingShiftsResponse = Http::withToken($user['accessToken'])
-            ->get($this->apiBaseUrl . "/employee/schedule", [
-                'from_date' => $today,
-                'employee_id' => $user['id'],
-            ]);
-
-        // Process results
-        $monthlyShifts = $monthlyShiftsResponse->ok() ? $monthlyShiftsResponse->json('data') : [];
-        $upcomingShifts = $upcomingShiftsResponse->ok() ? $upcomingShiftsResponse->json('data') : [];
-
-        $shiftCount = count($monthlyShifts);
-        $hoursWorked = $shiftCount * 8;
-        $salary = $shiftCount * $salaryPerShift;
-
-        return view('pages.service-employee.employee.dashboard', [
-            'currentMonthName' => Carbon::parse($month)->format('F Y'),
-            'summary' => [
-                'shifts' => $shiftCount,
-                'hours' => $hoursWorked,
-                'salary' => $salary,
-            ],
-            'upcomingShifts' => $upcomingShifts,
-        ]);
-    }
-    public function store(Request $request)
-    {
-        // Validasi hanya field yang diisi user
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:employee_data,email',
-            'password' => 'required|string|min:6',
-        ]);
-
-        // Simpan ke database dengan nilai default untuk role dan salary
-        Employee::create([
-            'name' => $validated['name'],
-            'role' => 'unassign', // default value
-            'email' => $validated['email'],
-            'password' => Hash::make($validated['password']),
-            'salary_per_shift' => 0, // default value
-        ]);
-
-        return redirect('/employee/login')->with('success', 'Register berhasil! Silakan login.');
-    }
-
-    public function login(Request $request)
-    {
-        $credentials = $request->validate([
-            'email' => 'required|email',
-            'password' => 'required',
-        ]);
-
-        $employee = Employee::where('email', $credentials['email'])->first();
-
-        if (!$employee || !Hash::check($credentials['password'], $employee->password)) {
-            return back()->withErrors(['email' => 'Email atau password salah'])->withInput();
+        if (empty($data['password'])) {
+            unset($data['password']);
         }
 
-        session([
-            'user' => [
-                'id' => $employee->id,
-                'name' => $employee->name,
-                'email' => $employee->email,
-                'role' => $employee->role,
-                'salary_per_shift' => $employee->salary_per_shift,
-            ]
-        ]);
+        $token = session('user.accessToken');
 
-        // ✅ redirect ke route dengan prefix 'employee'
-        return redirect('/employee/dashboard');
+        $response = Http::withToken($token)->put("{$this->apiBaseUrl}/employee/{$id}", $data);
+
+        if ($response->successful()) {
+            $updatedUser = $response->json('data');
+
+            session()->put('user.name', $updatedUser['name']);
+            session()->put('user.email', $updatedUser['email']);
+
+            return redirect()->route('employee.profile')->with('success', 'Profile updated successfully.');
+        }
+
+        return back()->withErrors([
+            'update' => $response->json('message') ?? 'Failed to update profile.',
+        ])->withInput();
     }
-    public function logout()
+    public function updateByManager(Request $request, $id)
     {
-        session()->forget('user');
-        return redirect()->route('employee.login')->with('success', 'Anda telah berhasil logout.');
+        $data = $request->only(['name', 'role', 'salary_per_shift']);
+
+        $token = session('user.accessToken');
+
+        $response = Http::withToken($token)->put("{$this->apiBaseUrl}/employee/{$id}", $data);
+
+        return $response->successful()
+            ? redirect()->route('manager.employee_data')->with('success', 'Employee updated successfully.')
+            : back()->withErrors(['update' => 'Failed to update employee'])->withInput();
     }
 }

@@ -35,12 +35,8 @@
                     <div class="border border-[#1A1A1A] bg-[#F6F3D7] rounded-lg p-6 shadow-md">
                         <div class="flex justify-between text-lg font-sans mb-1">
                             <span class="font-semibold">{{ \Carbon\Carbon::parse($shift['date'])->format('l, d M Y') }}</span>
-                            <span>{{ $shift['start'] }} - {{ $shift['end'] }}</span>
                         </div>
                         <p class="text-sm text-gray-700">Role: {{ ucfirst($shift['role']) }}</p>
-                        @if(!empty($shift['location']))
-                            <p class="text-sm text-gray-700">Location: {{ $shift['location'] }}</p>
-                        @endif
                     </div>
                 @endforeach
             </div>

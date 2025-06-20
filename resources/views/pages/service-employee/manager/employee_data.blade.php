@@ -1,159 +1,73 @@
 @extends('pages.service-employee.helper.appManager')
 
-@section('title', 'Employee Data')
+@section('title', 'Manage Employee')
 
-@section('header-title', 'Employee Data')
+@section('header-title', 'Manage Employee')
 
 @section('content')
     <h2 class="text-2xl font-semibold mb-2">Search Employees</h2>
-    <p class="text-base text-gray-700 mb-6 max-w-md">
-        Find employees by ID and filters by parameters
-    </p>
 
     <!-- Search Input -->
-    <form class="mb-8 max-w-xl">
-        <label class="sr-only" for="search">Search</label>
+    <form method="GET" action="{{ route('manager.employee_data') }}" class="mb-8 max-w-xl space-y-4">
         <div class="relative">
             <input
+                name="search"
+                value="{{ request('search') }}"
                 class="w-full rounded-lg py-3 pl-12 pr-6 text-base font-medium text-black placeholder-gray-500 bg-white border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#d1a72f]"
-                id="search" placeholder="Search" type="search" />
-            <i
-                class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500 text-lg"></i>
+                placeholder="Search"
+                type="search" />
+            <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500 text-lg"></i>
         </div>
+
+        <select name="role" class="border border-gray-300 p-2 rounded-md bg-white">
+            <option value="">All Roles</option>
+            <option value="Chef" {{ request('role') == 'chef' ? 'selected' : '' }}>Chef</option>
+            <option value="Cashier" {{ request('role') == 'cashier' ? 'selected' : '' }}>Cashier</option>
+            <option value="Delivery" {{ request('role') == 'delivery' ? 'selected' : '' }}>Delivery</option>
+            <option value="Waiter" {{ request('role') == 'waiter' ? 'selected' : '' }}>Waiter</option>
+        </select>
+
+        <button type="submit" class="bg-[#d1a72f] px-4 py-2 rounded hover:bg-[#c89b2c] transition">Filter</button>
     </form>
-
-    <!-- Role Button -->
-    <div class="mb-10 relative inline-block text-left">
-        <button id="roleButton"
-            class="bg-[#d1a72f] text-black font-semibold text-sm px-5 py-2 rounded hover:bg-[#c89b2c] transition-colors duration-200 flex items-center space-x-2"
-            type="button" onclick="toggleDropdown()">
-            <span>Role</span>
-            <i class="fas fa-chevron-down text-sm"></i>
-        </button>
-
-        <!-- Dropdown Menu -->
-        <div id="roleDropdown"
-            class="hidden absolute mt-2 w-40 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-10">
-            <div class="py-1 text-sm text-black">
-                <a href="#" class="block px-4 py-2 hover:bg-gray-100">Chef</a>
-                <a href="#" class="block px-4 py-2 hover:bg-gray-100">Cashier</a>
-                <a href="#" class="block px-4 py-2 hover:bg-gray-100">Delivery</a>
-                <a href="#" class="block px-4 py-2 hover:bg-gray-100">Waiter</a>
-            </div>
-        </div>
-    </div>
 
     <!-- Table -->
     <div class="overflow-x-auto">
         <table class="w-full text-base text-left text-black bg-white shadow border border-gray-200">
             <thead class="bg-black text-white text-sm uppercase">
-                <tr>
-                    <th class="py-4 px-6">ID</th>
-                    <th class="py-4 px-6">Name</th>
-                    <th class="py-4 px-6">Date</th>
-                    <th class="py-4 px-6">Shift</th>
-                    <th class="py-4 px-6">Attendance</th>
-                    <th class="py-4 px-6">Role</th>
-                    <th class="py-4 px-6">Action</th>
-                </tr>
+            <tr>
+                <th class="py-4 px-6">ID</th>
+                <th class="py-4 px-6">Name</th>
+                <th class="py-4 px-6">Role</th>
+                <th class="py-4 px-6">Salary per Shift</th>
+                <th class="py-4 px-6">Action</th>
+            </tr>
             </thead>
             <tbody>
+            @forelse($employees as $emp)
                 <tr class="border-t border-gray-200 text-lg">
-                    <td class="py-4 px-6 font-normal">1</td>
-                    <td class="py-4 px-6 font-normal">Bima</td>
-                    <td class="py-4 px-6 font-normal">23/05/2025</td>
-                    <td class="py-4 px-6 font-normal">Day</td>
-                    <td class="py-4 px-6 font-normal">Present</td>
-                    <td class="py-4 px-6 font-normal">Cashier</td>
+                    <td class="py-4 px-6 font-normal">{{ $emp['id'] }}</td>
+                    <td class="py-4 px-6 font-normal">{{ $emp['name'] }}</td>
+                    <td class="py-4 px-6 font-normal">{{ $emp['role'] }}</td>
+                    <td class="py-4 px-6 font-normal">{{ $emp['salary_per_shift'] }}</td>
                     <td class="py-4 px-6 font-normal flex space-x-4">
-                        <button aria-label="Edit Bima" class="text-[#d1a72f] hover:text-yellow-400 text-xl">
+                        <a href="{{ route('manager.employee.edit', $emp['id']) }}" class="text-[#d1a72f] hover:text-yellow-400 text-xl" title="Edit">
                             <i class="fas fa-edit"></i>
-                        </button>
-                        <button aria-label="Delete Bima" class="text-red-700 hover:text-red-900 text-xl">
-                            <i class="fas fa-trash-alt"></i>
-                        </button>
+                        </a>
+{{--                        <form action="#" method="POST" onsubmit="return confirm('Delete this user?')">--}}
+{{--                            @csrf--}}
+{{--                            @method('DELETE')--}}
+{{--                            <button type="submit" class="text-red-700 hover:text-red-900 text-xl" title="Delete">--}}
+{{--                                <i class="fas fa-trash-alt"></i>--}}
+{{--                            </button>--}}
+{{--                        </form>--}}
                     </td>
                 </tr>
-                <tr class="border-t border-gray-200 text-lg">
-                    <td class="py-4 px-6 font-normal">2</td>
-                    <td class="py-4 px-6 font-normal">Sari</td>
-                    <td class="py-4 px-6 font-normal">22/05/2025</td>
-                    <td class="py-4 px-6 font-normal">Night</td>
-                    <td class="py-4 px-6 font-normal">Absent</td>
-                    <td class="py-4 px-6 font-normal">Chef</td>
-                    <td class="py-4 px-6 font-normal flex space-x-4">
-                        <button aria-label="Edit Sari" class="text-[#d1a72f] hover:text-yellow-400 text-xl">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button aria-label="Delete Sari" class="text-red-700 hover:text-red-900 text-xl">
-                            <i class="fas fa-trash-alt"></i>
-                        </button>
-                    </td>
+            @empty
+                <tr>
+                    <td colspan="7" class="text-center py-6 text-gray-500">No employees found</td>
                 </tr>
-                <tr class="border-t border-gray-200 text-lg">
-                    <td class="py-4 px-6 font-normal">3</td>
-                    <td class="py-4 px-6 font-normal">Rizky</td>
-                    <td class="py-4 px-6 font-normal">21/05/2025</td>
-                    <td class="py-4 px-6 font-normal">Day</td>
-                    <td class="py-4 px-6 font-normal">Present</td>
-                    <td class="py-4 px-6 font-normal">Delivery</td>
-                    <td class="py-4 px-6 font-normal flex space-x-4">
-                        <button aria-label="Edit Rizky" class="text-[#d1a72f] hover:text-yellow-400 text-xl">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button aria-label="Delete Rizky" class="text-red-700 hover:text-red-900 text-xl">
-                            <i class="fas fa-trash-alt"></i>
-                        </button>
-                    </td>
-                </tr>
-                <tr class="border-t border-gray-200 text-lg">
-                    <td class="py-4 px-6 font-normal">4</td>
-                    <td class="py-4 px-6 font-normal">Dewi</td>
-                    <td class="py-4 px-6 font-normal">20/05/2025</td>
-                    <td class="py-4 px-6 font-normal">Night</td>
-                    <td class="py-4 px-6 font-normal">Present</td>
-                    <td class="py-4 px-6 font-normal">Waiter</td>
-                    <td class="py-4 px-6 font-normal flex space-x-4">
-                        <button aria-label="Edit Dewi" class="text-[#d1a72f] hover:text-yellow-400 text-xl">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button aria-label="Delete Dewi" class="text-red-700 hover:text-red-900 text-xl">
-                            <i class="fas fa-trash-alt"></i>
-                        </button>
-                    </td>
-                </tr>
-                <tr class="border-t border-gray-200 text-lg">
-                    <td class="py-4 px-6 font-normal">5</td>
-                    <td class="py-4 px-6 font-normal">Andi</td>
-                    <td class="py-4 px-6 font-normal">19/05/2025</td>
-                    <td class="py-4 px-6 font-normal">Day</td>
-                    <td class="py-4 px-6 font-normal">Present</td>
-                    <td class="py-4 px-6 font-normal">Chef</td>
-                    <td class="py-4 px-6 font-normal flex space-x-4">
-                        <button aria-label="Edit Andi" class="text-[#d1a72f] hover:text-yellow-400 text-xl">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button aria-label="Delete Andi" class="text-red-700 hover:text-red-900 text-xl">
-                            <i class="fas fa-trash-alt"></i>
-                        </button>
-                    </td>
-                </tr>
+            @endforelse
             </tbody>
         </table>
     </div>
-
-    <script>
-        function toggleDropdown() {
-            const dropdown = document.getElementById("roleDropdown");
-            dropdown.classList.toggle("hidden");
-        }
-
-        window.addEventListener("click", function (e) {
-            const button = document.getElementById("roleButton");
-            const dropdown = document.getElementById("roleDropdown");
-            if (!button.contains(e.target) && !dropdown.contains(e.target)) {
-                dropdown.classList.add("hidden");
-            }
-        });
-    </script>
 @endsection

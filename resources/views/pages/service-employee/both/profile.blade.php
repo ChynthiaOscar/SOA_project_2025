@@ -1,4 +1,4 @@
-@extends('pages.service-employee.helper.appEmployee')
+@extends(session('user.role') === 'manager' ? 'pages.service-employee.helper.appManager' : 'pages.service-employee.helper.appEmployee')
 
 @section('title', 'Profile Page')
 
@@ -23,7 +23,6 @@
         <a href="{{ route('employee.edit') }}"
             class="bg-[#DD8B24] hover:bg-[#c7791a] text-black font-bold text-lg py-3 px-6 rounded w-full max-w-2xl transition text-center block">
             Edit Profile
-        </a>
         </a>
     </section>
 @endsection

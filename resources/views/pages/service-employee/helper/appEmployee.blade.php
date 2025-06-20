@@ -24,8 +24,8 @@
             </div>
         </div>
         <div class="mb-10">
-            <p class="font-semibold text-[#e0a93a] mb-1">{{ session('user.name') ?? 'Guest' }}</p>
-            <p class="text-xs text-[#e0a93a]">{{ session('user.email') ?? '' }}</p>
+            <p class="font-semibold text-[#e0a93a] mb-1">{{ session('user.name') }}</p>
+            <p class="text-xs text-[#e0a93a]">{{ session('user.email') }}</p>
         </div>
         <nav class="flex flex-col space-y-8 text-xs font-normal">
             <a href="{{ route('employee.dashboard') }}" class="flex items-center space-x-3">
@@ -39,10 +39,13 @@
 
         </nav>
         <div class="mt-auto pt-10">
-            <a href="#" class="flex items-center space-x-2 text-xs text-[#e0a93a]">
-                <i class="fas fa-sign-out-alt"></i>
-                <span>Logout</span>
-            </a>
+            <form method="POST" action="{{ route('employee.logout') }}">
+                @csrf
+                <button type="submit" class="flex items-center space-x-2 text-xs text-[#e0a93a]">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </button>
+            </form>
         </div>
     </aside>
 
