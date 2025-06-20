@@ -26,6 +26,12 @@ use App\Http\Controllers\EventReservationController;
 use App\Http\Controllers\KitchenController;
 use App\Http\Controllers\VoucherController;
 
+
+
+Route::get('/', function () {
+    return view('pages.homepage');
+});
+
 // Auth & Profile (Member)
 Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
 Route::post('/register', [AuthController::class, 'register']);
