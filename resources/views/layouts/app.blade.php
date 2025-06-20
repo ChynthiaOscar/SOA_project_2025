@@ -12,6 +12,7 @@
     
     @stack('styles') <!-- Optional: untuk stylesheet tambahan -->
 </head>
+{{-- <body class="bg-[#131313]">" --}}
 
     <!-- Navbar -->
     @include('partials.navbar')

@@ -4,7 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Transparent Navbar</title>
-  <script src="https://cdn.tailwindcss.com"></script>
   <style>
     .transition-bg {
       transition: background-color 0.3s ease;
@@ -30,7 +29,7 @@
           <a href="#" class="nav-link {{ request()->is('delivery*') ? 'relative text-[#d4af37] after:block after:content-[\'\'] after:h-[1px] after:bg-[#d4af37] after:w-full after:mt-1' : 'text-[#7d661c]' }}" data-link="Delivery">Delivery</a>
           <a href="{{ route('profile') }}" class="nav-link {{ request()->is('profile') ? 'relative text-[#d4af37] after:block after:content-[\'\'] after:h-[1px] after:bg-[#d4af37] after:w-full after:mt-1' : 'text-[#7d661c]' }}" data-link="Profile">Profile</a>
         </div>
-        <!-- Order Now -->
+        <!-- Logout -->
         <div>
           <form action="{{ route('logout') }}" method="POST">
             @csrf
