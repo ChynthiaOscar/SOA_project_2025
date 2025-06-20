@@ -402,7 +402,7 @@ class ReservationController extends Controller
             $paymentResponse = Http::withHeaders([
                 'Authorization' => 'order123',
                 'Content-Type' => 'application/json',
-            ])->post('http://50.19.17.50:8002/payment', $paymentData);
+            ])->post('http://3.216.16.187:8002/payment', $paymentData);
 
             if ($paymentResponse->ok() && $paymentResponse->json()['status'] === 'success') {
                 $paymentResult = $paymentResponse->json();
