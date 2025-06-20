@@ -26,17 +26,6 @@ use App\Http\Controllers\EventReservationController;
 use App\Http\Controllers\KitchenController;
 use App\Http\Controllers\VoucherController;
 
-Route::get('/', [InventoryItemController::class, 'index'])->name('inventory.index');
-
-
-Route::resource('inventory', InventoryItemController::class);
-
-Route::resource('categories', InventoryCategoryController::class)->except(['show']);
-
-Route::get('/inventory-categories', [App\Http\Controllers\InventoryItemController::class, 'categories'])->name('service-inventory.category');
-
-
-
 // Auth & Profile (Member)
 Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
 Route::post('/register', [AuthController::class, 'register']);
