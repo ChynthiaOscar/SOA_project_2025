@@ -10,7 +10,7 @@ class ChefController extends Controller
     public function chefTasks(Request $request)
     {
         // $token = $request->bearerToken();
-        $token = "token";
+        $token = session('user.accessToken');
 
         $employee = Http::withToken($token)->get('http://50.19.17.50:8002/employee/me')->json()['data'];
 
@@ -26,9 +26,7 @@ class ChefController extends Controller
     {
         $payload = ['status' => 'done'];
 
-        Http::put('http://50.19.17.50:8002/tasks/' . $request->task_id, $payload);
-
-
+        Http::put('http://50.19.17.50:8002/tasks/' . $request->task_id . '/edit', $payload);
         return redirect()->back();
     }
 }
