@@ -13,36 +13,51 @@
 </head>
 <body class="relative">
 
-  <!-- Navbar -->
-  <nav id="navbar" class="fixed top-0 left-0 w-full z-50 transition-bg bg-transparent text-white">
-    <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
-      <!-- Logo -->
-      <div class="text-xl font-bold">Logo</div>
-
-        <!-- Center -->
-     <div class="hidden md:flex gap-6 text-base" id="nav-menu">
-        <a href="#" 
-            class="nav-link relative text-[#d4af37] after:block after:content-[''] after:h-[1px] after:bg-[#d4af37] after:w-full after:mt-1"
-            data-link="Home">Home</a>
-        <a href="#" 
-            class="nav-link text-[#7d661c]" 
-            data-link="About">About</a>
-        <a href="#" 
-            class="nav-link text-[#7d661c]" 
-            data-link="Services">Services</a>
-        <a href="#" 
-            class="nav-link text-[#7d661c]" 
-            data-link="Contact">Contact</a>
+  @if(session('member'))
+    {{-- Navbar untuk user yang sudah login --}}
+    <nav id="navbar" class="fixed top-0 left-0 w-full z-50 transition-bg bg-transparent text-white">
+      <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+        <!-- Logo -->
+        <div>
+            <img src="{{ asset('images/logo.png') }}" alt="YÙ JADE Logo" class="h-12 w-auto">
         </div>
-
-      <!-- Order Now -->
-      <div>
-        <button class="font-serif bg-[#7a0c0c] text-[#d4af37] border border-[#d4af37] rounded-full px-6 py-2 text-[16px] font-semibold shadow-xl transition transform hover:translate-y-0.5 active:translate-y-1 hover:shadow-lg active:shadow-sm">
-        BOOK NOW
-        </button>
+        <!-- Center -->
+        <div class="hidden md:flex gap-6 text-base" id="nav-menu">
+          <a href="#" class="nav-link {{ request()->is('/') ? 'relative text-[#d4af37] after:block after:content-[\'\'] after:h-[1px] after:bg-[#d4af37] after:w-full after:mt-1' : 'text-[#7d661c]' }}" data-link="Home">Home</a>
+          <a href="#" class="nav-link {{ request()->is('order*') ? 'relative text-[#d4af37] after:block after:content-[\'\'] after:h-[1px] after:bg-[#d4af37] after:w-full after:mt-1' : 'text-[#7d661c]' }}" data-link="Order">Order</a>
+          <a href="#" class="nav-link {{ request()->is('reservation*') ? 'relative text-[#d4af37] after:block after:content-[\'\'] after:h-[1px] after:bg-[#d4af37] after:w-full after:mt-1' : 'text-[#7d661c]' }}" data-link="Services">Reservation</a>
+          <a href="#" class="nav-link {{ request()->is('event*') ? 'relative text-[#d4af37] after:block after:content-[\'\'] after:h-[1px] after:bg-[#d4af37] after:w-full after:mt-1' : 'text-[#7d661c]' }}" data-link="Event">Event</a>
+          <a href="#" class="nav-link {{ request()->is('delivery*') ? 'relative text-[#d4af37] after:block after:content-[\'\'] after:h-[1px] after:bg-[#d4af37] after:w-full after:mt-1' : 'text-[#7d661c]' }}" data-link="Delivery">Delivery</a>
+          <a href="{{ route('profile') }}" class="nav-link {{ request()->is('profile') ? 'relative text-[#d4af37] after:block after:content-[\'\'] after:h-[1px] after:bg-[#d4af37] after:w-full after:mt-1' : 'text-[#7d661c]' }}" data-link="Profile">Profile</a>
+        </div>
+        <!-- Order Now -->
+        <div>
+          <form action="{{ route('logout') }}" method="POST">
+            @csrf
+            <button type="submit" class="font-serif bg-[#7a0c0c] text-[#d4af37] border border-[#d4af37] rounded-full px-6 py-2 text-[16px] font-semibold shadow-xl transition transform active:translate-y-0.5 hover:shadow-lg active:shadow-sm">
+              LOGOUT
+            </button>
+          </form>
+        </div>
       </div>
-    </div>
-  </nav>
+    </nav>
+  @else
+    {{-- Navbar lama untuk user yang belum login --}}
+    <nav id="navbar" class="fixed top-0 left-0 w-full z-50 transition-bg bg-transparent text-white">
+      <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+        <!-- Logo -->
+        <div class="text-xl font-bold">Logo</div>
+        <!-- Order Now -->
+        <div>
+          <a href="{{ route('login') }}">
+            <button type="button" onclick="window.location='{{ route('login') }}'" class="font-serif bg-[#7a0c0c] text-[#d4af37] border border-[#d4af37] rounded-full px-6 py-2 text-[16px] font-semibold shadow-xl transition transform hover:translate-y-0.5 active:translate-y-1 hover:shadow-lg active:shadow-sm">
+              LOGIN
+            </button>
+          </a>
+        </div>
+      </div>
+    </nav>
+  @endif
 
   <script>
     //navbar trans
@@ -50,10 +65,10 @@
     window.addEventListener('scroll', () => {
       if (window.scrollY > 10) {
         navbar.classList.remove('bg-transparent');
-        navbar.classList.add('bg-black/30');
+        navbar.classList.add('bg-[#131313]/100');
       } else {
         navbar.classList.add('bg-transparent');
-        navbar.classList.remove('bg-black/30');
+        navbar.classList.remove('bg-[#131313]/100');
       }
     });
 

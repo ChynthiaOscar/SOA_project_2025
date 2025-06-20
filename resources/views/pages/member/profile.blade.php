@@ -45,27 +45,18 @@
         {{-- Actions --}}
         <div class="flex flex-col sm:flex-row gap-4 justify-center mt-10 w-full">
             <a href="{{ route('profile.edit') }}"
-            class="bg-[#E2BB4D] text-[#65090D] hover:bg-yellow-600 hover:text-white font-bold px-8 py-4 rounded-full transition text-base text-center w-full sm:w-auto">
+               class="bg-[#E2BB4D] text-[#65090D] hover:bg-yellow-600 hover:text-white font-bold px-8 py-4 rounded-full transition text-base text-center w-full sm:w-auto">
                 Edit Profile
             </a>
-
-            <form action="{{ route('logout') }}" method="POST" class="w-full sm:w-auto">
+            <form action="{{ route('profile.destroy') }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus akun? Tindakan ini tidak dapat dibatalkan.');" class="w-full sm:w-auto flex justify-center items-center">
                 @csrf
+                @method('DELETE')
                 <button type="submit"
-                        class="bg-[#A67D44] text-white hover:bg-[#E2BB4D] hover:text-[#65090D] font-bold px-8 py-4 rounded-full transition text-base w-full sm:w-auto">
-                    Logout
+                        class="bg-red-800 text-white hover:bg-red-700 font-bold px-8 py-4 rounded-full transition text-base w-full sm:w-auto">
+                    Delete Account
                 </button>
             </form>
         </div>
-
-        {{-- Delete Account Form --}}
-        <form action="{{ route('profile.destroy') }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus akun? Tindakan ini tidak dapat dibatalkan.');" style="margin-top: 2rem;">
-            @csrf
-            @method('DELETE')
-            <button type="submit" class="bg-red-800 text-white hover:bg-red-700 font-bold px-8 py-4 rounded-full transition text-base w-full">
-                Delete Account
-            </button>
-        </form>
 
     </div>
 </div>

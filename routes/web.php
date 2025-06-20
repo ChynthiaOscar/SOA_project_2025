@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\ProfileController;
 
 Route::get('/', function () {
-    return redirect()->route('login');
+    return view('pages.homepage');
 });
 
 Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
