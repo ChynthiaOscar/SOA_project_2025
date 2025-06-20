@@ -28,10 +28,6 @@
                     <button onclick="showDeleteSlotModal()" class="bg-red-600 text-white px-4 py-2 rounded font-semibold">
                         Hapus Slot Waktu
                     </button>
-                    <button onclick="showDeleteAllSlotsModal()"
-                        class="bg-red-800 text-white px-4 py-2 rounded font-semibold">
-                        Hapus All Slot Waktu
-                    </button>
                 </div>
                 <form method="GET" action="{{ route('admin.slots.index') }}" class="flex items-center gap-2">
                     <input type="date" name="date" value="{{ $selectedDate }}"
@@ -47,13 +43,13 @@
                 @forelse($slots as $slot)
                     <div class="bg-[#D4AF37] text-[#1a1a1a] rounded-lg p-4 text-center">
                         <div class="font-bold text-lg">
-                            {{ \Carbon\Carbon::parse($slot->start_time)->format('H:i') }}
+                            {{ $slot['start_time'] }}
                         </div>
                         <div class="text-sm">
-                            {{ \Carbon\Carbon::parse($slot->end_time)->format('H:i') }}
+                            {{ $slot['end_time'] }}
                         </div>
                         <div class="text-xs mt-1">
-                            {{ \Carbon\Carbon::parse($slot->date)->translatedFormat('d M') }}
+                            {{ \Carbon\Carbon::parse($slot['date'])->translatedFormat('d M') }}
                         </div>
                     </div>
                 @empty
@@ -99,7 +95,7 @@
     <div id="deleteSlotModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
         <div class="bg-[#8B0000] rounded-lg p-6 w-96 mx-4">
             <h3 class="text-xl font-bold text-[#D4AF37] mb-4 text-center">HAPUS SLOT WAKTU</h3>
-            <form method="POST" action="{{ route('admin.slots.destroy', 'placeholder') }}">
+            <form id="deleteSlotForm" method="POST">
                 @csrf
                 @method('DELETE')
                 <div class="mb-6">
@@ -108,9 +104,8 @@
                         class="w-full bg-[#2a2a2a] text-white border border-[#D4AF37] rounded px-3 py-2">
                         <option value="">Pilih Slot</option>
                         @foreach ($slots as $slot)
-                            <option value="{{ $slot->id }}">
-                                {{ \Carbon\Carbon::parse($slot->start_time)->format('H:i') }} -
-                                {{ \Carbon\Carbon::parse($slot->end_time)->format('H:i') }}
+                            <option value="{{ $slot['id'] }}">
+                                {{ $slot['start_time'] }} - {{ $slot['end_time'] }}
                             </option>
                         @endforeach
                     </select>
@@ -125,29 +120,6 @@
                     </button>
                 </div>
             </form>
-        </div>
-    </div>
-
-    <!-- Delete All Slots Modal -->
-    <div id="deleteAllSlotsModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
-        <div class="bg-[#8B0000] rounded-lg p-6 w-96 mx-4">
-            <h3 class="text-xl font-bold text-[#D4AF37] mb-4 text-center">HAPUS ALL SLOT WAKTU</h3>
-            <div class="mb-6">
-                <p class="text-white text-center">
-                    Apakah Anda yakin ingin menghapus semua slot waktu pada tanggal
-                    <strong
-                        class="text-[#D4AF37]">{{ \Carbon\Carbon::parse($selectedDate)->translatedFormat('d M Y') }}</strong>?
-                </p>
-            </div>
-            <div class="flex gap-4">
-                <button type="button" onclick="hideDeleteAllSlotsModal()"
-                    class="flex-1 bg-gray-600 text-white py-2 rounded font-semibold">
-                    Batal
-                </button>
-                <button onclick="deleteAllSlots()" class="flex-1 bg-red-600 text-white py-2 rounded font-semibold">
-                    Hapus
-                </button>
-            </div>
         </div>
     </div>
 
@@ -173,46 +145,12 @@
                 document.getElementById('deleteSlotModal').classList.remove('flex');
             }
 
-            function showDeleteAllSlotsModal() {
-                document.getElementById('deleteAllSlotsModal').classList.remove('hidden');
-                document.getElementById('deleteAllSlotsModal').classList.add('flex');
-            }
-
-            function hideDeleteAllSlotsModal() {
-                document.getElementById('deleteAllSlotsModal').classList.add('hidden');
-                document.getElementById('deleteAllSlotsModal').classList.remove('flex');
-            }
-
-            function deleteAllSlots() {
-                const selectedDate = '{{ $selectedDate }}';
-
-                // Create form and submit
-                const form = document.createElement('form');
-                form.method = 'POST';
-                form.action = '{{ route('admin.slots.destroy', 'all') }}';
-
-                const csrfToken = document.createElement('input');
-                csrfToken.type = 'hidden';
-                csrfToken.name = '_token';
-                csrfToken.value = '{{ csrf_token() }}';
-
-                const methodField = document.createElement('input');
-                methodField.type = 'hidden';
-                methodField.name = '_method';
-                methodField.value = 'DELETE';
-
-                const dateField = document.createElement('input');
-                dateField.type = 'hidden';
-                dateField.name = 'date';
-                dateField.value = selectedDate;
-
-                form.appendChild(csrfToken);
-                form.appendChild(methodField);
-                form.appendChild(dateField);
-
-                document.body.appendChild(form);
-                form.submit();
-            }
+            // Handle delete slot selection
+            document.querySelector('#deleteSlotForm select[name="slot_id"]').addEventListener('change', function() {
+                if (this.value) {
+                    document.getElementById('deleteSlotForm').action = `/admin/slots/${this.value}`;
+                }
+            });
         </script>
     @endpush
 @endsection

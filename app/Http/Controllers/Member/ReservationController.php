@@ -17,40 +17,107 @@ class ReservationController extends Controller
         $this->reservationServiceUrl = 'http://52.5.201.24:8002';
     }
 
-    private function getAuthHeaders(Request $request)
+    private function getAuthHeaders()
     {
-        $user = $request->get('auth_user');
+        $member = session('member');
+        if (!$member || !isset($member['token'])) {
+            return null;
+        }
+
         return [
-            'Authorization' => 'Bearer ' . $user['token'],
+            'Authorization' => 'Bearer ' . $member['token'],
             'Content-Type' => 'application/json',
         ];
     }
 
-    public function index(Request $request)
+    private function getMemberData()
     {
-        $user = $request->get('auth_user');
-        
+        $member = session('member');
+        if (!$member) {
+            return null;
+        }
+
+        return [
+            'id' => $member['id'],
+            'token' => $member['token'] ?? null,
+            'email' => $member['email'] ?? null,
+            'nama' => $member['nama'] ?? null,
+        ];
+    }
+
+    public function index()
+    {
+        $headers = $this->getAuthHeaders();
+        $member = $this->getMemberData();
+
+        if (!$headers || !$member) {
+            return redirect()->route('login')->withErrors(['error' => 'Please login to access reservations.']);
+        }
+
         try {
-            $response = Http::withHeaders($this->getAuthHeaders($request))
+            $response = Http::withHeaders($headers)
                 ->get($this->reservationServiceUrl . '/reservation/history', [
-                    'user_id' => $user['id']
+                    'user_id' => $member['id']
                 ]);
 
             if ($response->ok()) {
-                $reservations = $response->json('reservations', []);
-                return view('pages.member.reservation.index', compact('reservations'));
+                $data = $response->json();
+                $reservations = $data['reservations'] ?? [];
+
+                // Transform reservations for view
+                $transformedReservations = collect($reservations)->map(function ($reservation) {
+                    return (object) [
+                        'id' => $reservation['id'],
+                        'user_id' => $reservation['user_id'],
+                        'reservation_date' => Carbon::parse($reservation['reservation_date']),
+                        'guest_count' => $reservation['guest_count'],
+                        'table_count' => $reservation['table_count'],
+                        'dp_amount' => $reservation['dp_amount'],
+                        'minimal_charge' => $reservation['minimal_charge'],
+                        'status' => $reservation['status'],
+                        'payment_time' => $reservation['payment_time'] ? Carbon::parse($reservation['payment_time']) : null,
+                        'payment_method' => $reservation['payment_method'],
+                        'note' => $reservation['note'],
+                        'created_at' => Carbon::parse($reservation['created_at']),
+                        'slotTimes' => collect($reservation['slot_times'] ?? [])->map(function ($slot) {
+                            return (object) [
+                                'id' => $slot['id'],
+                                'start_time' => $slot['start_time'],
+                                'end_time' => $slot['end_time'],
+                            ];
+                        }),
+                        'tables' => collect($reservation['tables'] ?? [])->map(function ($table) {
+                            return (object) [
+                                'id' => $table['id'],
+                                'number' => $table['number'],
+                                'seat_count' => $table['seat_count'],
+                            ];
+                        }),
+                        'formatted_slot_times' => collect($reservation['slot_times'] ?? [])->map(function ($slot) {
+                            return $slot['start_time'] . ' - ' . $slot['end_time'];
+                        })->implode(', '),
+                        'table_numbers' => collect($reservation['tables'] ?? [])->pluck('number')->toArray(),
+                    ];
+                });
+
+                return view('pages.member.reservation.index', compact('transformedReservations'));
             } else {
                 Log::error('Failed to fetch reservations: ' . $response->body());
-                return view('pages.member.reservation.index', ['reservations' => []]);
+                return view('pages.member.reservation.index', ['transformedReservations' => collect()]);
             }
         } catch (\Exception $e) {
             Log::error('Reservation index error: ' . $e->getMessage());
-            return view('pages.member.reservation.index', ['reservations' => []]);
+            return view('pages.member.reservation.index', ['transformedReservations' => collect()]);
         }
     }
 
     public function create()
     {
+        $member = $this->getMemberData();
+        if (!$member) {
+            return redirect()->route('login')->withErrors(['error' => 'Please login to make reservations.']);
+        }
+
         // Generate available dates (H-1 to H-7)
         $dates = [];
         for ($i = 1; $i <= 7; $i++) {
@@ -72,6 +139,13 @@ class ReservationController extends Controller
             'guest_count' => 'required|integer|min:1',
         ]);
 
+        $headers = $this->getAuthHeaders();
+        $member = $this->getMemberData();
+
+        if (!$headers || !$member) {
+            return redirect()->route('login')->withErrors(['error' => 'Please login to continue.']);
+        }
+
         $reservationDate = $request->reservation_date;
         $guestCount = $request->guest_count;
         $tableCount = ceil($guestCount / 4);
@@ -86,15 +160,16 @@ class ReservationController extends Controller
 
         try {
             // Get available slots from reservation service
-            $response = Http::withHeaders($this->getAuthHeaders($request))
+            $response = Http::withHeaders($headers)
                 ->get($this->reservationServiceUrl . '/slots/available', [
                     'date' => $reservationDate,
                     'required_tables' => $tableCount
                 ]);
 
             if ($response->ok()) {
-                $availableSlots = $response->json('slots', []);
-                
+                $data = $response->json();
+                $availableSlots = $data['slots'] ?? [];
+
                 return view('pages.member.reservation.select_time', [
                     'reservationDate' => $reservationDate,
                     'guestCount' => $guestCount,
@@ -120,6 +195,13 @@ class ReservationController extends Controller
             'slot_time_ids.*' => 'integer',
         ]);
 
+        $headers = $this->getAuthHeaders();
+        $member = $this->getMemberData();
+
+        if (!$headers || !$member) {
+            return redirect()->route('login')->withErrors(['error' => 'Please login to continue.']);
+        }
+
         // Store in session for back navigation
         session([
             'reservation_step2' => [
@@ -133,7 +215,7 @@ class ReservationController extends Controller
 
         try {
             // Get slot details and calculate costs
-            $response = Http::withHeaders($this->getAuthHeaders($request))
+            $response = Http::withHeaders($headers)
                 ->post($this->reservationServiceUrl . '/reservation/calculate', [
                     'slot_time_ids' => $request->slot_time_ids,
                     'table_count' => $request->table_count
@@ -141,12 +223,14 @@ class ReservationController extends Controller
 
             if ($response->ok()) {
                 $calculation = $response->json();
-                
+
                 return view('pages.member.reservation.confirm', [
                     'reservationDate' => $request->reservation_date,
                     'guestCount' => $request->guest_count,
                     'tableCount' => $request->table_count,
-                    'slotTimes' => $calculation['slot_times'],
+                    'slotTimes' => collect($calculation['slot_times'])->map(function ($slot) {
+                        return (object) $slot;
+                    }),
                     'slotTimeIds' => $request->slot_time_ids,
                     'dpAmount' => $calculation['dp_amount'],
                     'minimalCharge' => $calculation['minimal_charge'],
@@ -171,12 +255,17 @@ class ReservationController extends Controller
             'note' => 'nullable|string|max:500',
         ]);
 
-        $user = $request->get('auth_user');
+        $headers = $this->getAuthHeaders();
+        $member = $this->getMemberData();
+
+        if (!$headers || !$member) {
+            return redirect()->route('login')->withErrors(['error' => 'Please login to continue.']);
+        }
 
         try {
-            $response = Http::withHeaders($this->getAuthHeaders($request))
+            $response = Http::withHeaders($headers)
                 ->post($this->reservationServiceUrl . '/reservation', [
-                    'user_id' => $user['id'],
+                    'user_id' => $member['id'],
                     'reservation_date' => $request->reservation_date,
                     'guest_count' => $request->guest_count,
                     'table_count' => $request->table_count,
@@ -185,15 +274,16 @@ class ReservationController extends Controller
                 ]);
 
             if ($response->ok()) {
-                $reservation = $response->json('reservation');
-                
+                $data = $response->json();
+                $reservation = $data['reservation'];
+
                 // Clear session data after successful creation
                 session()->forget(['reservation_step1', 'reservation_step2']);
 
                 return redirect()->route('member.reservations.status', $reservation['id'])
                     ->with('success', 'Reservation created successfully and waiting for admin confirmation.');
             } else {
-                $error = $response->json('message', 'Failed to create reservation.');
+                $error = $response->json()['error'] ?? 'Failed to create reservation.';
                 return back()->withErrors(['error' => $error]);
             }
         } catch (\Exception $e) {
@@ -202,23 +292,64 @@ class ReservationController extends Controller
         }
     }
 
-    public function status(Request $request, $reservationId)
+    public function status($reservationId)
     {
-        $user = $request->get('auth_user');
+        $headers = $this->getAuthHeaders();
+        $member = $this->getMemberData();
+
+        if (!$headers || !$member) {
+            return redirect()->route('login')->withErrors(['error' => 'Please login to continue.']);
+        }
 
         try {
-            $response = Http::withHeaders($this->getAuthHeaders($request))
+            $response = Http::withHeaders($headers)
                 ->get($this->reservationServiceUrl . "/reservation/{$reservationId}", [
-                    'user_id' => $user['id']
+                    'user_id' => $member['id']
                 ]);
 
             if ($response->ok()) {
-                $reservation = $response->json('reservation');
-                
+                $data = $response->json();
+                $reservationData = $data['reservation'];
+
                 // Check if user owns this reservation
-                if ($reservation['user_id'] != $user['id']) {
+                if ($reservationData['user_id'] != $member['id']) {
                     abort(403);
                 }
+
+                // Transform reservation data
+                $reservation = (object) [
+                    'id' => $reservationData['id'],
+                    'user_id' => $reservationData['user_id'],
+                    'reservation_date' => Carbon::parse($reservationData['reservation_date']),
+                    'guest_count' => $reservationData['guest_count'],
+                    'table_count' => $reservationData['table_count'],
+                    'dp_amount' => $reservationData['dp_amount'],
+                    'minimal_charge' => $reservationData['minimal_charge'],
+                    'status' => $reservationData['status'],
+                    'payment_time' => $reservationData['payment_time'] ? Carbon::parse($reservationData['payment_time']) : null,
+                    'payment_method' => $reservationData['payment_method'],
+                    'note' => $reservationData['note'],
+                    'created_at' => Carbon::parse($reservationData['created_at']),
+                    'slotTimes' => collect($reservationData['slot_times'] ?? [])->map(function ($slot) {
+                        return (object) [
+                            'id' => $slot['id'],
+                            'start_time' => $slot['start_time'],
+                            'end_time' => $slot['end_time'],
+                        ];
+                    }),
+                    'tables' => collect($reservationData['tables'] ?? [])->map(function ($table) {
+                        return (object) [
+                            'id' => $table['id'],
+                            'number' => $table['number'],
+                            'seat_count' => $table['seat_count'],
+                        ];
+                    }),
+                    'table_numbers' => collect($reservationData['tables'] ?? [])->pluck('number')->toArray(),
+                    'user' => (object) [
+                        'name' => $member['nama'],
+                        'phone' => null // Add phone if available in member data
+                    ]
+                ];
 
                 return view('pages.member.reservation.status', compact('reservation'));
             } else {
@@ -238,24 +369,49 @@ class ReservationController extends Controller
             'payment_method' => 'required|in:bca,gopay,ovo,qris',
         ]);
 
-        $user = $request->get('auth_user');
+        $headers = $this->getAuthHeaders();
+        $member = $this->getMemberData();
+
+        if (!$headers || !$member) {
+            return redirect()->route('login')->withErrors(['error' => 'Please login to continue.']);
+        }
 
         try {
-            // Call payment service to process payment
-            $paymentResponse = Http::withHeaders($this->getAuthHeaders($request))
-                ->post(env('PAYMENT_SERVICE_URL') . '/payment/process', [
-                    'reservation_id' => $reservationId,
-                    'user_id' => $user['id'],
-                    'payment_method' => $request->payment_method,
-                    'amount_type' => 'dp'
+            // First get reservation details to get DP amount
+            $reservationResponse = Http::withHeaders($headers)
+                ->get($this->reservationServiceUrl . "/reservation/{$reservationId}", [
+                    'user_id' => $member['id']
                 ]);
 
-            if ($paymentResponse->ok() && $paymentResponse->json('success')) {
+            if (!$reservationResponse->ok()) {
+                return back()->withErrors(['error' => 'Reservation not found.']);
+            }
+
+            $reservationData = $reservationResponse->json()['reservation'];
+
+            // Call payment service to process payment
+            $paymentData = [
+                'customer_id' => $member['id'],
+                'requester_type' => 1, // 1 for reservation
+                'requester_id' => $reservationId,
+                'secondary_requester_id' => null,
+                'payment_method' => $request->payment_method,
+                'payment_amount' => $reservationData['dp_amount']
+            ];
+
+            $paymentResponse = Http::withHeaders([
+                'Authorization' => 'order123',
+                'Content-Type' => 'application/json',
+            ])->post('http://50.19.17.50:8002/payment', $paymentData);
+
+            if ($paymentResponse->ok() && $paymentResponse->json()['status'] === 'success') {
+                $paymentResult = $paymentResponse->json();
+
                 // Update reservation status to paid
-                $updateResponse = Http::withHeaders($this->getAuthHeaders($request))
+                $updateResponse = Http::withHeaders($headers)
                     ->patch($this->reservationServiceUrl . "/reservation/{$reservationId}/payment", [
                         'payment_method' => $request->payment_method,
-                        'payment_reference' => $paymentResponse->json('payment_reference')
+                        'payment_reference' => $paymentResult['payment_id']
                     ]);
 
                 if ($updateResponse->ok()) {
@@ -271,21 +427,26 @@ class ReservationController extends Controller
         }
     }
 
-    public function cancel(Request $request, $reservationId)
+    public function cancel($reservationId)
     {
-        $user = $request->get('auth_user');
+        $headers = $this->getAuthHeaders();
+        $member = $this->getMemberData();
+
+        if (!$headers || !$member) {
+            return redirect()->route('login')->withErrors(['error' => 'Please login to continue.']);
+        }
 
         try {
-            $response = Http::withHeaders($this->getAuthHeaders($request))
+            $response = Http::withHeaders($headers)
                 ->patch($this->reservationServiceUrl . "/reservation/{$reservationId}/cancel", [
-                    'user_id' => $user['id']
+                    'user_id' => $member['id']
                 ]);
 
             if ($response->ok()) {
                 return redirect()->route('member.reservations.index')
                     ->with('success', 'Reservation cancelled successfully.');
             } else {
-                $error = $response->json('message', 'Failed to cancel reservation.');
+                $error = $response->json()['error'] ?? 'Failed to cancel reservation.';
                 return back()->withErrors(['error' => $error]);
             }
         } catch (\Exception $e) {
@@ -294,22 +455,63 @@ class ReservationController extends Controller
         }
     }
 
-    public function confirmed(Request $request, $reservationId)
+    public function confirmed($reservationId)
     {
-        $user = $request->get('auth_user');
+        $headers = $this->getAuthHeaders();
+        $member = $this->getMemberData();
+
+        if (!$headers || !$member) {
+            return redirect()->route('login')->withErrors(['error' => 'Please login to continue.']);
+        }
 
         try {
-            $response = Http::withHeaders($this->getAuthHeaders($request))
+            $response = Http::withHeaders($headers)
                 ->get($this->reservationServiceUrl . "/reservation/{$reservationId}", [
-                    'user_id' => $user['id']
+                    'user_id' => $member['id']
                 ]);
 
             if ($response->ok()) {
-                $reservation = $response->json('reservation');
-                
-                if ($reservation['user_id'] != $user['id']) {
+                $data = $response->json();
+                $reservationData = $data['reservation'];
+
+                if ($reservationData['user_id'] != $member['id']) {
                     abort(403);
                 }
+
+                // Transform reservation data
+                $reservation = (object) [
+                    'id' => $reservationData['id'],
+                    'user_id' => $reservationData['user_id'],
+                    'reservation_date' => Carbon::parse($reservationData['reservation_date']),
+                    'guest_count' => $reservationData['guest_count'],
+                    'table_count' => $reservationData['table_count'],
+                    'dp_amount' => $reservationData['dp_amount'],
+                    'minimal_charge' => $reservationData['minimal_charge'],
+                    'status' => $reservationData['status'],
+                    'payment_time' => $reservationData['payment_time'] ? Carbon::parse($reservationData['payment_time']) : null,
+                    'payment_method' => $reservationData['payment_method'],
+                    'note' => $reservationData['note'],
+                    'created_at' => Carbon::parse($reservationData['created_at']),
+                    'slotTimes' => collect($reservationData['slot_times'] ?? [])->map(function ($slot) {
+                        return (object) [
+                            'id' => $slot['id'],
+                            'start_time' => $slot['start_time'],
+                            'end_time' => $slot['end_time'],
+                        ];
+                    }),
+                    'tables' => collect($reservationData['tables'] ?? [])->map(function ($table) {
+                        return (object) [
+                            'id' => $table['id'],
+                            'number' => $table['number'],
+                            'seat_count' => $table['seat_count'],
+                        ];
+                    }),
+                    'table_numbers' => collect($reservationData['tables'] ?? [])->pluck('number')->toArray(),
+                    'user' => (object) [
+                        'name' => $member['nama'],
+                        'phone' => null
+                    ]
+                ];
 
                 return view('pages.member.reservation.confirmed', compact('reservation'));
             } else {
@@ -323,14 +525,11 @@ class ReservationController extends Controller
         }
     }
 
-    public function getMinimalCharge(Request $request, $reservationId)
+    public function getMinimalCharge($reservationId)
     {
         // This endpoint will be called by order service to get minimal charge
-        $user = $request->get('auth_user');
-
         try {
-            $response = Http::withHeaders($this->getAuthHeaders($request))
-                ->get($this->reservationServiceUrl . "/reservation/{$reservationId}/minimal-charge");
+            $response = Http::get($this->reservationServiceUrl . "/reservation/{$reservationId}/minimal-charge");
 
             if ($response->ok()) {
                 return response()->json($response->json());

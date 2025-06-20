@@ -42,6 +42,18 @@
                 <i class="far fa-clock text-[#e0a93a] text-sm"></i>
                 <span>Attendance</span>
             </a>
+            <a href="{{ route('admin.reservations.index') }}" class="flex items-center space-x-3">
+                <i class="fas fa-calendar-alt text-[#e0a93a] text-sm"></i>
+                <span>Reservations</span>
+            </a>
+            <a href="{{ route('admin.tables.index') }}" class="flex items-center space-x-3">
+                <i class="fas fa-table text-[#e0a93a] text-sm"></i>
+                <span>Tables</span>
+            </a>
+            <a href="{{ route('admin.slots.index') }}" class="flex items-center space-x-3">
+                <i class="far fa-clock text-[#e0a93a] text-sm"></i>
+                <span>Time Slots</span>
+            </a>
             <a href="{{ route('employee.profile') }}" class="flex items-center space-x-3">
                 <i class="far fa-id-card text-[#e0a93a] text-sm"></i>
                 <span>Profile</span>

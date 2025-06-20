@@ -1,7 +1,5 @@
 <?php
 
-use App\Http\Controllers\ChefController;
-use App\Http\Controllers\KitchenController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\MenuController;
@@ -11,9 +9,10 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\MenuRecipeController;
 use App\Http\Controllers\MenuCategoryController;
-use App\Http\Controllers\PromoController;
-use App\Http\Controllers\VoucherController;
-use App\Http\Controllers\PromoVoucherHomeController;
+use App\Http\Controllers\Member\ReservationController;
+use App\Http\Controllers\Admin\ReservationController as AdminReservationController;
+use App\Http\Controllers\Admin\TableController as AdminTableController;
+use App\Http\Controllers\Admin\SlotTimeController as AdminSlotTimeController;
 
 Route::get('/', function () {
     return view('pages.homepage');
@@ -34,6 +33,56 @@ Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.e
 Route::post('/profile/update', [ProfileController::class, 'update'])->name('profile.update');
 Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
+// Member Dashboard
+Route::middleware(['auth.reservation'])->group(function () {
+    Route::get('/member/dashboard', function () {
+        return view('pages.member.dashboard');
+    })->name('member.dashboard');
+});
+
+// Member Reservations - Updated to use session-based authentication
+Route::prefix('member/reservations')->name('member.reservations.')->group(function () {
+    Route::get('/', [ReservationController::class, 'index'])->name('index');
+    Route::get('/create', [ReservationController::class, 'create'])->name('create');
+    Route::post('/select-time', [ReservationController::class, 'selectTime'])->name('select-time');
+    Route::post('/confirm', [ReservationController::class, 'confirm'])->name('confirm');
+    Route::post('/store', [ReservationController::class, 'store'])->name('store');
+    Route::get('/{reservationId}/status', [ReservationController::class, 'status'])->name('status');
+    Route::post('/{reservationId}/pay', [ReservationController::class, 'pay'])->name('pay');
+    Route::post('/{reservationId}/cancel', [ReservationController::class, 'cancel'])->name('cancel');
+    Route::get('/{reservationId}/confirmed', [ReservationController::class, 'confirmed'])->name('confirmed');
+    Route::get('/{reservationId}/minimal-charge', [ReservationController::class, 'getMinimalCharge'])->name('minimal-charge');
+});
+
+// Admin Dashboard
+Route::middleware(['role:manager'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/dashboard', function () {
+        return view('pages.admin.dashboard');
+    })->name('dashboard');
+
+    // Reservation Management
+    Route::prefix('reservations')->name('reservations.')->group(function () {
+        Route::get('/', [AdminReservationController::class, 'index'])->name('index');
+        Route::post('/{reservationId}/approve', [AdminReservationController::class, 'approve'])->name('approve');
+        Route::post('/{reservationId}/reject', [AdminReservationController::class, 'reject'])->name('reject');
+    });
+
+    // Table Management
+    Route::prefix('tables')->name('tables.')->group(function () {
+        Route::get('/', [AdminTableController::class, 'index'])->name('index');
+        Route::post('/', [AdminTableController::class, 'store'])->name('store');
+        Route::put('/{tableId}', [AdminTableController::class, 'update'])->name('update');
+        Route::delete('/{tableId}', [AdminTableController::class, 'destroy'])->name('destroy');
+    });
+
+    // Slot Time Management
+    Route::prefix('slots')->name('slots.')->group(function () {
+        Route::get('/', [AdminSlotTimeController::class, 'index'])->name('index');
+        Route::post('/', [AdminSlotTimeController::class, 'store'])->name('store');
+        Route::delete('/{slotId}', [AdminSlotTimeController::class, 'destroy'])->name('destroy');
+    });
+});
+
 // Menu Management
 Route::get('/menu', function () {
     return view('pages.service-menu.customer_pages.all-menu');
@@ -53,7 +102,6 @@ Route::get('/menu-category', [MenuCategoryController::class, 'index'])->name('me
 Route::post('/store_category', [MenuCategoryController::class, 'store'])->name('store.category');
 Route::put('/update_category/{id}', [MenuCategoryController::class, 'update'])->name('update.category');
 Route::delete('/delete_category/{id}', [MenuCategoryController::class, 'destroy'])->name('delete.category');
-// menu
 
 //Employee
 Route::prefix('employee')->group(function () {
@@ -83,18 +131,18 @@ Route::prefix('employee')->group(function () {
         Route::get('/dashboard', [ManagerController::class, 'index'])->name('dashboard');
 
         // Employee Management
-        Route::get('/employee_data', [ManagerController::class, 'showEmployees'])->name('manager.employee_data');
+        Route::get('/employee_data', [ManagerController::class, 'showEmployees'])->name('employee_data');
         Route::get('/employee/{id}/edit', [ManagerController::class, 'editEmployee'])->name('employee.edit');
 
         // Schedule
-        Route::get('/schedule', [ManagerController::class, 'scheduleView'])->name('manager.schedule');
+        Route::get('/schedule', [ManagerController::class, 'scheduleView'])->name('schedule');
         Route::get('/schedule/add', [ManagerController::class, 'createSingleSchedule'])->name('schedule.single.create');
         Route::get('/schedule/add-batch', [ManagerController::class, 'createBatchSchedule'])->name('schedule.batch.create');
         Route::post('/schedule', [ManagerController::class, 'storeSingleSchedule'])->name('schedule.single.store');
         Route::post('/schedule/batch', [ManagerController::class, 'storeBatchSchedule'])->name('schedule.batch.store');
 
         // Attendance
-        Route::get('/attendance', [ManagerController::class, 'attendanceView'])->name('manager.attendance');
+        Route::get('/attendance', [ManagerController::class, 'attendanceView'])->name('attendance');
     });
 });
 
@@ -108,11 +156,8 @@ Route::prefix('api')->group(function () {
 
     Route::put('/employee/schedule/{id}', [ManagerController::class, 'updateSchedule'])->name('manager.schedule.update');
 });
-// Batas Routes untuk Employee
-
 
 // routes untuk payment 
-
 Route::prefix('payment')->group(function () {
     // Success page
     Route::get('/success', [PaymentController::class, 'ShowSuccess'])->name('payment.success');
@@ -123,39 +168,48 @@ Route::prefix('payment')->group(function () {
 
     // Gopay
     Route::get('/gopay', [PaymentController::class, 'ShowGopay'])->name('payment.gopay');
-    Route::get('/gopay/generate-qr', [PaymentController::class, 'generateGopayQr'])->name('payment.gopay.generate');
+    Route::post('/gopay/generate-qr', [PaymentController::class, 'generateGopayQr'])->name('payment.gopay.generate');
 
     // QRIS
     Route::get('/qris', [PaymentController::class, 'ShowQris'])->name('payment.qris');
-    Route::get('/qris/generate-qr', [PaymentController::class, 'generateQrisQr'])->name('payment.qris.generate');
+    Route::post('/qris/generate-qr', [PaymentController::class, 'generateQrisQr'])->name('payment.qris.generate');
 
     // Tunai
-    Route::get('/tunai',[PaymentController::class, 'ShowTunai'])->name('payment.tunai');
+    Route::get('/tunai', [PaymentController::class, 'ShowTunai'])->name('payment.tunai');
     Route::post('/tunai/confirm', [PaymentController::class, 'confirmPaymentTunai'])->name('payment.tunai.confirm');
 
     // BCA VA
-    Route::get('/BCA_VA', [PaymentController::class, 'ShowBCA_VA'])->name('payment.BCA_VA');
-    Route::get('/BCA_VA/generate-va', [PaymentController::class, 'generateBCA_VA'])->name('payment.BCA_VA.generate');
+    Route::get('/BCA_VA', [PaymentController::class, 'ShowBCA_VA'])->name('payment.bca');
+    Route::post('/BCA_VA/generate-va', [PaymentController::class, 'generateBCA_VA'])->name('payment.bca.generate');
 
     // Get Payment Status
-    Route::get('/getstatus/{payment_id}', [PaymentController::class, 'getStatustoPayment'])->name('payment.getstatus');
+    Route::get('/{payment_id}/check-status', [PaymentController::class, 'getStatustoPayment'])->name('payment.check-status');
 
     // Cancel Payment
     Route::delete('/cancel', [PaymentController::class, 'cancelPayment'])->name('payment.cancel');
 });
 
+// Promo & Voucher Routes
+Route::get('/promo', [\App\Http\Controllers\PromoVoucherHomeController::class, 'index'])->name('promoHome');
 
-// Voucher & Promo Management
-Route::get('/promo', function () {
-    return view('pages.voucher-promo.promoHome');
+Route::prefix('promo')->group(function () {
+    Route::get('/create', [\App\Http\Controllers\PromoController::class, 'create']);
+    Route::post('/store', [\App\Http\Controllers\PromoController::class, 'store']);
 });
 
-Route::get('/promo', [PromoVoucherHomeController::class, 'index'])->name('promoHome');
+Route::prefix('promos')->group(function () {
+    Route::get('/{id}/edit', [\App\Http\Controllers\PromoController::class, 'edit']);
+    Route::put('/{id}', [\App\Http\Controllers\PromoController::class, 'update'])->name('promos.update');
+    Route::delete('/{id}', [\App\Http\Controllers\PromoController::class, 'destroy']);
+});
 
-Route::get('/promo/create', [PromoController::class, 'create']);
-Route::post('/promo/store', [PromoController::class, 'store']);
-Route::resource('promos', PromoController::class);
+Route::prefix('voucher')->group(function () {
+    Route::get('/create', [\App\Http\Controllers\VoucherController::class, 'create']);
+    Route::post('/store', [\App\Http\Controllers\VoucherController::class, 'store']);
+});
 
-Route::get('/voucher/create', [VoucherController::class, 'create']);
-Route::post('/voucher/store', [VoucherController::class, 'store']);
-Route::resource('vouchers', VoucherController::class);
+Route::prefix('vouchers')->group(function () {
+    Route::get('/{id}/edit', [\App\Http\Controllers\VoucherController::class, 'edit']);
+    Route::put('/{id}', [\App\Http\Controllers\VoucherController::class, 'update'])->name('vouchers.update');
+    Route::delete('/{id}', [\App\Http\Controllers\VoucherController::class, 'destroy']);
+});

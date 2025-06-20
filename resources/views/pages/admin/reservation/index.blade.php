@@ -35,22 +35,22 @@
                 @forelse($reservations as $reservation)
                     <div class="bg-[#8B0000] rounded-lg p-4">
                         <h4 class="text-[#D4AF37] font-bold text-lg mb-2">
-                            PESAN {{ $reservation->table_count }} MEJA
+                            PESAN {{ $reservation['table_count'] }} MEJA
                         </h4>
                         <div class="text-white text-sm space-y-1 mb-4">
-                            @foreach ($reservation->slotTimes as $slot)
-                                <p>{{ \Carbon\Carbon::parse($slot->start_time)->format('H:i') }} -
-                                    {{ \Carbon\Carbon::parse($slot->end_time)->format('H:i') }}</p>
-                            @endforeach
-                            <p class="font-semibold">{{ $reservation->user->name }}</p>
-                            <p>{{ $reservation->user->email }}</p>
-                            <p class="text-yellow-300">{{ $reservation->guest_count }} orang</p>
-                            @if ($reservation->user->phone)
-                                <p>{{ $reservation->user->phone }}</p>
+                            @if (isset($reservation['slot_times']))
+                                @foreach ($reservation['slot_times'] as $slot)
+                                    <p>{{ $slot['start_time'] }} - {{ $slot['end_time'] }}</p>
+                                @endforeach
+                            @endif
+                            <p class="font-semibold">User ID: {{ $reservation['user_id'] }}</p>
+                            <p class="text-yellow-300">{{ $reservation['guest_count'] }} orang</p>
+                            @if (isset($reservation['note']) && $reservation['note'])
+                                <p class="text-gray-300">Note: {{ $reservation['note'] }}</p>
                             @endif
                         </div>
                         <div class="flex gap-2">
-                            <form method="POST" action="{{ route('admin.reservations.reject', $reservation->id) }}"
+                            <form method="POST" action="{{ route('admin.reservations.reject', $reservation['id']) }}"
                                 class="flex-1">
                                 @csrf
                                 <button type="submit" onclick="return confirm('Yakin ingin menolak reservasi ini?')"
@@ -58,7 +58,7 @@
                                     Tolak
                                 </button>
                             </form>
-                            <button type="button" onclick="showTableSelection({{ $reservation->id }})"
+                            <button type="button" onclick="showTableSelection({{ $reservation['id'] }})"
                                 class="flex-1 bg-[#D4AF37] text-[#1a1a1a] py-2 rounded font-semibold hover:bg-yellow-500">
                                 Terima
                             </button>
@@ -73,27 +73,13 @@
 
             <!-- Table Schedule Grid -->
             <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-                @php
-                    $timeSlots = \App\Models\SlotTime::where('date', $selectedDate)->orderBy('start_time')->get();
-                @endphp
-
                 @forelse($tables as $table)
-                    @php
-                        $occupiedSlotIds = $table->getOccupiedSlotIds($selectedDate);
-                    @endphp
-
                     <div class="bg-[#F5E6A3] text-[#1a1a1a] rounded-lg p-3">
-                        <h5 class="font-bold text-center mb-2">Meja Nomor {{ $table->number }}</h5>
-                        @foreach ($timeSlots as $slot)
-                            @php
-                                $isOccupied = in_array($slot->id, $occupiedSlotIds);
-                            @endphp
-                            <div
-                                class="text-xs text-center py-1 mb-1 rounded {{ $isOccupied ? 'bg-[#8B0000] text-white' : 'bg-[#F5E6A3] text-[#8B0000] border border-[#8B0000]' }}">
-                                {{ \Carbon\Carbon::parse($slot->start_time)->format('H:i') }} -
-                                {{ \Carbon\Carbon::parse($slot->end_time)->format('H:i') }}
-                            </div>
-                        @endforeach
+                        <h5 class="font-bold text-center mb-2">Meja Nomor {{ $table['number'] }}</h5>
+                        <p class="text-xs text-center">{{ $table['seat_count'] }} Kursi</p>
+                        <p class="text-xs text-center {{ $table['is_available'] ? 'text-green-600' : 'text-red-600' }}">
+                            {{ $table['is_available'] ? 'Tersedia' : 'Tidak Tersedia' }}
+                        </p>
                     </div>
                 @empty
                     <div class="col-span-full bg-[#2a2a2a] rounded-lg p-8 text-center">
@@ -156,34 +142,21 @@
                 const detailsHtml = `
                     <div class="bg-[#8B0000] rounded-lg p-4 text-white">
                         <h4 class="text-[#D4AF37] font-bold mb-2">Detail Reservasi:</h4>
-                        <p><strong>Pelanggan:</strong> ${reservation.user.name}</p>
+                        <p><strong>User ID:</strong> ${reservation.user_id}</p>
                         <p><strong>Tanggal:</strong> ${new Date(reservation.reservation_date).toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
                         <p><strong>Tamu:</strong> ${reservation.guest_count} orang</p>
                         <p><strong>Meja dibutuhkan:</strong> minimal ${requiredTables} meja</p>
-                        <p><strong>Slot waktu:</strong> ${reservation.slot_times.map(slot => {
-                            const startTime = slot.start_time.includes(':') ? slot.start_time : new Date('1970-01-01T' + slot.start_time).toLocaleTimeString('id-ID', {hour: '2-digit', minute: '2-digit'});
-                            const endTime = slot.end_time.includes(':') ? slot.end_time : new Date('1970-01-01T' + slot.end_time).toLocaleTimeString('id-ID', {hour: '2-digit', minute: '2-digit'});
-                            return startTime + ' - ' + endTime;
-                        }).join(', ')}</p>
+                        ${reservation.slot_times ? `<p><strong>Slot waktu:</strong> ${reservation.slot_times.map(slot => slot.start_time + ' - ' + slot.end_time).join(', ')}</p>` : ''}
                         <p class="text-yellow-300 mt-2"><strong>Catatan:</strong> Pilih minimal ${requiredTables} meja untuk menampung ${reservation.guest_count} orang</p>
                     </div>
                 `;
                 document.getElementById('reservationDetails').innerHTML = detailsHtml;
 
                 // Show available tables
-                const slotTimeIds = reservation.slot_times.map(slot => slot.id);
                 let tableHtml = '';
 
                 tables.forEach(table => {
-                    // Check if table is available for the selected slots
-                    const occupiedSlotIds = table.reservations
-                        .filter(res => res.reservation_date === reservation.reservation_date && ['confirmed', 'paid']
-                            .includes(res.status))
-                        .flatMap(res => res.slot_times.map(slot => slot.id));
-
-                    const isAvailable = !slotTimeIds.some(slotId => occupiedSlotIds.includes(slotId));
-
-                    if (isAvailable && table.is_available) {
+                    if (table.is_available) {
                         tableHtml += `
                             <label class="cursor-pointer">
                                 <input type="checkbox" name="table_ids[]" value="${table.id}" class="sr-only peer">
@@ -198,7 +171,7 @@
 
                 if (tableHtml === '') {
                     tableHtml =
-                        '<div class="col-span-full text-center text-red-400">Tidak ada meja yang tersedia untuk slot waktu ini</div>';
+                        '<div class="col-span-full text-center text-red-400">Tidak ada meja yang tersedia</div>';
                 }
 
                 document.getElementById('tableSelection').innerHTML = tableHtml;

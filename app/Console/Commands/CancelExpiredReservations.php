@@ -2,9 +2,9 @@
 
 namespace App\Console\Commands;
 
-use App\Models\Reservation;
 use Illuminate\Console\Command;
-use Carbon\Carbon;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class CancelExpiredReservations extends Command
 {
@@ -13,18 +13,20 @@ class CancelExpiredReservations extends Command
 
     public function handle()
     {
-        $expiredReservations = Reservation::where('status', 'confirmed')
-            ->where('created_at', '<=', Carbon::now()->subHour())
-            ->get();
+        try {
+            $response = Http::post('http://52.5.201.24:8002/admin/auto-cancel-expired');
 
-        $cancelledCount = 0;
-
-        foreach ($expiredReservations as $reservation) {
-            $reservation->update(['status' => 'cancelled']);
-            $cancelledCount++;
+            if ($response->ok()) {
+                $data = $response->json();
+                $cancelledCount = $data['cancelled_count'] ?? 0;
+                $this->info("Cancelled {$cancelledCount} expired reservations.");
+            } else {
+                $this->error("Failed to cancel expired reservations: " . $response->body());
+            }
+        } catch (\Exception $e) {
+            Log::error('Cancel expired reservations error: ' . $e->getMessage());
+            $this->error("Error cancelling expired reservations: " . $e->getMessage());
         }
-
-        $this->info("Cancelled {$cancelledCount} expired reservations.");
 
         return 0;
     }

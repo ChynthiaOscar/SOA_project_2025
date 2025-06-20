@@ -13,7 +13,7 @@
 
             <div class="p-6">
                 <div class="flex justify-between items-center">
-                    <p class="text-gray-600">Total Reservasi: {{ $reservations->count() }}</p>
+                    <p class="text-gray-600">Total Reservasi: {{ $transformedReservations->count() }}</p>
                     <a href="{{ route('member.reservations.create') }}"
                         class="bg-red-800 text-white px-6 py-2 rounded-lg hover:bg-red-700 transition-colors">
                         Buat Reservasi Baru
@@ -23,7 +23,7 @@
         </div>
 
         <!-- Reservations List -->
-        @if ($reservations->isEmpty())
+        @if ($transformedReservations->isEmpty())
             <div class="bg-white rounded-lg shadow-lg p-8 text-center">
                 <div class="text-gray-400 mb-4">
                     <svg class="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -41,7 +41,7 @@
             </div>
         @else
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                @foreach ($reservations as $reservation)
+                @foreach ($transformedReservations as $reservation)
                     <div class="bg-white rounded-lg shadow-lg overflow-hidden">
                         <!-- Status Badge -->
                         <div

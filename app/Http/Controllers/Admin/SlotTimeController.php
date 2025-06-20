@@ -3,17 +3,63 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\SlotTime;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class SlotTimeController extends Controller
 {
+    private $reservationServiceUrl;
+
+    public function __construct()
+    {
+        $this->reservationServiceUrl = 'http://52.5.201.24:8002';
+    }
+
+    private function getAuthHeaders()
+    {
+        $user = session('user');
+        if (!$user || !isset($user['accessToken'])) {
+            return null;
+        }
+
+        return [
+            'Authorization' => 'Bearer ' . $user['accessToken'],
+            'Content-Type' => 'application/json',
+        ];
+    }
+
     public function index(Request $request)
     {
         $selectedDate = $request->get('date', now()->format('Y-m-d'));
-        $slots = SlotTime::where('date', $selectedDate)->orderBy('start_time')->get();
+        $headers = $this->getAuthHeaders();
 
-        return view('pages.admin.slots.index', compact('slots', 'selectedDate'));
+        if (!$headers) {
+            return redirect()->route('employee.login')->withErrors(['error' => 'Please login to continue.']);
+        }
+
+        try {
+            $response = Http::withHeaders($headers)
+                ->get($this->reservationServiceUrl . '/admin/slots', [
+                    'date' => $selectedDate
+                ]);
+
+            if ($response->ok()) {
+                $data = $response->json();
+                $slots = $data['slots'] ?? [];
+            } else {
+                Log::error('Failed to fetch slots: ' . $response->body());
+                $slots = [];
+            }
+
+            return view('pages.admin.slots.index', compact('slots', 'selectedDate'));
+        } catch (\Exception $e) {
+            Log::error('Slots index error: ' . $e->getMessage());
+            return view('pages.admin.slots.index', [
+                'slots' => [],
+                'selectedDate' => $selectedDate
+            ]);
+        }
     }
 
     public function store(Request $request)
@@ -24,93 +70,53 @@ class SlotTimeController extends Controller
             'date' => 'required|date',
         ]);
 
-        // Check for overlapping slots
-        $overlappingSlot = SlotTime::where('date', $request->date)
-            ->where(function ($query) use ($request) {
-                // Case 1: New slot starts during an existing slot
-                $query->where(function ($q) use ($request) {
-                    $q->where('start_time', '<=', $request->start_time)
-                        ->where('end_time', '>', $request->start_time);
-                })
-                    // Case 2: New slot ends during an existing slot
-                    ->orWhere(function ($q) use ($request) {
-                        $q->where('start_time', '<', $request->end_time)
-                            ->where('end_time', '>=', $request->end_time);
-                    })
-                    // Case 3: New slot completely contains an existing slot
-                    ->orWhere(function ($q) use ($request) {
-                        $q->where('start_time', '>=', $request->start_time)
-                            ->where('end_time', '<=', $request->end_time);
-                    })
-                    // Case 4: Existing slot completely contains the new slot
-                    ->orWhere(function ($q) use ($request) {
-                        $q->where('start_time', '<=', $request->start_time)
-                            ->where('end_time', '>=', $request->end_time);
-                    });
-            })
-            ->first();
+        $headers = $this->getAuthHeaders();
 
-        if ($overlappingSlot) {
-            $existingTime = \Carbon\Carbon::parse($overlappingSlot->start_time)->format('H:i') . ' - ' .
-                \Carbon\Carbon::parse($overlappingSlot->end_time)->format('H:i');
-            $newTime = $request->start_time . ' - ' . $request->end_time;
-
-            return back()->withErrors([
-                'error' => "Slot waktu {$newTime} bertabrakan dengan slot yang sudah ada ({$existingTime}). Silakan pilih waktu yang tidak bertabrakan."
-            ]);
+        if (!$headers) {
+            return redirect()->route('employee.login')->withErrors(['error' => 'Please login to continue.']);
         }
 
-        SlotTime::create($request->all());
-        return back()->with('success', 'Slot waktu berhasil ditambahkan.');
+        try {
+            $response = Http::withHeaders($headers)
+                ->post($this->reservationServiceUrl . '/admin/slot', [
+                    'start_time' => $request->start_time,
+                    'end_time' => $request->end_time,
+                    'date' => $request->date
+                ]);
+
+            if ($response->ok()) {
+                return back()->with('success', 'Slot waktu berhasil ditambahkan.');
+            } else {
+                $error = $response->json()['error'] ?? 'Failed to create slot.';
+                return back()->withErrors(['error' => $error]);
+            }
+        } catch (\Exception $e) {
+            Log::error('Create slot error: ' . $e->getMessage());
+            return back()->withErrors(['error' => 'Service unavailable. Please try again.']);
+        }
     }
 
-    public function destroy(Request $request, $id)
+    public function destroy($slotId)
     {
-        if ($id === 'all') {
-            // Delete all slots for specific date
-            $request->validate([
-                'date' => 'required|date',
-            ]);
+        $headers = $this->getAuthHeaders();
 
-            // Check if any slot has active reservations
-            $slotsWithReservations = SlotTime::where('date', $request->date)
-                ->whereHas('reservations', function ($query) {
-                    $query->whereIn('status', ['confirmed', 'paid'])
-                        ->where('reservation_date', '>=', now()->format('Y-m-d'));
-                })
-                ->exists();
+        if (!$headers) {
+            return redirect()->route('employee.login')->withErrors(['error' => 'Please login to continue.']);
+        }
 
-            if ($slotsWithReservations) {
-                return back()->withErrors(['error' => 'Tidak dapat menghapus slot waktu yang memiliki reservasi aktif.']);
-            }
+        try {
+            $response = Http::withHeaders($headers)
+                ->delete($this->reservationServiceUrl . '/admin/slot/' . $slotId);
 
-            $deletedCount = SlotTime::where('date', $request->date)->delete();
-
-            if ($deletedCount > 0) {
-                return back()->with('success', "Berhasil menghapus {$deletedCount} slot waktu.");
+            if ($response->ok()) {
+                return back()->with('success', 'Slot waktu berhasil dihapus.');
             } else {
-                return back()->withErrors(['error' => 'Tidak ada slot waktu untuk dihapus pada tanggal tersebut.']);
+                $error = $response->json()['error'] ?? 'Failed to delete slot.';
+                return back()->withErrors(['error' => $error]);
             }
-        } else {
-            // Delete specific slot
-            $request->validate([
-                'slot_id' => 'required|exists:slot_times,id',
-            ]);
-
-            $slot = SlotTime::findOrFail($request->slot_id);
-
-            // Check if slot has active reservations
-            $hasActiveReservations = $slot->reservations()
-                ->whereIn('status', ['confirmed', 'paid'])
-                ->where('reservation_date', '>=', now()->format('Y-m-d'))
-                ->exists();
-
-            if ($hasActiveReservations) {
-                return back()->withErrors(['error' => 'Tidak dapat menghapus slot waktu yang memiliki reservasi aktif.']);
-            }
-
-            $slot->delete();
-            return back()->with('success', 'Slot waktu berhasil dihapus.');
+        } catch (\Exception $e) {
+            Log::error('Delete slot error: ' . $e->getMessage());
+            return back()->withErrors(['error' => 'Service unavailable. Please try again.']);
         }
     }
 }

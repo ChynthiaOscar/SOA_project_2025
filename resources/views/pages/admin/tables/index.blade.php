@@ -30,13 +30,13 @@
             <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
                 @forelse($tables as $table)
                     <div class="bg-[#F5E6A3] text-[#1a1a1a] rounded-lg p-4 text-center">
-                        <h3 class="font-bold text-lg">Meja Nomor {{ $table->number }}</h3>
+                        <h3 class="font-bold text-lg">Meja Nomor {{ $table['number'] }}</h3>
                         <p class="text-sm mb-2">
-                            <span class="font-semibold {{ $table->is_available ? 'text-green-600' : 'text-red-600' }}">
-                                {{ $table->is_available ? 'Tersedia' : 'Tidak Tersedia' }}
+                            <span class="font-semibold {{ $table['is_available'] ? 'text-green-600' : 'text-red-600' }}">
+                                {{ $table['is_available'] ? 'Tersedia' : 'Tidak Tersedia' }}
                             </span>
                         </p>
-                        <p class="text-sm">{{ $table->seat_count }} Kursi</p>
+                        <p class="text-sm">{{ $table['seat_count'] }} Kursi</p>
                     </div>
                 @empty
                     <div class="col-span-full bg-[#2a2a2a] rounded-lg p-8 text-center">
@@ -89,9 +89,9 @@
                         class="w-full bg-[#2a2a2a] text-white border border-[#D4AF37] rounded px-3 py-2">
                         <option value="">Pilih Meja</option>
                         @foreach ($tables as $table)
-                            <option value="{{ $table->id }}" data-seats="{{ $table->seat_count }}"
-                                data-status="{{ $table->is_available }}">
-                                Meja {{ $table->number }}
+                            <option value="{{ $table['id'] }}" data-seats="{{ $table['seat_count'] }}"
+                                data-status="{{ $table['is_available'] ? '1' : '0' }}">
+                                Meja {{ $table['number'] }}
                             </option>
                         @endforeach
                     </select>
@@ -135,7 +135,7 @@
                         class="w-full bg-[#2a2a2a] text-white border border-[#D4AF37] rounded px-3 py-2">
                         <option value="">Pilih Meja</option>
                         @foreach ($tables as $table)
-                            <option value="{{ $table->id }}">Meja {{ $table->number }}</option>
+                            <option value="{{ $table['id'] }}">Meja {{ $table['number'] }}</option>
                         @endforeach
                     </select>
                 </div>

@@ -3,103 +3,156 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Reservation;
-use App\Models\Table;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
+use Carbon\Carbon;
 
 class ReservationController extends Controller
 {
+    private $reservationServiceUrl;
+
+    public function __construct()
+    {
+        $this->reservationServiceUrl = 'http://52.5.201.24:8002';
+    }
+
+    private function getAuthHeaders()
+    {
+        $user = session('user');
+        if (!$user || !isset($user['accessToken'])) {
+            return null;
+        }
+
+        return [
+            'Authorization' => 'Bearer ' . $user['accessToken'],
+            'Content-Type' => 'application/json',
+        ];
+    }
+
     public function index(Request $request)
     {
         $selectedDate = $request->get('date', now()->format('Y-m-d'));
+        $headers = $this->getAuthHeaders();
 
-        $reservations = Reservation::with(['user', 'slotTimes', 'tables'])
-            ->where('reservation_date', $selectedDate)
-            ->where('status', 'pending')
-            ->latest()
-            ->get();
+        if (!$headers) {
+            return redirect()->route('employee.login')->withErrors(['error' => 'Please login to continue.']);
+        }
 
-        $tables = Table::with(['reservations' => function ($query) use ($selectedDate) {
-            $query->where('reservation_date', $selectedDate)
-                ->whereIn('status', ['confirmed', 'paid'])
-                ->with('slotTimes');
-        }])->orderBy('number')->get();
+        try {
+            // Get pending reservations from reservation service
+            $response = Http::withHeaders($headers)
+                ->get($this->reservationServiceUrl . '/admin/reservations', [
+                    'date' => $selectedDate
+                ]);
 
-        return view('pages.admin.reservation.index', compact('reservations', 'tables', 'selectedDate'));
+            if ($response->ok()) {
+                $data = $response->json();
+                $reservations = $data['reservations'] ?? [];
+
+                // Transform reservations for view
+                $transformedReservations = collect($reservations)->map(function ($reservation) {
+                    return [
+                        'id' => $reservation['id'],
+                        'user_id' => $reservation['user_id'],
+                        'reservation_date' => $reservation['reservation_date'],
+                        'guest_count' => $reservation['guest_count'],
+                        'table_count' => $reservation['table_count'],
+                        'dp_amount' => $reservation['dp_amount'],
+                        'minimal_charge' => $reservation['minimal_charge'],
+                        'status' => $reservation['status'],
+                        'note' => $reservation['note'],
+                        'slot_times' => $reservation['slot_times'] ?? [],
+                        'tables' => $reservation['tables'] ?? [],
+                    ];
+                })->toArray();
+            } else {
+                Log::error('Failed to fetch reservations: ' . $response->body());
+                $transformedReservations = [];
+            }
+
+            // Get all tables from reservation service
+            $tablesResponse = Http::withHeaders($headers)
+                ->get($this->reservationServiceUrl . '/admin/tables');
+
+            if ($tablesResponse->ok()) {
+                $tablesData = $tablesResponse->json();
+                $tables = $tablesData['tables'] ?? [];
+            } else {
+                Log::error('Failed to fetch tables: ' . $tablesResponse->body());
+                $tables = [];
+            }
+
+            return view('pages.admin.reservation.index', [
+                'reservations' => $transformedReservations,
+                'tables' => $tables,
+                'selectedDate' => $selectedDate
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Reservation index error: ' . $e->getMessage());
+            return view('pages.admin.reservation.index', [
+                'reservations' => [],
+                'tables' => [],
+                'selectedDate' => $selectedDate
+            ]);
+        }
     }
 
-    public function approve(Request $request, Reservation $reservation)
+    public function approve(Request $request, $reservationId)
     {
-        // Calculate required tables based on guest count
-        $requiredTables = ceil($reservation->guest_count / 4);
-
         $request->validate([
-            'table_ids' => 'required|array|min:' . $requiredTables,
-            'table_ids.*' => 'exists:tables,id',
-        ], [
-            'table_ids.min' => "Minimal harus memilih {$requiredTables} meja untuk {$reservation->guest_count} orang.",
+            'table_ids' => 'required|array|min:1',
+            'table_ids.*' => 'integer',
         ]);
 
-        // Validate that selected tables can accommodate all guests
-        $selectedTables = Table::whereIn('id', $request->table_ids)->get();
-        $totalSeats = $selectedTables->sum('seat_count');
+        $headers = $this->getAuthHeaders();
 
-        if ($totalSeats < $reservation->guest_count) {
-            return back()->withErrors(['error' => "Meja yang dipilih hanya dapat menampung {$totalSeats} orang, sedangkan reservasi untuk {$reservation->guest_count} orang."]);
+        if (!$headers) {
+            return redirect()->route('employee.login')->withErrors(['error' => 'Please login to continue.']);
         }
 
-        // Check if selected tables are available for all slot times
-        $slotTimeIds = $reservation->slotTimes->pluck('id')->toArray();
-
-        foreach ($selectedTables as $table) {
-            if (!$table->isAvailableForDate($reservation->reservation_date, $slotTimeIds)) {
-                return back()->withErrors(['error' => "Meja {$table->number} tidak tersedia untuk slot waktu yang dipilih."]);
-            }
-        }
-
-        DB::beginTransaction();
         try {
-            // Update reservation status
-            $reservation->update(['status' => 'confirmed']);
+            $response = Http::withHeaders($headers)
+                ->post($this->reservationServiceUrl . '/admin/reservation/approve', [
+                    'reservation_id' => $reservationId,
+                    'table_ids' => $request->table_ids
+                ]);
 
-            // Assign tables to reservation
-            $reservation->tables()->sync($request->table_ids);
-
-            DB::commit();
-
-            return back()->with('success', 'Reservasi berhasil dikonfirmasi dan meja telah ditetapkan.');
+            if ($response->ok()) {
+                return back()->with('success', 'Reservasi berhasil dikonfirmasi dan meja telah ditetapkan.');
+            } else {
+                $error = $response->json()['error'] ?? 'Failed to approve reservation.';
+                return back()->withErrors(['error' => $error]);
+            }
         } catch (\Exception $e) {
-            DB::rollback();
-            return back()->withErrors(['error' => 'Terjadi kesalahan saat mengkonfirmasi reservasi.']);
+            Log::error('Approve reservation error: ' . $e->getMessage());
+            return back()->withErrors(['error' => 'Service unavailable. Please try again.']);
         }
     }
 
-    public function reject(Reservation $reservation)
+    public function reject($reservationId)
     {
-        if ($reservation->status !== 'pending') {
-            return back()->withErrors(['error' => 'Reservasi sudah diproses sebelumnya.']);
+        $headers = $this->getAuthHeaders();
+
+        if (!$headers) {
+            return redirect()->route('employee.login')->withErrors(['error' => 'Please login to continue.']);
         }
 
-        $reservation->update(['status' => 'rejected']);
+        try {
+            $response = Http::withHeaders($headers)
+                ->post($this->reservationServiceUrl . '/admin/reservation/reject', [
+                    'reservation_id' => $reservationId
+                ]);
 
-        return back()->with('success', 'Reservasi berhasil ditolak.');
-    }
-
-    public function showTableSelection(Reservation $reservation)
-    {
-        if ($reservation->status !== 'pending') {
-            return back()->withErrors(['error' => 'Reservasi sudah diproses sebelumnya.']);
+            if ($response->ok()) {
+                return back()->with('success', 'Reservasi berhasil ditolak.');
+            } else {
+                $error = $response->json()['error'] ?? 'Failed to reject reservation.';
+                return back()->withErrors(['error' => $error]);
+            }
+        } catch (\Exception $e) {
+            Log::error('Reject reservation error: ' . $e->getMessage());
+            return back()->withErrors(['error' => 'Service unavailable. Please try again.']);
         }
-
-        $slotTimeIds = $reservation->slotTimes->pluck('id')->toArray();
-
-        $availableTables = Table::where('is_available', true)
-            ->get()
-            ->filter(function ($table) use ($reservation, $slotTimeIds) {
-                return $table->isAvailableForDate($reservation->reservation_date, $slotTimeIds);
-            });
-
-        return view('pages.admin.reservation.table-selection', compact('reservation', 'availableTables'));
     }
 }
