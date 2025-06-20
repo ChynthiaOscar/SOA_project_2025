@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
+
 
 class DeliveryController extends Controller
 {
@@ -12,7 +14,7 @@ class DeliveryController extends Controller
     public function __construct()
     {
         // Set your gateway URL - adjust as needed
-        $this->gatewayUrl = 'http://54.160.170.89:8002';
+        $this->gatewayUrl = 'http://localhost:8000';
     }
 
     public function index()
@@ -35,31 +37,43 @@ class DeliveryController extends Controller
         }
     }
 
+    // public function userIndex(Request $request)
+    // {
+    //     $orderId = $request->input('order_id', null);
+    //     $orderDetails = [];
+
+    //     if ($orderId) {
+    //         $orderDetails = [
+    //             [
+    //                 'menu_name' => 'Sample Menu Item',
+    //                 'order_detail_quantity' => 2,
+    //                 'menu_price' => 50000,
+    //                 'order_detail_note' => 'Extra spicy'
+    //             ]
+    //         ];
+    //     }
+
+    //     return view('pages.service-delivery.foruser.index', [
+    //         'orderId' => $orderId,
+    //         'orderDetails' => $orderDetails,
+    //         'order' => ['member_id' => 1]
+    //     ]);
+    // }
+
     public function userIndex(Request $request)
     {
-        $orderId = $request->input('order_id', null);
-        $orderDetails = [];
-
-        // You can fetch actual order details if needed
-        if ($orderId) {
-            $orderDetails = [
-                [
-                    'menu_name' => 'Sample Menu Item',
-                    'order_detail_quantity' => 2,
-                    'menu_price' => 50000,
-                    'order_detail_note' => 'Extra spicy'
-                ]
-            ];
-        }
-
-        return view('pages.service-delivery.foruser.index', [
-            'orderId' => $orderId,
-            'orderDetails' => $orderDetails,
-            'order' => ['member_id' => 1]
-        ]);
+        $orderId = $request->input('orderId', 1);
+        $orderDetails = [
+            [
+                'menu_name' => 'Nasi Goreng',
+                'order_detail_quantity' => 2,
+                'menu_price' => 20000,
+                'order_detail_note' => 'Pedas'
+            ]
+        ];
+        $order = ['member_id' => 123];
+        return view('pages.service-delivery.foruser.index', compact('orderId', 'orderDetails', 'order'));
     }
-
-    // API proxy methods to connect to the Gateway
     public function getAllDeliveries()
     {
         try {
@@ -114,7 +128,14 @@ class DeliveryController extends Controller
     {
         try {
             $response = Http::post($this->gatewayUrl . '/distance', $request->all());
-            return $response->json();
+            $data = $response->json();
+
+            if (isset($data['distance_km'])) {
+                $data['distance'] = $data['distance_km'];
+                $data['price'] = round($data['distance_km'] * 500); // contoh per km
+            }
+
+            return response()->json($data);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
         }
@@ -149,29 +170,4 @@ class DeliveryController extends Controller
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
-    // Add this method to your DeliveryController class
-
-    public function testConnection()
-    {
-        try {
-            $response = Http::get($this->gatewayUrl . '/delivery');
-
-            return view('pages.service-delivery.test-connection', [
-                'status' => $response->successful() ? 'success' : 'error',
-                'message' => $response->successful()
-                    ? 'Successfully connected to Gateway service'
-                    : 'Gateway returned an error response',
-                'response' => $response->json(),
-                'statusCode' => $response->status()
-            ]);
-        } catch (\Exception $e) {
-            return view('pages.service-delivery.test-connection', [
-                'status' => 'error',
-                'message' => 'Failed to connect to Gateway service',
-                'error' => $e->getMessage()
-            ]);
-        }
-    }
-
-    
 }
