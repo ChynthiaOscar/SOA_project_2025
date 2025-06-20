@@ -76,7 +76,7 @@
                                         class="block text-[#65090D] font-semibold text-lg mb-2">Amount</label>
                                     <input type="text" id="amount1"
                                         class="w-full px-4 py-3 border border-[#E2BB4D] bg-[#E4C788] focus:outline-none focus:ring-2 focus:ring-[#65090D]"
-                                        placeholder="e.g. 2g">
+                                        placeholder="e.g. 2">
                                 </div>
                             </div>
                         </div>
