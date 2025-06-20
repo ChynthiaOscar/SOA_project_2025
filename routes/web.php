@@ -125,9 +125,8 @@ Route::prefix('payment')->group(function () {
     Route::get('/qris/generate-qr', [PaymentController::class, 'generateQrisQr'])->name('payment.qris.generate');
 
     // Tunai
-    Route::get('/tunai', function () {
-        return view('pages.service_payment.Tunai');
-    });
+    Route::get('/tunai',[PaymentController::class, 'ShowTunai'])->name('payment.tunai');
+    Route::post('/tunai/confirm', [PaymentController::class, 'confirmPaymentTunai'])->name('payment.tunai.confirm');
 
     // BCA VA
     Route::get('/BCA_VA', [PaymentController::class, 'ShowBCA_VA'])->name('payment.BCA_VA');

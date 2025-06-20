@@ -60,7 +60,42 @@ class PaymentController extends Controller
 
     public function confirmPaymentTunai(Request $request)
     {
-        return view('pages.service_payment.Tunai');
+        $data = $request->validate([
+            'customer_id' => 'required|integer',
+            'requester_type' => 'required|integer',
+            'requester_id' => 'required|integer',
+            'secondary_requester_id' => 'nullable|integer',
+            'payment_method' => 'required|string',
+            'payment_amount' => 'required|numeric',
+        ]);
+
+        try {
+            $response = Http::withHeaders([
+                'Authorization' => 'order123',
+            ])->post('http://50.19.17.50:8002/payment', $data);
+
+            if ($response->successful()) {
+                $apiData = $response->json();
+
+                return response()->json([
+                    'status' => 'success',
+                    'va-number' => $apiData['payment_info'],
+                    'payment_id' => $apiData['id'],
+                    'payment_status' => $apiData['status'],
+                ]);
+            }
+
+            return response()->json([
+                'status' => 'error',
+                'message' => 'API gagal: ' . $response->body(),
+            ], $response->status());
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage(),
+            ], 500);
+        }
     }
 
 
