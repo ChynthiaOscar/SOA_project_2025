@@ -223,7 +223,7 @@ class PaymentController extends Controller
         try {
             $response = Http::withHeaders([
                 'Authorization' => 'order123',
-            ])->delete("http://50.19.17.50:8002/payment/{$paymentId}");
+            ])->patch("http://50.19.17.50:8002/payment/{$paymentId}/cancel");
 
             if ($response->successful()) {
                 return response()->json([
