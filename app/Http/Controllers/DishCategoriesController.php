@@ -23,13 +23,25 @@ class DishCategoriesController extends Controller
     public function index(Request $request)
     {
         $page = $request->query('page', 1);
-        $response = Http::get($this->url . '/dish_categories?page=' . $page);
+        $search = $request->query('search'); // ambil query search
+
+        $url = $this->url . '/dish_categories?page=' . $page;
+
+        if ($search) {
+            $url .= '&search=' . urlencode($search);
+        }
+
+        $response = Http::get($url);
         $res = json_decode($response);
-        $data['categories'] = $res->data->data;
-        $data['pagination'] = $res->data;
+
+        $data['categories'] = $res->data->data ?? [];
+        $data['pagination'] = $res->data ?? null;
         $data['title'] = "Manage Dish Categories";
+        $data['search'] = $search;
+
         return view('pages.service-event.admin.dish_categories.index', $data);
     }
+
 
     /**
      * Show the form for creating a new resource.

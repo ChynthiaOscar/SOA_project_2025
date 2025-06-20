@@ -23,16 +23,37 @@ class EventReservationController extends Controller
      */
     public function index(Request $request)
     {
-        $page = $request->query('page', 1);
-        $response = Http::get($this->url . '/event_reservations?page=' . $page);
-        $res = json_decode($response);
-        $data['reservations'] = $res->data->data ?? [];
-        $data['pagination'] = $res->data ?? null;
-        $data['title'] = "Manage Event Reservations";
-        return view('pages.service-event.admin.event_reservations.index', $data);
-        return response()->json([
-            'data' => $reservations
-        ]);
+        try {
+            $page = $request->query('page', 1);
+            $search = $request->query('search'); // buat fitur pencarian
+
+            $url = $this->url . '/event_reservations?page=' . $page;
+
+            if ($search) {
+                $url .= '&search=' . urlencode($search); // tambahkan search jika ada
+            }
+
+            $response = Http::get($url);
+
+            if (!$response->successful()) {
+                throw new \Exception("API Error " . $response->status());
+            }
+
+            $res = json_decode($response);
+
+            $data['reservations'] = $res->data->data ?? [];
+            $data['pagination'] = $res->data ?? null;
+            $data['title'] = "Manage Event Reservations";
+
+            return view('pages.service-event.admin.event_reservations.index', $data);
+        } catch (\Exception $e) {
+            return view('pages.service-event.admin.event_reservations.index', [
+                'reservations' => [],
+                'pagination' => null,
+                'title' => "Manage Event Reservations",
+                'error' => $e->getMessage(),
+            ]);
+        }
     }
 
     /**

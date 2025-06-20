@@ -8,9 +8,25 @@
         </div>
         <div class="flex-1 flex flex-col items-center py-10">
             <div class="w-full max-w-5xl">
+
                 @if (session('success'))
-                    <div class="mb-6 p-4 bg-green-100 text-green-800 rounded shadow">{{ session('success') }}</div>
+                    <div class="mb-6 p-4 bg-green-100 text-green-800 rounded shadow">
+                        {{ session('success') }}
+                    </div>
                 @endif
+
+                {{-- Search Bar --}}
+                <div class="mb-4">
+                    <form class="relative w-full max-w-md mx-auto" method="GET" action="{{ route('event-reservations.index') }}">
+                        <input type="text" name="search" value="{{ request('search') }}"
+                            placeholder="Search name or location..."
+                            class="w-full py-2 px-4 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-yellow-500 transition-all duration-300 ease-in-out">
+                        <button type="submit"
+                            class="absolute right-2 top-1/2 transform -translate-y-1/2 text-yellow-600 hover:text-yellow-800 transition-all duration-300 ease-in-out">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </button>
+                    </form>
+                </div>
 
                 <div class="flex justify-between items-center mb-6">
                     <h2 class="text-2xl font-semibold text-[#222] mb-2">Event Reservations</h2>
@@ -35,13 +51,14 @@
                         </thead>
                         <tbody>
                             @forelse($reservations ?? [] as $reservation)
-                                <tr
-                                    class="{{ $loop->even ? 'bg-[#f7f6fa]' : 'bg-[#f3f1d6]' }} text-[#222] border-b border-gray-200">
+                                <tr class="{{ $loop->even ? 'bg-[#f7f6fa]' : 'bg-[#f3f1d6]' }} text-[#222] border-b border-gray-200">
                                     <td class="py-3 px-4">{{ $reservation->customer_name }}</td>
                                     <td class="py-3 px-4">
-                                        {{ \Carbon\Carbon::parse($reservation->start_date)->format('d M Y') }}</td>
+                                        {{ \Carbon\Carbon::parse($reservation->start_date)->format('d M Y') }}
+                                    </td>
                                     <td class="py-3 px-4">
-                                        {{ \Carbon\Carbon::parse($reservation->end_date)->format('d M Y') }}</td>
+                                        {{ \Carbon\Carbon::parse($reservation->end_date)->format('d M Y') }}
+                                    </td>
                                     <td class="py-3 px-4">{{ $reservation->pax }}</td>
                                     <td class="py-3 px-4">Rp{{ number_format($reservation->total_price, 0, ',', '.') }}</td>
                                     <td class="py-3 px-4 uppercase">{{ $reservation->status }}</td>
@@ -51,8 +68,7 @@
                                             <i class="fa-solid fa-pencil"></i>
                                         </a>
                                         <form action="{{ route('event-reservations.destroy', $reservation->id) }}"
-                                            method="POST" onsubmit="return confirm('Delete this reservation?')"
-                                            style="display:inline;">
+                                            method="POST" onsubmit="return confirm('Delete this reservation?')" style="display:inline;">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="text-red-600 hover:text-red-800">
@@ -76,6 +92,8 @@
                             @endforelse
                         </tbody>
                     </table>
+
+                    {{-- Pagination --}}
                     @if ($pagination)
                         <div class="my-8">
                             <nav>
@@ -107,10 +125,10 @@
                 htmlContent = '<div class="text-left">';
                 menus.forEach(menu => {
                     htmlContent += `<div class="mb-3 p-2 border-b border-gray-200">
-                <p class="text-lg font-semibold">
-                    🍽️ ${menu.name} - <span class="text-sm text-gray-600">Rp${parseInt(menu.price).toLocaleString('id-ID')}</span>
-                </p>
-            </div>`;
+                        <p class="text-lg font-semibold">
+                            🍽️ ${menu.name} - <span class="text-sm text-gray-600">Rp${parseInt(menu.price).toLocaleString('id-ID')}</span>
+                        </p>
+                    </div>`;
                 });
                 htmlContent += '</div>';
             } else {
@@ -131,15 +149,16 @@
             });
         }
 
-
         function showAddOns(addons) {
             let htmlContent = '';
             if (addons.length > 0) {
                 htmlContent = '<div class="text-left">';
                 addons.forEach(addon => {
                     htmlContent += `<div class="mb-3 p-2 border-b border-gray-200">
-                <p class="text-lg font-semibold">🧩 ${addon.name} - <span class="text-sm text-gray-600">Rp${parseInt(addon.price).toLocaleString('id-ID')}</span></p>
-            </div>`;
+                        <p class="text-lg font-semibold">
+                            🧩 ${addon.name} - <span class="text-sm text-gray-600">Rp${parseInt(addon.price).toLocaleString('id-ID')}</span>
+                        </p>
+                    </div>`;
                 });
                 htmlContent += '</div>';
             } else {

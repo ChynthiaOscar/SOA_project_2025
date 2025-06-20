@@ -24,16 +24,14 @@
                     </a>
                 </div>
                 <!-- Search Bar -->
-                <form class="flex items-center mb-6 w-full" method="GET" action="{{ url('dish-categories') }}">
-                    <div class="flex items-center bg-white rounded-full shadow px-4 py-2 w-full max-w-3xl">
-                        <svg class="w-6 h-6 text-[#222] mr-2" fill="none" stroke="currentColor" stroke-width="2"
-                            viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 104.5 4.5a7.5 7.5 0 0012.15 12.15z" />
-                        </svg>
-                        <input type="text" name="search" value="{{ $search ?? '' }}" placeholder="Search"
-                            class="w-full border-none outline-none bg-transparent text-lg py-2" />
-                    </div>
+                <form class="relative w-full max-w-md mx-auto mb-6" method="GET" action="{{ route('dish-categories.index') }}">
+                    <input type="text" name="search" value="{{ request('search') }}"
+                        placeholder="Search by name ..."
+                        class="w-full py-2 px-4 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-yellow-500 transition-all duration-300 ease-in-out">
+                    <button type="submit"
+                        class="absolute right-3 top-1/2 transform -translate-y-1/2 text-yellow-600 hover:text-yellow-800 transition-all duration-300 ease-in-out">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                    </button>
                 </form>
                 <!-- Table -->
                 <div class="overflow-x-auto rounded-lg shadow">

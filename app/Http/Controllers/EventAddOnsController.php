@@ -23,13 +23,24 @@ class EventAddOnsController extends Controller
     public function index(Request $request)
     {
         $page = $request->query('page', 1);
-        $response = Http::get($this->url . '/event_add_ons?page=' . $page);
+        $search = $request->query('search'); 
+
+        $url = $this->url . '/event_add_ons?page=' . $page;
+        if ($search) {
+            $url .= '&search=' . urlencode($search);
+        }
+
+        $response = Http::get($url);
         $res = json_decode($response);
-        $data['add_ons'] = $res->data->data;
-        $data['pagination'] = $res->data;
+
+        $data['add_ons'] = $res->data->data ?? [];
+        $data['pagination'] = $res->data ?? null;
         $data['title'] = "Manage Event Add-Ons";
+        $data['search'] = $search;
+
         return view('pages.service-event.admin.event_add_ons.index', $data);
     }
+
 
     /**
      * Show the form for creating a new resource.
