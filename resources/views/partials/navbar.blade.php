@@ -28,13 +28,16 @@
             data-link="Home">Home</a>
         <a href="#" 
             class="nav-link text-[#7d661c]" 
-            data-link="About">About</a>
+            data-link="">Order</a>
         <a href="#" 
             class="nav-link text-[#7d661c]" 
-            data-link="Services">Services</a>
+            data-link="Services">Reservation</a>
         <a href="#" 
             class="nav-link text-[#7d661c]" 
-            data-link="Contact">Contact</a>
+            data-link="Contact">Event</a>
+          <a href="#" 
+            class="nav-link text-[#7d661c]" 
+            data-link="Contact">Delivery</a>
         </div>
 
       <!-- Order Now -->
