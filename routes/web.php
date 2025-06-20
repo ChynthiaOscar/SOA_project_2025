@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\ChefController;
+use App\Http\Controllers\KitchenController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\MenuController;
