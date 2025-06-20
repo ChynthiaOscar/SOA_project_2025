@@ -17,12 +17,14 @@ use App\Http\Controllers\Member\ReservationController;
 use App\Http\Controllers\Admin\ReservationController as AdminReservationController;
 use App\Http\Controllers\Admin\TableController as AdminTableController;
 use App\Http\Controllers\Admin\SlotTimeController as AdminSlotTimeController;
+use App\Http\Controllers\ChefController;
 use App\Http\Controllers\InventoryItemController;
 use App\Http\Controllers\InventoryCategoryController;
 use App\Http\Controllers\DishCategoriesController;
 use App\Http\Controllers\EventMenuController;
 use App\Http\Controllers\EventReservationController;
-
+use App\Http\Controllers\KitchenController;
+use App\Http\Controllers\VoucherController;
 
 Route::get('/', [InventoryItemController::class, 'index'])->name('inventory.index');
 
