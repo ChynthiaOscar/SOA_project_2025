@@ -241,11 +241,6 @@ Route::prefix('events')->name('events.')->group(function () {
     Route::get('/validate', [EventController::class, 'validateReservation'])->name('validate');
 });
 
-// Employee Data UI Route
-Route::get('/employee-data', function () {
-    return view('pages.service-event.admin.event_packages.index');
-})->name('employee.data');
-
 // Event Package Routes
 Route::prefix('event-packages')->name('event-packages.')->group(function () {
     Route::get('/', [EventPackageController::class, 'index'])->name('index');
