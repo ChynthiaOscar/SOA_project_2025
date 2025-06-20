@@ -29,14 +29,3 @@ Route::get('/menu-category', [MenuCategoryController::class, 'index'])->name('me
 Route::post('/store_category', [MenuCategoryController::class, 'store'])->name('store.category');
 Route::put('/update_category/{id}', [MenuCategoryController::class, 'update'])->name('update.category');
 Route::delete('/delete_category/{id}', [MenuCategoryController::class, 'destroy'])->name('delete.category');
-
-
-
-
-Route::get('/add_category', function () {
-    return view('pages.service-menu.admin_pages.menu-category');
-});
-
-Route::get('/edit_recipe', function () {
-    return view('pages.service-menu.admin_pages.menu.edit-recipe');
-});
