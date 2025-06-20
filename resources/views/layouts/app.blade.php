@@ -4,16 +4,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <title>@yield('title', 'Nama Aplikasi')</title>
 
-    <title>@yield('title', 'Restaurant Reservation System')</title>
-
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-    @stack('styles')
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <!-- CSS -->
+    <link href="{{ asset('css/app.css') }}" rel="stylesheet">
+    
+    @stack('styles') <!-- Optional: untuk stylesheet tambahan -->
 </head>
-
-<body class="bg-gray-50 text-gray-900 font-sans">
+{{-- <body class="bg-[#131313]">" --}}
 
     <!-- Navbar -->
     @include('partials.navbar')
@@ -47,7 +47,8 @@
         @yield('content')
     </main>
 
-    @stack('scripts')
+    <!-- JS -->
+    <script src="{{ asset('js/app.js') }}"></script>
+    @stack('scripts') 
 </body>
-
 </html>

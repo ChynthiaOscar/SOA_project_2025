@@ -1,0 +1,6 @@
+AMQP_URI: 'pyamqp://guest:guest@172.31.2.0'
+rpc_exchange: 'nameko-rpc'
+max_workers: 10
+parent_calls_tracked: 10
+WEB_SERVER_ADDRESS: '0.0.0.0:8002'
+

@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  member-service:
+    build:
+      context: ./nameko_service
+    container_name: member-service
+    depends_on:
+      - mysql
+    environment:
+      - RABBITMQ_HOST=172.31.2.0
+    volumes:
+      - ./nameko_service:/app
+    command: ["nameko", "run", "auth_service", "--config", "nameko.yml"]
+
+  mysql:
+    image: mysql:8.0
+    container_name: member-mysql
+    restart: always
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+      MYSQL_DATABASE: soa_project_2025
+      MYSQL_ROOT_PASSWORD: ""
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./mysql-init/members.sql:/docker-entrypoint-initdb.d/members.sql
+
+
+networks:
+  default:
+    name: member-employee
+    external: true
