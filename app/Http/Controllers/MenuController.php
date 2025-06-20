@@ -4,22 +4,25 @@ namespace App\Http\Controllers;
 
 use Http;
 use Illuminate\Http\Request;
+use Storage;
 
 class MenuController extends Controller
 {
+    private $TOKEN = 'member123';
+
     /**
      * Display a listing of the resource.
      */
     public function user_index()
     {
         try {
-            $menu_response = Http::get('http://50.19.17.50:8002/menus');
-            $category_response = Http::get('http://50.19.17.50:8002/menu-categories');
+            $menu_response = Http::withHeader('Authorization', $this->TOKEN)->get('http://50.19.17.50:8002/menus');
+            $category_response = Http::withHeader('Authorization', $this->TOKEN)->get('http://50.19.17.50:8002/menu-categories');
             // TODO: Handle rating response
             // TODO: Handle availability response
 
             if (!$menu_response->successful()) {
-                return response()->json(['error' => 'Failed to retrieve menus'], $menu_response->status());
+                return response()->json($menu_response->json(), $menu_response->status());
             } elseif (!$category_response->successful()) {
                 return response()->json(['error' => 'Failed to retrieve categories'], $category_response->status());
             } else {
@@ -38,7 +41,7 @@ class MenuController extends Controller
     public function admin_index()
     {
         try {
-            $menu_response = Http::get('http://50.19.17.50:8002/menus');
+            $menu_response = Http::withHeader('Authorization', $this->TOKEN)->get('http://50.19.17.50:8002/menus');
 
             if ($menu_response->successful()) {
                 $menus = $menu_response->json();
@@ -59,7 +62,7 @@ class MenuController extends Controller
     public function create()
     {
         try {
-            $category_response = Http::get('http://50.19.17.50:8002/menu-categories');
+            $category_response = Http::withHeader('Authorization', $this->TOKEN)->get('http://50.19.17.50:8002/menu-categories');
 
             if (!$category_response->successful()) {
                 return response()->json(['error' => 'Failed to retrieve categories'], $category_response->status());
@@ -96,8 +99,8 @@ class MenuController extends Controller
     public function edit(string $id)
     {
         try {
-            $category_response = Http::get('http://50.19.17.50:8002/menu-categories');
-            $menu_response = Http::get("http://50.19.17.50:8002/menus/{$id}");
+            $category_response = Http::withHeader('Authorization', $this->TOKEN)->get('http://50.19.17.50:8002/menu-categories');
+            $menu_response = Http::withHeader('Authorization', $this->TOKEN)->get("http://50.19.17.50:8002/menus/{$id}");
 
             if (!$category_response->successful()) {
                 return response()->json(['error' => 'Failed to retrieve categories'], $category_response->status());
@@ -131,7 +134,19 @@ class MenuController extends Controller
     {
         $id = $request->input('menu_id');
         try {
-            $response = Http::delete("http://50.19.17.50:8002/menus/{$id}");
+            $menu_response = Http::withHeader('Authorization', $this->TOKEN)->get("http://50.19.17.50:8002/menus/{$id}");
+            if (!$menu_response->successful()) {
+                return response()->json(['error' => 'Failed to retrieve menu'], $menu_response->status());
+            }
+
+            $menu = $menu_response->json();
+            if (isset($menu['image_path'])) {
+                if ($menu['image_path'] && Storage::exists($menu['image_path'])) {
+                    Storage::delete($menu['image_path']);
+                }
+            }
+
+            $response = Http::withHeader('Authorization', $this->TOKEN)->delete("http://50.19.17.50:8002/menus/{$id}");
             if ($response->successful()) {
                 return redirect()->back()->with('success', 'Menu deleted successfully.');
             } else {
