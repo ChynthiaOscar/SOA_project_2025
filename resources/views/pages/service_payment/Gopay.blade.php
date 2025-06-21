@@ -38,14 +38,17 @@
 
 @section('scripts')
 <script>
-const paymentData = {
-        customer_id: {{ $customer_id }},
-        requester_type: {{ $requester_type }},
-        requester_id: {{ $requester_id }},
-        secondary_requester_id: {{ $secondary_requester_id }},
+
+    const paymentData = {
+        customer_id: 1234567890,
+        requester_type: 2,
+        requester_id: 212,
+        secondary_requester_id: null,
         payment_method: "gopay",
-        payment_amount: {{ $payment_amount }}
+        payment_amount: 10000
     };
+
+
 
     let currentPaymentId = null;
 
@@ -80,7 +83,7 @@ const paymentData = {
         })
         .catch(error => {
             console.error(error);
-            alert("Terjadi kesalahan saat menghubungi server.");
+            alert("Terjadi kesalahan saat menghubungi server (mungkin server lagi down).");
         });
     }
 

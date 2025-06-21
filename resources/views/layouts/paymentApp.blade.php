@@ -6,6 +6,7 @@
     
     <title>@yield('title', 'Nama Aplikasi')</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 </head>
 <body class="bg-black text-[#d4af37] font-sans">
 

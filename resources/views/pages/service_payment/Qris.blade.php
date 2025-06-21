@@ -74,7 +74,7 @@
         })
         .catch(error => {
             console.error(error);
-            alert("Terjadi kesalahan saat menghubungi server.");
+            alert("Terjadi kesalahan saat menghubungi server (mungkin server lagi down).");
         });
     }
 

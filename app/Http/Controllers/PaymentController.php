@@ -10,7 +10,7 @@ class PaymentController extends Controller
 
     public function ShowOVO(Request $request)
     {
-        return view('pages.service_payment.OVO',compact('id', 'user_id', 'dp_amount'));
+        return view('pages.service_payment.OVO');
     }
     
     public function generateOvoQr(Request $request)
@@ -74,9 +74,11 @@ class PaymentController extends Controller
                 'Authorization' => 'order123',
             ])->post('http://50.19.17.50:8002/payment', $data);
 
+
+
             if ($response->successful()) {
                 $apiData = $response->json();
-
+                
                 return response()->json([
                     'status' => 'success',
                     'va-number' => $apiData['payment_info'],

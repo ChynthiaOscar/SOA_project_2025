@@ -45,15 +45,28 @@
 
 @section('scripts')
 <script>
+    const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
 
     const paymentData = {
-        customer_id: {{ $customer_id }},
-        requester_type: {{ $requester_type }},
-        requester_id: {{ $requester_id }},
-        secondary_requester_id: {{ $secondary_requester_id }},
+        customer_id: 1234567890,
+        requester_type: 2,
+        requester_id: 212,
+        secondary_requester_id: null,
         payment_method: "ovo",
-        payment_amount: {{ $payment_amount }}
+        payment_amount: 10000
     };
+
+    // hardcode
+    
+    // const paymentData = {
+    //     customer_id: 1234567890,
+    //     requester_type: 2,
+    //     requester_id: 212,
+    //     secondary_requester_id: null,
+    //     payment_method: "ovo",
+    //     payment_amount: 10000
+    // };
 
     let currentPaymentId = null;
 
@@ -62,7 +75,7 @@
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                'X-CSRF-TOKEN': csrfToken
             },
             body: JSON.stringify(paymentData)
         })
@@ -80,7 +93,7 @@
         })
         .catch(error => {
             console.error(error);
-            alert("Terjadi kesalahan saat menghubungi server.");
+            alert("Terjadi kesalahan saat menghubungi server (mungkin server lagi down).");
         });
     }
 
