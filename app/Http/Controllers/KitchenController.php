@@ -17,12 +17,16 @@ class KitchenController extends Controller
         }
 
         $response = Http::withToken($token)->get('http://50.19.17.50:8002/employee/me');
-
         if (!$response->ok()) {
             abort(403, 'Gagal mengakses data user');
         }
 
         $employee = $response->json()['data'];
+
+        // $employee = [
+        //     'name' => 'Cashier Jenny',
+        //     'role' => 'Cashier'
+        // ];
 
         if ($employee['role'] === 'Chef') {
             return redirect()->route('kitchen.show');
@@ -33,6 +37,18 @@ class KitchenController extends Controller
         $orderDetailsResponse = Http::withToken($token)->get('http://50.19.17.50:8002/order-details');
         $orderDetails = $orderDetailsResponse->ok() ? $orderDetailsResponse->json() : [];
 
+        foreach ($orderDetails as &$detail) {
+            $menuId = $detail['menu_id'];
+            $menuResponse = Http::withToken($token)->get("http://50.19.17.50:8002/menus/{$menuId}");
+
+            if ($menuResponse->ok()) {
+                $menu = $menuResponse->json();
+                $detail['menu_name'] = $menu['name'] ?? '-';
+            } else {
+                $detail['menu_name'] = '[Unknown]';
+            }
+        }
+
         $chefsResponse = Http::withToken($token)->get('http://50.19.17.50:8002/employee/schedule', [
             'role' => 'Chef',
             'attendance' => true,
@@ -40,6 +56,32 @@ class KitchenController extends Controller
         ]);
 
         $chefs = $chefsResponse->ok() ? $chefsResponse->json()['data'] : [];
+
+        // Dummy order details
+        // $orderDetails = [
+        //     [
+        //         'id' => 4,
+        //         'order_id' => 101,
+        //         'menu_id' => 'M005',
+        //         'menu_name' => 'Teh Manis',
+        //         'quantity' => 2,
+        //         'note' => 'Gula sedikit'
+        //     ],
+        //     [
+        //         'id' => 5,
+        //         'order_id' => 102,
+        //         'menu_id' => 'M006',
+        //         'menu_name' => 'Ayam Goreng',
+        //         'quantity' => 4,
+        //         'note' => 'Paha'
+        //     ]
+        // ];
+
+        // Dummy chefs
+        // $chefs = [
+        //     ['employee_id' => 'C001', 'employee_name' => 'Chef Budi'],
+        //     ['employee_id' => 'C002', 'employee_name' => 'Chef Sari']
+        // ];
 
         return view('pages.service-kitchen.index', [
             'orderDetails' => $orderDetails,
@@ -52,7 +94,7 @@ class KitchenController extends Controller
         $request->validate([
             'order_detail_id' => 'required',
             'order_id' => 'required',
-            'menu_id' => 'required',
+            'menu_name' => 'required',
             'quantity' => 'required|integer|min:1',
             'chef' => 'required',
             'notes' => 'nullable|string',
@@ -60,7 +102,7 @@ class KitchenController extends Controller
 
         $payload = [
             'kitchen_id' => $request->order_detail_id,
-            'menu' => $request->menu_id,
+            'menu' => $request->menu_name,
             'quantity' => $request->quantity,
             'chef' => $request->chef,
             'notes' => $request->notes,

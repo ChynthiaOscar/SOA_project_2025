@@ -76,19 +76,20 @@
 
             <form action="{{ route('kitchen.assign') }}" method="POST">
                 @csrf
-                <input type="hidden" name="order_detail_id" value="{{ $detail['id'] }}">
+                <input type="hidden" name="order_detail_id" value="{{ $detail['order_detail_id'] }}">
                 <input type="hidden" name="order_id" value="{{ $detail['order_id'] }}">
-                <input type="hidden" name="menu_id" value="{{ $detail['menu_id'] }}">
+                <input type="hidden" name="menu_name" value="{{ $detail['menu_name'] }}">
                 <input type="hidden" name="quantity" value="{{ $detail['quantity'] }}">
                 <input type="hidden" name="notes" value="{{ $detail['note'] }}">
 
-                <label for="chef_id"><span class="label">Chef:</span></label>
-                <select name="chef" required>
+                <label for="chef_{{ $detail['id'] }}"><span class="label">Chef:</span></label>
+                <select id="chef_{{ $detail['id'] }}" name="chef" required>
                     <option value="">Pilih Chef</option>
                     @foreach ($chefs as $chef)
-                    <option value="{{ $chef['employee_id'] }}">{{ $chef['employee_name'] }}</option>
+                    <option value="{{ $chef['employee_name'] }}">{{ $chef['employee_name'] }}</option>
                     @endforeach
                 </select>
+
                 <button type="submit" class="assign-button">Assign</button>
             </form>
         </div>
