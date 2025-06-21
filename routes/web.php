@@ -26,12 +26,6 @@ use App\Http\Controllers\EventReservationController;
 use App\Http\Controllers\KitchenController;
 use App\Http\Controllers\VoucherController;
 
-
-
-Route::get('/', function () {
-    return view('pages.homepage');
-});
-
 // Auth & Profile (Member)
 Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
 Route::post('/register', [AuthController::class, 'register']);
@@ -240,6 +234,11 @@ Route::prefix('events')->name('events.')->group(function () {
     Route::get('/', [EventController::class, 'create'])->name('create');
     Route::get('/validate', [EventController::class, 'validateReservation'])->name('validate');
 });
+
+// Employee Data UI Route
+Route::get('/employee-data', function () {
+    return view('pages.service-event.admin.event_packages.index');
+})->name('employee.data');
 
 // Event Package Routes
 Route::prefix('event-packages')->name('event-packages.')->group(function () {

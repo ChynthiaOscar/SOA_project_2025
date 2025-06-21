@@ -40,13 +40,15 @@
 
 @section('scripts')
 <script>
+    
+
     const paymentData = {
-        customer_id: {{ $customer_id }},
-        requester_type: {{ $requester_type }},
-        requester_id: {{ $requester_id }},
-        secondary_requester_id: {{ $secondary_requester_id }},
+        customer_id: 1234567890,
+        requester_type: 2,
+        requester_id: 212,
+        secondary_requester_id: null,
         payment_method: "qris",
-        payment_amount: {{ $payment_amount }}
+        payment_amount: 10000
     };
 
     let currentPaymentId = null;
@@ -62,6 +64,8 @@
         })
         .then(response => response.json())
         .then(data => {
+            console.console.log(data);
+            
             if (data.status === 'success') {
                 document.getElementById('qr-image').src = data.qr_url;
                 document.getElementById('qr-container').classList.remove('hidden');

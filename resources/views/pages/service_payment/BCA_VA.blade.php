@@ -35,9 +35,8 @@
     <!-- VA Box -->
     <div id="va-box" class="hidden flex-col items-center justify-between w-full max-w-sm mb-6">
         <div class="flex items-center justify-between bg-yellow-400 text-black px-4 py-3 rounded-md shadow-md w-full">
-            <span id="va-number" class="flex-grow text-center select-text text-lg font-semibold tracking-wide">
-                <!-- VA Number akan diisi dengan JS -->
-            </span>
+            <input id="va-number" type="text" readonly
+                class="text-center text-lg font-semibold tracking-wide w-full bg-yellow-100 px-2 py-1 rounded" />
             <button onclick="copyToClipboard()" class="ml-3 hover:text-gray-900 transition" title="Salin">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -76,7 +75,7 @@
     let currentPaymentId = null;
 
     function copyToClipboard() {
-        const text = document.getElementById("va-number").textContent;
+        const text = document.getElementById("va-number").value;
         navigator.clipboard.writeText(text).then(() => {
             alert("Nomor Virtual Account telah disalin!");
         });
@@ -93,8 +92,11 @@
         })
         .then(response => response.json())
         .then(data => {
+            console.log(data);
+            const vaNumber = data['va-number']; 
+            console.log(vaNumber);
             if (data.status === 'success') {
-                document.getElementById('va-number').textContent = data.va_number;
+                document.getElementById('va-number').value = vaNumber;
                 document.getElementById('va-box').classList.remove('hidden');
                 document.getElementById('generate-va-btn').classList.add('hidden');
 
@@ -156,7 +158,7 @@
         fetch(`/payment/${currentPaymentId}/check-status`) // pastikan route ini tersedia
             .then(res => res.json())
             .then(data => {
-                if (data.status === 'success') {
+                if (data.status === 'Completed') {
                     alert("✅ Pembayaran berhasil!");
                     document.getElementById('cancel-btn').disabled = true;
                     window.location.href = redirectUrl;

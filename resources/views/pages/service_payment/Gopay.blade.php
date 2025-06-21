@@ -71,12 +71,11 @@
         .then(response => response.json())
         .then(data => {
             if (data.status === 'success') {
-                document.getElementById('va-number').textContent = data.va_number;
-                document.getElementById('va-box').classList.remove('hidden');
-                document.getElementById('generate-va-btn').classList.add('hidden');
+                document.getElementById('qr-image').src = data.qr_url;
+                document.getElementById('qr-container').classList.remove('hidden');
+
 
                 currentPaymentId = data.payment_id;
-                document.getElementById('cancel-btn').disabled = false;
             } else {
                 alert("Gagal generate VA: " + data.message);
             }
