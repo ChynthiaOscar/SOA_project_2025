@@ -140,9 +140,9 @@ class MenuController extends Controller
             }
 
             $menu = $menu_response->json();
-            if (isset($menu['image_path'])) {
-                if ($menu['image_path'] && Storage::exists($menu['image_path'])) {
-                    Storage::delete($menu['image_path']);
+            if (isset($menu['image'])) {
+                if ($menu['image'] && Storage::disk('public')->exists('images/service-menu/' . $menu['image'])) {
+                    Storage::disk('public')->delete('images/service-menu/' . $menu['image']);
                 }
             }
 
