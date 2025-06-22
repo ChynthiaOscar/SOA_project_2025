@@ -77,7 +77,7 @@ class AuthController extends Controller
                 \Session::put('member', $profile);
                 // Debugging: pastikan session sudah terisi
                 \Log::info('Session member after login:', [session('member')]);
-                return redirect()->route('profile');
+                return redirect()->route('order_menu');
             } else {
                 return back()->withErrors([
                     'login' => 'Gagal mengambil data profile.',
@@ -94,6 +94,17 @@ class AuthController extends Controller
         $member = \Session::get('member');
         if (!$member) {
             return redirect()->route('login')->withErrors(['email' => 'Sesi Anda telah berakhir, silakan login kembali.']);
+        }
+        // Validasi token ke backend
+        if (isset($member['token'])) {
+            $validate = \Http::post('http://50.19.17.50:8002/validate-token', [
+                'token' => $member['token']
+            ]);
+            $valid = $validate->json();
+            if (!($valid['valid'] ?? false)) {
+                \Session::forget('member');
+                return redirect()->route('login')->withErrors(['email' => 'Sesi Anda telah berakhir, silakan login kembali.']);
+            }
         }
         // Ambil data profile terbaru dari API jika ingin selalu up-to-date
         $response = \Http::get('http://50.19.17.50:8002/profile', [

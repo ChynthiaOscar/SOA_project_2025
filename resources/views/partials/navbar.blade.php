@@ -23,7 +23,7 @@
         <!-- Center -->
         <div class="hidden md:flex gap-6 text-base" id="nav-menu">
           <a href="#" class="nav-link {{ request()->is('/') ? 'relative text-[#d4af37] after:block after:content-[\'\'] after:h-[1px] after:bg-[#d4af37] after:w-full after:mt-1' : 'text-[#7d661c]' }}" data-link="Home">Home</a>
-          <a href="#" class="nav-link {{ request()->is('order*') ? 'relative text-[#d4af37] after:block after:content-[\'\'] after:h-[1px] after:bg-[#d4af37] after:w-full after:mt-1' : 'text-[#7d661c]' }}" data-link="Order">Order</a>
+          <a href="{{ route('order_menu') }}" class="nav-link {{ request()->is('order_menu') ? 'relative text-[#d4af37] after:block after:content-[\'\'] after:h-[1px] after:bg-[#d4af37] after:w-full after:mt-1' : 'text-[#7d661c]' }}" data-link="Order">Order</a>
           <a href="#" class="nav-link {{ request()->is('reservation*') ? 'relative text-[#d4af37] after:block after:content-[\'\'] after:h-[1px] after:bg-[#d4af37] after:w-full after:mt-1' : 'text-[#7d661c]' }}" data-link="Services">Reservation</a>
           <a href="#" class="nav-link {{ request()->is('event*') ? 'relative text-[#d4af37] after:block after:content-[\'\'] after:h-[1px] after:bg-[#d4af37] after:w-full after:mt-1' : 'text-[#7d661c]' }}" data-link="Event">Event</a>
           <a href="#" class="nav-link {{ request()->is('delivery*') ? 'relative text-[#d4af37] after:block after:content-[\'\'] after:h-[1px] after:bg-[#d4af37] after:w-full after:mt-1' : 'text-[#7d661c]' }}" data-link="Delivery">Delivery</a>
