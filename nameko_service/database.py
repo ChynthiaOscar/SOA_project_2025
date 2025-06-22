@@ -6,7 +6,7 @@ from nameko.extensions import DependencyProvider
 class DatabaseWrapper:
     connection = None
 
-    def __init__(self, connection):
+    def _init_(self, connection):
         self.connection = connection
 
     def get_all_members(self, search=None):
@@ -121,14 +121,14 @@ class DatabaseWrapper:
             print(f"Error deleting member: {e}")
             return False
 
-    def __del__(self):
+    def _del_(self):
         self.connection.close()
 
 
 class Database(DependencyProvider):
     connection_pool = None
 
-    def __init__(self):
+    def _init_(self):
         # Try to connect multiple times with delays
         retries = 5
         for attempt in range(retries):

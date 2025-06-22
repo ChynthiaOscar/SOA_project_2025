@@ -39,7 +39,7 @@ class AuthService:
             if not bcrypt.checkpw(password.encode(), member['password'].encode()):
                 return {"success": False, "message": "Invalid credentials"}
             token = str(uuid.uuid4())
-            expires_at = datetime.datetime.now() + datetime.timedelta(seconds=300)
+            expires_at = datetime.datetime.now() + datetime.timedelta(seconds=60)
             expires_at_str = expires_at.strftime('%Y-%m-%d %H:%M:%S')
             self.database.save_token(member['id'], token, expires_at_str)
             return {

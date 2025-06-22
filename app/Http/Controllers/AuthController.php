@@ -95,6 +95,17 @@ class AuthController extends Controller
         if (!$member) {
             return redirect()->route('login')->withErrors(['email' => 'Sesi Anda telah berakhir, silakan login kembali.']);
         }
+        // Validasi token ke backend
+        if (isset($member['token'])) {
+            $validate = \Http::post('http://50.19.17.50:8002/validate-token', [
+                'token' => $member['token']
+            ]);
+            $valid = $validate->json();
+            if (!($valid['valid'] ?? false)) {
+                \Session::forget('member');
+                return redirect()->route('login')->withErrors(['email' => 'Sesi Anda telah berakhir, silakan login kembali.']);
+            }
+        }
         // Ambil data profile terbaru dari API jika ingin selalu up-to-date
         $response = \Http::get('http://50.19.17.50:8002/profile', [
             'member_id' => $member['id']
