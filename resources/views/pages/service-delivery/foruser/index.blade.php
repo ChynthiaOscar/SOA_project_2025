@@ -87,9 +87,10 @@
             </div>
 
             <!-- Delivery Form -->
-            <form id="deliveryForm" class="mb-8 bg-black/30 p-6 rounded-lg border border-tan/20" method="POST" href="api/delivery/create">
+            <form id="deliveryForm" class="mb-8 bg-black/30 p-6 rounded-lg border border-tan/20" autocomplete="off">
                 <input type="hidden" id="order_id" name="order_id" key="order_id" value="{{ $orderId }}">
-                <input type="hidden" id="member_id" name="member_id" key="member_id" value="{{ $order['member_id'] ?? 1 }}">
+                <input type="hidden" id="member_id" name="member_id" key="member_id"
+                    value="{{ $order['member_id'] ?? 1 }}">
 
                 <h3 class="text-gold text-xl mb-4">Search Location</h3>
                 <div class="flex mb-4">
@@ -190,6 +191,7 @@
         }
 
         if (deliveryForm) {
+            console.log('deliveryForm');
             deliveryForm.addEventListener('submit', function(e) {
                 e.preventDefault();
 
@@ -197,11 +199,11 @@
                     order_id: document.getElementById('order_id').value,
                     member_id: document.getElementById('member_id').value,
                     destination: destinationInput.value,
-                    lat: latInput.value,
-                    lon: lonInput.value,
                     distance: distanceInput.value,
                     notes: "Kirim cepat brok!",
+                    status: "pending",
                 };
+
 
                 // if (!formData.destination || !formData.lat || !formData.lon || !formData.distance) {
                 //     showNotification('Please select a valid location first', 'error');
@@ -212,7 +214,6 @@
             });
         }
 
-        // Functions
         function searchLocation(query) {
             fetch('/api/delivery/search', {
                     method: 'POST',
@@ -254,7 +255,7 @@
             let html = '';
             results.forEach(place => {
                 html += `
-        <div class="p-3 hover:bg-black/30 cursor-pointer border-b border-tan/20" 
+        <div class="p-3 hover:bg-black/30 cursor-pointer border-b border-tan/20"
              onclick="selectLocation('${place.label.replace(/'/g, "\\'")}', ${place.latitude}, ${place.longitude})">
             <div class="font-bold">${place.label}</div>
             <div class="text-xs text-tan">${place.name}: ${place.latitude}, ${place.longitude}</div>
@@ -349,6 +350,7 @@
 
 
         function createDelivery(formData) {
+            console.log('masuk createDelivery', formData);
             fetch('/api/delivery/create', {
                     method: 'POST',
                     headers: {
@@ -359,6 +361,7 @@
                 })
                 .then(response => response.json())
                 .then(result => {
+                    console.log("Delivery result:", result);
                     if (result.error) {
                         showNotification(result.error, 'error');
                         return;

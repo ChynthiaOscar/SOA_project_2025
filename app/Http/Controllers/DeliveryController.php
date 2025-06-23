@@ -14,7 +14,7 @@ class DeliveryController extends Controller
     public function __construct()
     {
         // Set your gateway URL - adjust as needed
-        $this->gatewayUrl = 'http://localhost:8000';
+        $this->gatewayUrl = 'http://50.19.17.50:8002';
     }
 
     public function index()
