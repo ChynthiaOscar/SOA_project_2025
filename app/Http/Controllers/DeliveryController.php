@@ -37,6 +37,34 @@ class DeliveryController extends Controller
         }
     }
 
+    public function driverIndex($employee_id)
+    {
+        try {
+            // Since backend API /delivery/employee/{employee_id} is not implemented,
+            // fallback to fetching all deliveries and filter by employee_id here
+            $response = Http::get($this->gatewayUrl . '/delivery');
+            $data = $response->json();
+
+            $allDeliveries = $data['data']['data'] ?? [];
+
+            // Filter deliveries by employee_id
+            $deliveries = array_filter($allDeliveries, function ($delivery) use ($employee_id) {
+                return isset($delivery['employee_id']) && $delivery['employee_id'] == $employee_id;
+            });
+
+            return view('pages.service-delivery.fordriver.index', [
+                'deliveries' => $deliveries,
+                'employee_id' => $employee_id
+            ]);
+        } catch (\Exception $e) {
+            return view('pages.service-delivery.fordriver.index', [
+                'deliveries' => [],
+                'error' => $e->getMessage(),
+                'employee_id' => $employee_id
+            ]);
+        }
+    }
+
     // public function userIndex(Request $request)
     // {
     //     $orderId = $request->input('order_id', null);
@@ -107,9 +135,13 @@ class DeliveryController extends Controller
     public function createDelivery(Request $request)
     {
         try {
+            Log::info('CreateDelivery payload:', $request->all());
             $response = Http::post($this->gatewayUrl . '/delivery', $request->all());
+            $responseBody = $response->body();
+            Log::info('CreateDelivery response: ' . $responseBody);
             return $response->json();
         } catch (\Exception $e) {
+            Log::error('CreateDelivery error: ' . $e->getMessage());
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
@@ -154,9 +186,13 @@ class DeliveryController extends Controller
     public function updateDelivery($id, Request $request)
     {
         try {
+            Log::info("UpdateDelivery payload for id $id:", $request->all());
             $response = Http::put($this->gatewayUrl . '/delivery/' . $id, $request->all());
+            $responseBody = $response->body();
+            Log::info("UpdateDelivery response for id $id: " . $responseBody);
             return $response->json();
         } catch (\Exception $e) {
+            Log::error("UpdateDelivery error for id $id: " . $e->getMessage());
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
@@ -165,6 +201,18 @@ class DeliveryController extends Controller
     {
         try {
             $response = Http::delete($this->gatewayUrl . '/delivery/' . $id);
+            return $response->json();
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    public function getEmployees(Request $request)
+    {
+        try {
+            $queryParams = $request->getQueryString();
+            $url = $this->gatewayUrl . '/employee' . ($queryParams ? '?' . $queryParams : '');
+            $response = Http::get($url);
             return $response->json();
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);

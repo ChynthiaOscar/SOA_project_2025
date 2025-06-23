@@ -196,10 +196,10 @@
                 e.preventDefault();
 
                 const formData = {
-                    order_id: document.getElementById('order_id').value,
-                    member_id: document.getElementById('member_id').value,
+                    order_id: parseInt(document.getElementById('order_id').value),
+                    member_id: parseInt(document.getElementById('member_id').value),
                     destination: destinationInput.value,
-                    distance: distanceInput.value,
+                    distance: parseFloat(distanceInput.value),
                     notes: "Kirim cepat brok!",
                     status: "pending",
                 };
@@ -351,6 +351,8 @@
 
         function createDelivery(formData) {
             console.log('masuk createDelivery', formData);
+            console.log('Data JSON:', JSON.stringify(formData)); // ← pindahkan ke sini
+
             fetch('/api/delivery/create', {
                     method: 'POST',
                     headers: {
@@ -367,7 +369,6 @@
                         return;
                     }
 
-                    // Show success message and hide form
                     deliveryForm.classList.add('hidden');
                     successMessage.classList.remove('hidden');
                 })
@@ -376,6 +377,7 @@
                     showNotification('Failed to create delivery request', 'error');
                 });
         }
+
 
         function showNotification(message, type = 'success') {
             notificationElement.innerHTML = message;

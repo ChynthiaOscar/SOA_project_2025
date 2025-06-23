@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Http;
 // Frontend routes
 Route::get('/delivery', [DeliveryController::class, 'userIndex'])->name('delivery.user');
 Route::get('/delivery/admin', [DeliveryController::class, 'index'])->name('delivery.admin');
+Route::get('/delivery/employee/{employee_id}', [DeliveryController::class, 'driverIndex'])->name('delivery.driver');
 
 // API routes for gateway connection
 Route::prefix('api/delivery')->group(function () {
@@ -20,3 +21,6 @@ Route::prefix('api/delivery')->group(function () {
     Route::put('/{id}', [DeliveryController::class, 'updateDelivery'])->where('id', '[0-9]+');
     Route::delete('/{id}', [DeliveryController::class, 'deleteDelivery'])->where('id', '[0-9]+');
 });
+
+// New route for employees proxy
+Route::get('/api/employees', [DeliveryController::class, 'getEmployees']);
