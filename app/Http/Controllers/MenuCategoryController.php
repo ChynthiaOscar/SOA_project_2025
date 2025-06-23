@@ -8,14 +8,15 @@ use Illuminate\Support\Facades\Http;
 class MenuCategoryController extends Controller
 {
     const API_BASE_URL = 'http://50.19.17.50:8002';
+    private $TOKEN = 'member123';
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
         try {
-            $response = Http::get(self::API_BASE_URL . '/menu-categories');
-            $menuResponse = Http::get(self::API_BASE_URL . '/menus');
+            $response = Http::withHeader('Authorization', $this->TOKEN)->get(self::API_BASE_URL . '/menu-categories');
+            $menuResponse = Http::withHeader('Authorization', $this->TOKEN)->get(self::API_BASE_URL . '/menus');
             if ($response->successful() && $menuResponse->successful()) {
                 $categories = $response->json();
                 $menus = $menuResponse->json();
@@ -46,7 +47,7 @@ class MenuCategoryController extends Controller
         ]);
 
         try {
-            $response = Http::post(self::API_BASE_URL . '/menu-categories', [
+            $response = Http::withHeader('Authorization', $this->TOKEN)->post(self::API_BASE_URL . '/menu-categories', [
                 'name' => $validated['name'],
             ]);
             if (!$response->successful()) {
@@ -85,7 +86,7 @@ class MenuCategoryController extends Controller
         ]);
 
         try {
-            $response = Http::put(self::API_BASE_URL . '/menu-categories', [
+            $response = Http::withHeader('Authorization', $this->TOKEN)->put(self::API_BASE_URL . '/menu-categories', [
                 'id' => $id,
                 'name' => $validated['name'],
             ]);
@@ -105,7 +106,7 @@ class MenuCategoryController extends Controller
     public function destroy(string $id)
     {
         try {
-            $response = Http::delete("http://50.19.17.50:8002/menu-categories/{$id}");
+            $response = Http::withHeader('Authorization', $this->TOKEN)->delete("http://50.19.17.50:8002/menu-categories/{$id}");
 
             if ($response->successful()) {
                 return redirect()->back()->with('success', 'Category deleted successfully.');

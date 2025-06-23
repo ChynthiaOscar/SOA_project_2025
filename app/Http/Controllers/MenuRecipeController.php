@@ -8,6 +8,7 @@ use Storage;
 
 class MenuRecipeController extends Controller
 {
+    private $TOKEN = 'member123';
     /**
      * Display a listing of the resource.
      */
@@ -59,7 +60,7 @@ class MenuRecipeController extends Controller
         $data = $request->all();
         $ingredients = json_decode($data['list_ingredient'], true);
 
-        $menu_response = Http::post('http://50.19.17.50:8002/menus', [
+        $menu_response = Http::withHeader('Authorization', $this->TOKEN)->post('http://50.19.17.50:8002/menus', [
             'image' => $data['image'],
             'name' => $data['name'],
             'description' => $data['description'],
@@ -68,7 +69,7 @@ class MenuRecipeController extends Controller
         ]);
 
         foreach ($ingredients as $ingredient) {
-            $recipe_response = Http::post('http://50.19.17.50:8002/menu-recipes', [
+            $recipe_response = Http::withHeader('Authorization', $this->TOKEN)->post('http://50.19.17.50:8002/menu-recipes', [
                 'quantity' => $ingredient['amount'],
                 'menu_id' => $menu_response->json()['id'],
                 'inventory_id' => $ingredient['id']
@@ -97,8 +98,8 @@ class MenuRecipeController extends Controller
      */
     public function edit(string $id, Request $request)
     {
-        $menu_response = Http::get("http://50.19.17.50:8002/menus/{$id}");
-        $recipe_response = Http::get("http://50.19.17.50:8002/menu-recipes");
+        $menu_response = Http::withHeader('Authorization', $this->TOKEN)->get("http://50.19.17.50:8002/menus/{$id}");
+        $recipe_response = Http::withHeader('Authorization', $this->TOKEN)->get("http://50.19.17.50:8002/menu-recipes");
 
         if (!$menu_response->successful()) {
             return response()->json(['error' => 'Failed to retrieve menu'], $menu_response->status());
@@ -152,7 +153,7 @@ class MenuRecipeController extends Controller
         $ingredients = json_decode($data['list_ingredient'], true);
 
         // Update the menu
-        $menu_response = Http::put("http://50.19.17.50:8002/menus", [
+        $menu_response = Http::withHeader('Authorization', $this->TOKEN)->put("http://50.19.17.50:8002/menus", [
             'id' => $id,
             'image' => $data['image'],
             'name' => $data['name'],
@@ -163,7 +164,7 @@ class MenuRecipeController extends Controller
 
         // Update the recipes
         foreach ($ingredients as $ingredient) {
-            $recipe_response = Http::put("http://50.19.17.50:8002/menu-recipes", [
+            $recipe_response = Http::withHeader('Authorization', $this->TOKEN)->put("http://50.19.17.50:8002/menu-recipes", [
                 'id' => $ingredient['recipe_id'],
                 'quantity' => $ingredient['amount'],
                 'menu_id' => $id,
@@ -172,7 +173,7 @@ class MenuRecipeController extends Controller
         }
 
         if (!$menu_response->successful()) {
-            return response()->json(['error' => 'Failed to update menuasdjasjdjk'], $menu_response->status());
+            return response()->json(['error' => 'Failed to update menu'], $menu_response->status());
         } elseif (!$recipe_response->successful()) {
             return response()->json(['error' => 'Failed to update recipes'], $recipe_response->status());
         } else {
